@@ -16,51 +16,51 @@ const teamMembers = [
     name: 'Sarah Johnson',
     role: 'CEO & Founder',
     image: '/api/placeholder/150/150',
-    bio: 'Former tech executive with 15+ years in SaaS. Passionate about building products that make a difference.',
+    bio: 'Former fintech executive with 15+ years in financial services. Passionate about democratizing financial wellness.',
   },
   {
     name: 'Michael Chen',
     role: 'CTO',
     image: '/api/placeholder/150/150',
-    bio: 'Full-stack engineer and open source contributor. Loves solving complex technical challenges.',
+    bio: 'AI and machine learning expert specializing in financial data analysis. Loves building intelligent systems.',
   },
   {
     name: 'Emily Rodriguez',
     role: 'Head of Design',
     image: '/api/placeholder/150/150',
-    bio: 'Designer with a focus on user experience and accessibility. Believes great design should be inclusive.',
+    bio: 'UX designer with a focus on financial interfaces. Believes great design makes complex financial data accessible.',
   },
   {
     name: 'David Kim',
     role: 'Head of Engineering',
     image: '/api/placeholder/150/150',
-    bio: 'Backend specialist with expertise in scalable systems. Enjoys mentoring and building great teams.',
+    bio: 'Security and backend specialist with expertise in financial data protection. Ensures your data stays safe.',
   },
 ];
 
 const values = [
   {
-    title: 'Innovation',
+    title: 'Financial Empowerment',
     description:
-      'We constantly push boundaries and explore new technologies to deliver cutting-edge solutions.',
+      'We believe everyone deserves the tools and knowledge to achieve financial independence and security.',
     icon: Zap,
   },
   {
-    title: 'Quality',
+    title: 'Privacy First',
     description:
-      'We maintain the highest standards in everything we build, from code to customer support.',
+      'Your financial data is sacred. We maintain the highest security standards and never compromise on privacy.',
     icon: Award,
   },
   {
-    title: 'Community',
+    title: 'Transparency',
     description:
-      'We believe in the power of community and actively contribute to open source projects.',
+      'We believe in clear, honest communication about how we handle your data and what insights we provide.',
     icon: Users,
   },
   {
-    title: 'Impact',
+    title: 'Continuous Improvement',
     description:
-      'We measure our success by the positive impact we create for our users and the world.',
+      'We constantly enhance our AI algorithms and features to provide better financial insights and user experience.',
     icon: Heart,
   },
 ];
@@ -69,27 +69,27 @@ const milestones = [
   {
     year: '2020',
     title: 'Company Founded',
-    description: 'Started with a vision to democratize SaaS development',
+    description: 'Started with a vision to democratize financial wellness',
   },
   {
     year: '2021',
     title: 'First Product Launch',
-    description: 'Released our first SaaS template with 1,000+ downloads',
+    description: 'Released Finwise with AI-powered expense tracking',
   },
   {
     year: '2022',
     title: 'Series A Funding',
-    description: 'Raised $5M to accelerate product development',
+    description: 'Raised $5M to accelerate AI development and user growth',
   },
   {
     year: '2023',
     title: '10,000+ Users',
-    description: 'Reached a major milestone with 10,000+ active users',
+    description: 'Reached a major milestone with 10,000+ active users tracking their finances',
   },
   {
     year: '2024',
     title: 'Global Expansion',
-    description: 'Expanded to serve customers in 50+ countries',
+    description: 'Expanded to serve users in 50+ countries with multi-currency support',
   },
 ];
 
@@ -102,10 +102,12 @@ export default function AboutPage() {
           <Badge variant="secondary" className="mb-4">
             About Us
           </Badge>
-          <h1 className="text-4xl font-bold tracking-tight mb-4">Building the Future of SaaS</h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-4">
+            Building the Future of Personal Finance
+          </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            We&apos;re a team of passionate developers, designers, and entrepreneurs dedicated to
-            making SaaS development accessible to everyone.
+            We&apos;re a team of passionate developers, designers, and financial experts dedicated
+            to making smart financial management accessible to everyone.
           </p>
         </div>
 
@@ -118,14 +120,15 @@ export default function AboutPage() {
                 <h2 className="text-3xl font-bold">Our Mission</h2>
               </div>
               <p className="text-lg text-muted-foreground mb-6">
-                To democratize SaaS development by providing high-quality, production-ready
-                templates and tools that enable developers to build amazing applications faster than
-                ever before.
+                To democratize financial wellness by providing intelligent, user-friendly tools that
+                help people understand and improve their financial health through smart tracking and
+                AI insights.
               </p>
               <p className="text-muted-foreground">
-                We believe that great software should be accessible to everyone, regardless of their
-                budget or technical expertise. That&apos;s why we&apos;ve created comprehensive
-                templates that include everything you need to launch a successful SaaS business.
+                We believe that financial literacy and smart money management should be accessible
+                to everyone, regardless of their income or financial background. That&apos;s why
+                we&apos;ve created comprehensive tools that make financial tracking simple, secure,
+                and insightful.
               </p>
             </div>
             <div className="bg-background rounded-lg p-6">
@@ -133,19 +136,19 @@ export default function AboutPage() {
               <ul className="space-y-3">
                 <li className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span>Create production-ready SaaS templates</span>
+                  <span>Build intelligent financial tracking tools</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span>Provide comprehensive documentation</span>
+                  <span>Provide AI-powered financial insights</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span>Offer ongoing support and updates</span>
+                  <span>Offer secure and private data handling</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span>Build a thriving developer community</span>
+                  <span>Build a community of financially empowered users</span>
                 </li>
               </ul>
             </div>
@@ -245,8 +248,8 @@ export default function AboutPage() {
               <div className="text-muted-foreground">Active Users</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">50+</div>
-              <div className="text-muted-foreground">Countries</div>
+              <div className="text-4xl font-bold text-primary mb-2">$50M+</div>
+              <div className="text-muted-foreground">Transactions Tracked</div>
             </div>
             <div className="text-center">
               <div className="text-4xl font-bold text-primary mb-2">99.9%</div>
@@ -261,15 +264,15 @@ export default function AboutPage() {
 
         {/* CTA Section */}
         <div className="text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
+          <h2 className="text-3xl font-bold mb-4">Ready to Take Control of Your Finances?</h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join thousands of developers who are already building amazing SaaS applications with our
-            templates.
+            Join thousands of users who are already improving their financial health with smart
+            tracking and AI insights.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg">Get Started Free</Button>
+            <Button size="lg">Start Tracking Free</Button>
             <Button variant="outline" size="lg">
-              View Pricing
+              View Plans
             </Button>
           </div>
         </div>

@@ -253,7 +253,7 @@ export function SubscriptionBanner({
   const getBannerTitle = () => {
     switch (subscriptionInfo.bannerType) {
       case 'start_trial':
-        return 'Your application is currently on the free plan';
+        return 'You are currently on the free plan';
       case 'trial_countdown':
         const isLastDay = subscriptionInfo.trialDaysLeft === 1;
         return isLastDay
@@ -273,8 +273,8 @@ export function SubscriptionBanner({
       case 'start_trial':
         return (
           <>
-            Start your free trial or upgrade to unlock premium features and higher limits. Learn
-            more{' '}
+            Start your free trial or upgrade to unlock advanced financial insights and higher
+            transaction limits. Learn more{' '}
             <a className="underline" href="/pricing">
               here
             </a>

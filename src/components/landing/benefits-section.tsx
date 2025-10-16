@@ -6,33 +6,34 @@ import { motion } from 'motion/react';
 
 const benefits = [
   {
-    title: 'Modern Tech Stack',
+    title: 'AI-Powered Analysis',
     description:
-      'Next.js 14, TypeScript, Tailwind CSS, and shadcn/ui components. Built with the latest technologies.',
+      'Advanced machine learning algorithms analyze your spending patterns and provide personalized financial insights.',
   },
   {
-    title: 'Responsive Design',
+    title: 'Real-Time Sync',
     description:
-      'Mobile-first approach with beautiful responsive layouts that work on every device.',
+      'Automatic synchronization with your bank accounts and credit cards. Always up-to-date financial data.',
   },
   {
-    title: 'Dark Mode Support',
+    title: 'Smart Categorization',
     description:
-      'Built-in theme switching with system preference detection. Your users will love it.',
+      'Intelligent transaction categorization that learns from your habits. Spend less time organizing, more time saving.',
   },
   {
-    title: 'Flexible Layouts',
-    description: 'Public and protected layouts with customizable navigation. Adapt to your needs.',
+    title: 'Goal Tracking',
+    description:
+      'Set and track financial goals with visual progress indicators. Stay motivated and achieve your targets.',
   },
   {
-    title: 'Production Ready',
+    title: 'Secure & Private',
     description:
-      'Authentication, database integration, and deployment guides included. Launch with confidence.',
+      'Bank-level encryption and privacy controls. Your financial data is protected with the highest security standards.',
   },
   {
-    title: 'Well Documented',
+    title: 'Export & Reports',
     description:
-      'Comprehensive documentation and examples. Get up and running in minutes, not hours.',
+      'Generate detailed financial reports and export data in multiple formats. Perfect for tax preparation and analysis.',
   },
 ];
 
@@ -68,11 +69,12 @@ export const BenefitsSection = () => {
           <h2 id="benefits-heading" className="text-4xl sm:text-5xl font-bold text-foreground mb-6">
             Why Choose{' '}
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Our Template?
+              Finwise?
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Save weeks of development time and focus on what matters most - building your product.
+            Join thousands of users who have transformed their financial health with smart tracking
+            and AI insights.
           </p>
         </motion.div>
 
@@ -116,8 +118,8 @@ export const BenefitsSection = () => {
             className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg px-12 py-6 rounded-2xl shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
             asChild
           >
-            <a href="/dashboard" aria-label="Start building your SaaS today">
-              Start Building Today
+            <a href="/dashboard" aria-label="Start tracking your finances today">
+              Start Tracking Today
               <ArrowRight className="ml-3 w-5 h-5" aria-hidden="true" />
             </a>
           </Button>

@@ -43,7 +43,7 @@ export const CTASection = () => {
           >
             <div className="inline-flex items-center bg-blue-600/10 dark:bg-blue-400/10 backdrop-blur-sm border border-blue-600/20 dark:border-blue-400/20 rounded-full px-6 py-3 text-blue-700 dark:text-blue-300 font-medium">
               <Rocket className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" />
-              Ready to Launch?
+              Ready to Get Started?
             </div>
           </motion.div>
 
@@ -56,7 +56,7 @@ export const CTASection = () => {
             id="cta-heading"
             className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-8 leading-tight"
           >
-            Start Building Your SaaS Today
+            Take Control of Your Finances Today
           </motion.h2>
 
           {/* Description */}
@@ -67,8 +67,8 @@ export const CTASection = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="text-xl sm:text-2xl text-muted-foreground mb-12 leading-relaxed max-w-3xl mx-auto"
           >
-            Join thousands of developers who have already launched successful applications with our
-            template.
+            Join thousands of users who have transformed their financial health with smart tracking
+            and AI insights.
           </motion.p>
 
           {/* CTA Buttons */}
@@ -84,8 +84,8 @@ export const CTASection = () => {
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg px-12 py-6 rounded-2xl shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
               asChild
             >
-              <a href="/dashboard" aria-label="Get started for free">
-                Get Started Free
+              <a href="/dashboard" aria-label="Start tracking your finances for free">
+                Start Tracking Free
                 <ArrowRight className="ml-3 w-5 h-5" aria-hidden="true" />
               </a>
             </Button>
@@ -96,7 +96,7 @@ export const CTASection = () => {
               asChild
             >
               <a href="#features" aria-label="View pricing plans">
-                View Pricing
+                View Plans
               </a>
             </Button>
           </motion.div>

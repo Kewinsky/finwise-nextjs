@@ -7,17 +7,29 @@ const faqs = [
       "Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately, and we'll prorate any billing differences.",
   },
   {
-    question: 'Is there a free trial?',
-    answer: 'Yes! All plans come with a 14-day free trial. No credit card required to get started.',
+    question: 'Is my financial data secure?',
+    answer:
+      'Absolutely. We use bank-level encryption and security measures to protect your financial data. Your information is never shared with third parties.',
   },
   {
     question: 'What payment methods do you accept?',
-    answer: 'We accept all major credit cards, PayPal, and bank transfers for Enterprise plans.',
+    answer:
+      'We accept all major credit cards, PayPal, and bank transfers. All payments are processed securely through Stripe.',
   },
   {
     question: 'Do you offer refunds?',
     answer:
       'Yes, we offer a 30-day money-back guarantee for all paid plans. Contact our support team for assistance.',
+  },
+  {
+    question: 'Can I export my financial data?',
+    answer:
+      'Yes, you can export your transaction data in CSV or Excel formats. Pro users get unlimited exports.',
+  },
+  {
+    question: 'How does the AI financial insights work?',
+    answer:
+      'Our AI analyzes your spending patterns and provides personalized insights to help you save money and make better financial decisions.',
   },
 ];
 

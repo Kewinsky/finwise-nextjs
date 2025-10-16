@@ -31,21 +31,39 @@ export const SUBSCRIPTION_PLANS = {
     name: 'Free',
     priceId: null,
     price: 0,
-    features: ['Basic features', 'Limited usage'],
+    features: [
+      'Track expenses and income',
+      'Up to 2 accounts',
+      '100 transactions/month',
+      'Basic financial insights',
+    ],
     trialDays: 0,
   },
   basic: {
     name: 'Basic',
     priceId: process.env.NEXT_PUBLIC_STRIPE_BASIC_PRICE_ID,
-    price: 19,
-    features: ['All basic features', 'Standard usage', 'Email support'],
+    price: 12,
+    features: [
+      'Up to 5 accounts',
+      '1,000 transactions/month',
+      'Export to CSV',
+      'AI financial insights (50 queries/month)',
+      'Advanced analytics dashboard',
+    ],
     trialDays: 14,
   },
   pro: {
     name: 'Pro',
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID,
-    price: 49,
-    features: ['All features', 'Unlimited usage', 'Priority support', 'Advanced analytics'],
+    price: 29,
+    features: [
+      'Unlimited accounts & transactions',
+      'Unlimited AI financial insights',
+      'Advanced analytics & reporting',
+      'Data export (CSV, Excel)',
+      'Team sharing (up to 5 members)',
+      'Priority support',
+    ],
     trialDays: 0,
   },
 } as const;
@@ -60,11 +78,18 @@ export type PlanType = keyof typeof SUBSCRIPTION_PLANS;
  * Application metadata
  */
 export const APP_METADATA = {
-  name: 'Your SaaS Name',
-  description: 'Build your SaaS faster with our boilerplate',
+  name: 'Finwise',
+  description: 'AI-powered expense and income tracking for smarter financial decisions',
   version: '1.0.0',
-  author: 'Your Company',
-  keywords: ['saas', 'nextjs', 'supabase', 'stripe'],
+  author: 'Finwise',
+  keywords: [
+    'finance',
+    'expense tracking',
+    'income tracking',
+    'ai',
+    'personal finance',
+    'budgeting',
+  ],
 } as const;
 
 /**
@@ -73,12 +98,12 @@ export const APP_METADATA = {
 export const APP_URLS = {
   // Base URLs
   base: isProduction
-    ? process.env.NEXT_PUBLIC_APP_URL || 'https://yoursaas.com'
+    ? process.env.NEXT_PUBLIC_APP_URL || 'https://finwise.app'
     : 'http://localhost:3000',
 
   // API URLs
   api: isProduction
-    ? `${process.env.NEXT_PUBLIC_APP_URL}/api` || 'https://yoursaas.com/api'
+    ? `${process.env.NEXT_PUBLIC_APP_URL}/api` || 'https://finwise.app/api'
     : 'http://localhost:3000/api',
 
   // Documentation
@@ -86,10 +111,10 @@ export const APP_URLS = {
 
   // Social links
   social: {
-    twitter: 'https://twitter.com/yoursaas',
-    github: 'https://github.com/yourusername/yoursaas',
-    linkedin: 'https://linkedin.com/company/yoursaas',
-    discord: 'https://discord.gg/yoursaas',
+    twitter: 'https://twitter.com/finwise',
+    github: 'https://github.com/finwise/finwise',
+    linkedin: 'https://linkedin.com/company/finwise',
+    discord: 'https://discord.gg/finwise',
   },
 
   // Legal pages
@@ -104,9 +129,9 @@ export const APP_URLS = {
  * Contact information
  */
 export const CONTACT_INFO = {
-  supportEmail: 'support@yoursaas.com',
-  salesEmail: 'sales@yoursaas.com',
-  generalEmail: 'hello@yoursaas.com',
+  supportEmail: 'support@finwise.app',
+  salesEmail: 'sales@finwise.app',
+  generalEmail: 'hello@finwise.app',
   phone: '+1 (555) 123-4567',
 } as const;
 
@@ -309,110 +334,62 @@ export const FEATURE_FLAGS = {
  * Plan limits configuration
  */
 export type PlanLimits = {
-  // Project limits
-  maxProjects: number;
-  maxProjectMembers: number;
-  maxStorage: string; // e.g., "1GB", "10GB", "unlimited"
-
-  // API limits
-  apiCallsPerMonth: number;
-  apiRateLimit: number; // requests per minute
-
-  // Feature access
-  features: {
-    analytics: boolean;
-    customDomain: boolean;
-    prioritySupport: boolean;
-    advancedReporting: boolean;
-    teamCollaboration: boolean;
-    apiAccess: boolean;
-    sso: boolean;
-    customBranding: boolean;
-    auditLogs: boolean;
-    dataExport: boolean;
-  };
-
-  // UI/UX limits
-  maxDashboards: number;
-  maxWidgetsPerDashboard: number;
-
-  // Team limits
-  maxTeamMembers: number;
-  maxTeams: number;
+  // Account limits
+  maxAccounts: number;
+  maxTransactionsPerMonth: number;
+  maxStorageMB: number;
+  aiQueriesPerMonth: number;
+  dashboards: number;
+  apiAccess: boolean;
+  teamMembers: number;
+  exportCSV: boolean;
+  exportExcel: boolean;
+  advancedAnalytics: boolean;
+  support: 'none' | 'standard' | 'priority';
 };
 
 /**
  * Plan limits by tier
  */
-export const PLAN_LIMITS: Record<PlanType, PlanLimits> = {
+export const PLAN_LIMITS = {
   free: {
-    maxProjects: 3,
-    maxProjectMembers: 1,
-    maxStorage: '1GB',
-    apiCallsPerMonth: 1000,
-    apiRateLimit: 10,
-    features: {
-      analytics: false,
-      customDomain: false,
-      prioritySupport: false,
-      advancedReporting: false,
-      teamCollaboration: false,
-      apiAccess: false,
-      sso: false,
-      customBranding: false,
-      auditLogs: false,
-      dataExport: false,
-    },
-    maxDashboards: 1,
-    maxWidgetsPerDashboard: 5,
-    maxTeamMembers: 1,
-    maxTeams: 0,
+    maxAccounts: 2,
+    maxTransactionsPerMonth: 100,
+    maxStorageMB: 100,
+    aiQueriesPerMonth: 5,
+    dashboards: 1,
+    apiAccess: false,
+    teamMembers: 0,
+    exportCSV: false,
+    exportExcel: false,
+    advancedAnalytics: false,
+    support: 'none',
   },
   basic: {
-    maxProjects: 10,
-    maxProjectMembers: 5,
-    maxStorage: '10GB',
-    apiCallsPerMonth: 10000,
-    apiRateLimit: 30,
-    features: {
-      analytics: true,
-      customDomain: false,
-      prioritySupport: false,
-      advancedReporting: false,
-      teamCollaboration: true,
-      apiAccess: true,
-      sso: false,
-      customBranding: false,
-      auditLogs: false,
-      dataExport: true,
-    },
-    maxDashboards: 5,
-    maxWidgetsPerDashboard: 10,
-    maxTeamMembers: 5,
-    maxTeams: 1,
+    maxAccounts: 5,
+    maxTransactionsPerMonth: 1000,
+    maxStorageMB: 2048,
+    aiQueriesPerMonth: 50,
+    dashboards: 3,
+    apiAccess: true,
+    teamMembers: 0,
+    exportCSV: true,
+    exportExcel: false,
+    advancedAnalytics: false,
+    support: 'standard',
   },
   pro: {
-    maxProjects: -1, // unlimited
-    maxProjectMembers: -1, // unlimited
-    maxStorage: 'unlimited',
-    apiCallsPerMonth: 100000,
-    apiRateLimit: 100,
-    features: {
-      analytics: true,
-      customDomain: true,
-      prioritySupport: true,
-      advancedReporting: true,
-      teamCollaboration: true,
-      apiAccess: true,
-      sso: true,
-      customBranding: true,
-      auditLogs: true,
-      dataExport: true,
-    },
-    maxDashboards: -1, // unlimited
-    maxWidgetsPerDashboard: -1, // unlimited
-    maxTeamMembers: -1, // unlimited
-    maxTeams: -1, // unlimited
+    maxAccounts: Infinity,
+    maxTransactionsPerMonth: Infinity,
+    maxStorageMB: Infinity,
+    aiQueriesPerMonth: Infinity,
+    dashboards: Infinity,
+    apiAccess: true,
+    teamMembers: 5,
+    exportCSV: true,
+    exportExcel: true,
+    advancedAnalytics: true,
+    support: 'priority',
   },
 } as const;
 
@@ -574,7 +551,7 @@ export const SEO_CONFIG = {
   defaultDescription: APP_METADATA.description,
   defaultKeywords: APP_METADATA.keywords,
   defaultOgImage: `${APP_URLS.base}/og-image.png`,
-  twitterHandle: '@yoursaas',
+  twitterHandle: '@finwise',
   twitterCard: 'summary_large_image' as const,
 } as const;
 
@@ -595,8 +572,8 @@ export const configHelpers = {
   /**
    * Check if a feature is available for a plan
    */
-  hasFeature: (planType: PlanType, feature: keyof PlanLimits['features']) => {
-    return PLAN_LIMITS[planType].features[feature];
+  hasFeature: (planType: PlanType, feature: keyof PlanLimits) => {
+    return PLAN_LIMITS[planType][feature];
   },
 
   /**

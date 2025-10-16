@@ -1,30 +1,32 @@
-# SaaS Template
+# Finwise
 
-A modern, production-ready SaaS template built with Next.js 15, Supabase, Stripe, and TypeScript. This template provides a complete foundation for building subscription-based SaaS applications with authentication, billing, and user management.
+A modern, AI-powered expense and income tracking app built with Next.js 15, Supabase, Stripe, and TypeScript. Finwise helps you track personal and business finances, analyze income and expenses, and get smart AI insights for better financial decisions.
 
 ## 🚀 Features
 
 ### Core Features
 
-- **Services Layer**: Clean architecture with separated business logic (User, Auth, Subscription, Billing, Notification services)
-- **Authentication**: Complete auth system with Supabase (login, signup, password reset, magic links, OAuth)
-- **Billing & Subscriptions**: Stripe integration with subscription management, webhooks, and customer portal
-- **User Dashboard**: Protected dashboard with user settings and profile management
-- **Error Monitoring**: Sentry integration for error tracking, performance monitoring, and session replay
-- **Responsive Design**: Mobile-first design with Tailwind CSS and shadcn/ui
+- **AI-Powered Insights**: Smart financial analysis and personalized recommendations
+- **Expense & Income Tracking**: Comprehensive transaction management with automatic categorization
+- **Financial Dashboard**: Real-time overview of your financial health with visual analytics
+- **Goal Tracking**: Set and monitor financial goals with progress indicators
+- **Multi-Account Support**: Track multiple bank accounts, credit cards, and investment accounts
+- **Data Export**: Export financial data in CSV and Excel formats
+- **Team Collaboration**: Share financial insights with family or business partners
+- **Bank-Level Security**: Enterprise-grade encryption and privacy protection
+- **Mobile Optimized**: Responsive design that works perfectly on all devices
 - **Dark/Light Mode**: Theme switching with next-themes
 - **Email System**: Custom email templates with Supabase integration
 - **Rate Limiting**: Built-in rate limiting with Upstash Redis
-- **Security**: Comprehensive security headers, CSP, and middleware
 - **Type Safety**: Full TypeScript support with Zod validation
 
 ### UI Components
 
 - Modern, accessible components with Radix UI primitives
 - Responsive navigation and sidebar
-- Form components with validation
-- Data tables with sorting and filtering
-- Charts and analytics components
+- Financial form components with validation
+- Transaction tables with sorting and filtering
+- Financial charts and analytics components
 - Toast notifications and modals
 
 ### Developer Experience
@@ -52,7 +54,7 @@ Before you begin, ensure you have the following installed:
 
 ```bash
 git clone <your-repository-url>
-cd saas-template
+cd finwise-nextjs
 pnpm install
 ```
 
@@ -89,7 +91,7 @@ The setup guide covers:
 ## 📁 Project Structure
 
 ```
-saas-template/
+finwise-nextjs/
 ├── src/
 │   ├── app/                    # Next.js App Router (pages, layouts, API routes)
 │   ├── services/              # Business logic layer (6 services)
@@ -167,7 +169,7 @@ This project is licensed under the **MIT License**.
 ```
 MIT License
 
-Copyright (c) 2025 SaaS Template
+Copyright (c) 2025 Finwise
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

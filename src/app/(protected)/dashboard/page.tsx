@@ -27,39 +27,42 @@ async function DashboardData() {
 
     // Mock dashboard data - in a real app, these would be actual API calls
     const metrics = {
-      totalRevenue: 45231.89,
-      activeUsers: 2350,
-      activeProjects: 12,
-      conversionRate: 3.2,
+      totalBalance: 45231.89,
+      monthlyIncome: 8500.0,
+      monthlyExpenses: 6200.0,
+      savingsRate: 27.1,
     };
 
     const recentActivity = [
       {
         id: 1,
-        type: 'user_signup',
-        message: 'New user registered',
-        user: 'john.doe@example.com',
+        type: 'expense',
+        message: 'Expense added',
+        amount: '$45.67',
+        category: 'Groceries',
         time: '2 minutes ago',
       },
       {
         id: 2,
-        type: 'payment',
-        message: 'Payment processed',
-        amount: '$99.00',
+        type: 'income',
+        message: 'Income recorded',
+        amount: '$1,200.00',
+        source: 'Salary',
         time: '5 minutes ago',
       },
       {
         id: 3,
-        type: 'project',
-        message: 'Project milestone completed',
-        project: 'Website Redesign',
+        type: 'insight',
+        message: 'AI insight generated',
+        insight: 'You spent 15% more on dining this month',
         time: '1 hour ago',
       },
       {
         id: 4,
-        type: 'report',
-        message: 'Monthly report generated',
-        report: 'Revenue Analytics',
+        type: 'goal',
+        message: 'Goal progress updated',
+        goal: 'Emergency Fund',
+        progress: '75%',
         time: '2 hours ago',
       },
     ];
@@ -67,24 +70,24 @@ async function DashboardData() {
     const upcomingTasks = [
       {
         id: 1,
-        title: 'Review Q1 performance metrics',
+        title: 'Review monthly budget',
         dueDate: 'Today',
         priority: 'high',
-        assignee: 'Sarah Johnson',
+        category: 'Budgeting',
       },
       {
         id: 2,
-        title: 'Update project documentation',
+        title: 'Categorize pending transactions',
         dueDate: 'Tomorrow',
         priority: 'medium',
-        assignee: 'Michael Chen',
+        category: 'Transactions',
       },
       {
         id: 3,
-        title: 'Team standup meeting',
-        dueDate: 'In 2 hours',
-        priority: 'high',
-        assignee: 'All team members',
+        title: 'Set up savings goal',
+        dueDate: 'This week',
+        priority: 'medium',
+        category: 'Goals',
       },
     ];
 

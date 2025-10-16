@@ -7,49 +7,49 @@ import { motion } from 'motion/react';
 const features = [
   {
     icon: Zap,
-    title: 'Lightning Fast',
+    title: 'Smart AI Insights',
     description:
-      'Built with Next.js 14 and optimized for performance. Get blazing fast load times and smooth user experiences.',
+      'Get personalized financial insights powered by AI. Understand your spending patterns and discover opportunities to save.',
     color: 'text-blue-600',
     bgColor: 'bg-blue-50 dark:bg-blue-950/20',
   },
   {
     icon: Shield,
-    title: 'Secure by Default',
+    title: 'Bank-Level Security',
     description:
-      "Authentication, authorization, and security best practices built-in. Your users' data is always protected.",
+      'Your financial data is protected with enterprise-grade security. End-to-end encryption and secure cloud storage.',
     color: 'text-green-600',
     bgColor: 'bg-green-50 dark:bg-green-950/20',
   },
   {
     icon: Users,
-    title: 'Team Ready',
+    title: 'Team Collaboration',
     description:
-      'Multi-user support with role-based access control. Scale your team without compromising security.',
+      'Share financial insights with family or business partners. Collaborate on budgets and financial goals together.',
     color: 'text-purple-600',
     bgColor: 'bg-purple-50 dark:bg-purple-950/20',
   },
   {
     icon: Code,
-    title: 'Developer Friendly',
+    title: 'Automated Tracking',
     description:
-      'Clean, well-documented code with TypeScript. Built by developers, for developers.',
+      'Connect your bank accounts and credit cards for automatic transaction import. No more manual data entry.',
     color: 'text-orange-600',
     bgColor: 'bg-orange-50 dark:bg-orange-950/20',
   },
   {
     icon: Smartphone,
-    title: 'Mobile First',
+    title: 'Mobile Optimized',
     description:
-      'Responsive design that works perfectly on all devices. Your users will love the mobile experience.',
+      'Track expenses on the go with our mobile-first design. Add transactions instantly, anywhere, anytime.',
     color: 'text-pink-600',
     bgColor: 'bg-pink-50 dark:bg-pink-950/20',
   },
   {
     icon: Palette,
-    title: 'Beautiful UI',
+    title: 'Beautiful Analytics',
     description:
-      'Modern design system with shadcn/ui components. Create stunning interfaces without the hassle.',
+      'Visualize your financial health with intuitive charts and reports. Make data-driven decisions with confidence.',
     color: 'text-indigo-600',
     bgColor: 'bg-indigo-50 dark:bg-indigo-950/20',
   },
@@ -81,12 +81,12 @@ export const FeaturesSection = () => {
           <h2 id="features-heading" className="text-4xl sm:text-5xl font-bold text-foreground mb-6">
             Everything You Need to{' '}
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Build Amazing SaaS
+              Master Your Finances
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Built with modern tools and best practices. Everything you need to launch your SaaS
-            successfully.
+            Powerful tools and AI insights to help you track expenses, analyze income, and make
+            smarter financial decisions.
           </p>
         </motion.div>
 

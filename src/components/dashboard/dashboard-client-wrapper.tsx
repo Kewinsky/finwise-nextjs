@@ -41,10 +41,10 @@ import {
  */
 interface DashboardClientWrapperProps {
   metrics: {
-    totalRevenue: number;
-    activeUsers: number;
-    activeProjects: number;
-    conversionRate: number;
+    totalBalance: number;
+    monthlyIncome: number;
+    monthlyExpenses: number;
+    savingsRate: number;
   };
   recentActivity: Array<{
     id: number;
@@ -153,17 +153,17 @@ export function DashboardClientWrapper({
               <div>
                 <h2 className="text-2xl font-bold tracking-tight">Welcome back!</h2>
                 <p className="text-muted-foreground">
-                  Here&apos;s what&apos;s happening with your business today.
+                  Here&apos;s your financial overview for today.
                 </p>
               </div>
               <div className="flex items-center space-x-2">
                 <Button variant="outline" size="sm">
                   <Calendar className="mr-2 h-4 w-4" />
-                  View Calendar
+                  View Reports
                 </Button>
                 <Button size="sm">
                   <Plus className="mr-2 h-4 w-4" />
-                  Quick Add
+                  Add Transaction
                 </Button>
               </div>
             </div>
@@ -172,15 +172,15 @@ export function DashboardClientWrapper({
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                  <CardTitle className="text-sm font-medium">Total Balance</CardTitle>
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">${metrics.totalRevenue.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">${metrics.totalBalance.toLocaleString()}</div>
                   <p className="text-xs text-muted-foreground">
                     <span className="text-green-600 flex items-center">
                       <ArrowUpRight className="h-3 w-3 mr-1" />
-                      +20.1%
+                      +5.2%
                     </span>
                     from last month
                   </p>
@@ -188,47 +188,51 @@ export function DashboardClientWrapper({
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{metrics.activeUsers.toLocaleString()}</div>
-                  <p className="text-xs text-muted-foreground">
-                    <span className="text-green-600 flex items-center">
-                      <ArrowUpRight className="h-3 w-3 mr-1" />
-                      +15.3%
-                    </span>
-                    from last month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
-                  <Activity className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{metrics.activeProjects}</div>
-                  <p className="text-xs text-muted-foreground">
-                    <span className="text-red-600 flex items-center">
-                      <ArrowDownRight className="h-3 w-3 mr-1" />
-                      -2
-                    </span>
-                    from last week
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
+                  <CardTitle className="text-sm font-medium">Monthly Income</CardTitle>
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{metrics.conversionRate}%</div>
+                  <div className="text-2xl font-bold">
+                    ${metrics.monthlyIncome.toLocaleString()}
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     <span className="text-green-600 flex items-center">
                       <ArrowUpRight className="h-3 w-3 mr-1" />
-                      +0.4%
+                      +3.1%
+                    </span>
+                    from last month
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Monthly Expenses</CardTitle>
+                  <Activity className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    ${metrics.monthlyExpenses.toLocaleString()}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    <span className="text-red-600 flex items-center">
+                      <ArrowDownRight className="h-3 w-3 mr-1" />
+                      -2.3%
+                    </span>
+                    from last month
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Savings Rate</CardTitle>
+                  <Sparkles className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{metrics.savingsRate}%</div>
+                  <p className="text-xs text-muted-foreground">
+                    <span className="text-green-600 flex items-center">
+                      <ArrowUpRight className="h-3 w-3 mr-1" />
+                      +2.1%
                     </span>
                     from last month
                   </p>
@@ -242,7 +246,7 @@ export function DashboardClientWrapper({
               <Card className="col-span-4">
                 <CardHeader>
                   <CardTitle>Recent Activity</CardTitle>
-                  <CardDescription>Latest updates from your team and system</CardDescription>
+                  <CardDescription>Latest financial transactions and insights</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -276,7 +280,7 @@ export function DashboardClientWrapper({
               <Card className="col-span-3">
                 <CardHeader>
                   <CardTitle>Upcoming Tasks</CardTitle>
-                  <CardDescription>Things that need your attention</CardDescription>
+                  <CardDescription>Financial tasks and goals to complete</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">

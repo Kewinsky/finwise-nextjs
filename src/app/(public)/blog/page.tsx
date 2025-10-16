@@ -14,21 +14,21 @@ export const metadata: Metadata = {
 const blogPosts = [
   {
     id: 1,
-    title: 'Building Scalable SaaS Applications: A Complete Guide',
+    title: 'The Complete Guide to AI-Powered Financial Tracking',
     excerpt:
-      'Learn the essential principles and best practices for building SaaS applications that can scale to millions of users.',
+      'Discover how artificial intelligence is revolutionizing personal finance management and helping users make smarter financial decisions.',
     author: 'Sarah Johnson',
     date: '2024-01-15',
     readTime: '8 min read',
-    category: 'Development',
+    category: 'AI & Technology',
     image: '/api/placeholder/400/250',
     featured: true,
   },
   {
     id: 2,
-    title: 'The Future of Authentication in SaaS',
+    title: 'Bank-Level Security for Your Financial Data',
     excerpt:
-      'Exploring modern authentication methods and security best practices for SaaS applications.',
+      'Understanding the security measures that protect your financial information and ensure your privacy in fintech applications.',
     author: 'Michael Chen',
     date: '2024-01-12',
     readTime: '6 min read',
@@ -38,9 +38,9 @@ const blogPosts = [
   },
   {
     id: 3,
-    title: 'Designing User-Friendly SaaS Dashboards',
+    title: 'Designing Intuitive Financial Dashboards',
     excerpt:
-      'Tips and tricks for creating intuitive and engaging dashboard experiences for your users.',
+      'How we create user-friendly interfaces that make complex financial data accessible and actionable for everyone.',
     author: 'Emily Rodriguez',
     date: '2024-01-10',
     readTime: '5 min read',
@@ -50,42 +50,50 @@ const blogPosts = [
   },
   {
     id: 4,
-    title: 'Database Optimization for High-Traffic SaaS',
+    title: 'Smart Categorization: How AI Learns Your Spending Habits',
     excerpt:
-      'Learn how to optimize your database performance to handle millions of requests efficiently.',
+      'Learn how machine learning algorithms automatically categorize your transactions and provide personalized insights.',
     author: 'David Kim',
     date: '2024-01-08',
     readTime: '10 min read',
-    category: 'Performance',
+    category: 'AI & Technology',
     image: '/api/placeholder/400/250',
     featured: false,
   },
   {
     id: 5,
-    title: 'Monetization Strategies for SaaS Startups',
+    title: 'Building Healthy Financial Habits in 2024',
     excerpt:
-      'Explore different pricing models and revenue strategies that work for SaaS businesses.',
+      'Practical tips and strategies for developing better money management habits and achieving your financial goals.',
     author: 'Sarah Johnson',
     date: '2024-01-05',
     readTime: '7 min read',
-    category: 'Business',
+    category: 'Personal Finance',
     image: '/api/placeholder/400/250',
     featured: false,
   },
   {
     id: 6,
-    title: 'API Design Best Practices for SaaS Platforms',
-    excerpt: 'Learn how to design clean, intuitive APIs that developers love to work with.',
+    title: 'The Future of Personal Finance: Trends to Watch',
+    excerpt:
+      'Exploring emerging trends in fintech and how they will shape the future of personal financial management.',
     author: 'Michael Chen',
     date: '2024-01-03',
     readTime: '9 min read',
-    category: 'Development',
+    category: 'Industry Trends',
     image: '/api/placeholder/400/250',
     featured: false,
   },
 ];
 
-const categories = ['All', 'Development', 'Design', 'Security', 'Performance', 'Business'];
+const categories = [
+  'All',
+  'AI & Technology',
+  'Personal Finance',
+  'Security',
+  'Design',
+  'Industry Trends',
+];
 
 export default function BlogPage() {
   const featuredPost = blogPosts.find((post) => post.featured);

@@ -22,16 +22,16 @@ interface HeroSectionProps {
 }
 
 export const HeroSection = ({
-  badge = '🚀 Launch Your SaaS in Days',
-  heading = 'Build Amazing SaaS Apps',
-  description = 'A modern, flexible template built with Next.js, TypeScript, and Tailwind CSS. Get started in minutes with our comprehensive SaaS starter kit.',
+  badge = '💰 Smart Financial Tracking',
+  heading = 'Take Control of Your Finances',
+  description = 'Track expenses, analyze income, and get AI-powered insights to make smarter financial decisions. Simple, secure, and designed for modern life.',
   buttons = {
     primary: {
-      text: 'Get Started Free',
+      text: 'Start Tracking Free',
       url: '/dashboard',
     },
     secondary: {
-      text: 'View Demo',
+      text: 'See How It Works',
       url: '#features',
     },
   },
@@ -136,7 +136,7 @@ export const HeroSection = ({
                 role="img"
                 aria-label="Lightning icon"
               />
-              <span>Lightning Fast Setup</span>
+              <span>Instant Setup</span>
             </div>
             <div className="flex items-center">
               <Sparkles
@@ -145,7 +145,7 @@ export const HeroSection = ({
                 role="img"
                 aria-label="Sparkles icon"
               />
-              <span>Modern Tech Stack</span>
+              <span>AI-Powered Insights</span>
             </div>
             <div className="flex items-center">
               <Zap
@@ -154,7 +154,7 @@ export const HeroSection = ({
                 role="img"
                 aria-label="Lightning icon"
               />
-              <span>Production Ready</span>
+              <span>Bank-Level Security</span>
             </div>
           </motion.div>
         </motion.div>
