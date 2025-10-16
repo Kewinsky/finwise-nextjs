@@ -1,0 +1,38 @@
+🗄️ Supabase Setup:
+    ☐ Create Supabase project and get credentials (URL, anon key, service role key)
+    ☐ Set up database schema by running database/init.sql in Supabase SQL Editor
+    ☐ Configure Supabase authentication settings (Site URL, Redirect URLs)
+    ☐ Enable OAuth providers (GitHub, Google) in Supabase
+
+💳 Stripe Setup:
+    ☐ Create Stripe account and get API keys (publishable and secret keys)
+    ☐ Create products and prices in Stripe (Basic Plan $19/month, Pro Plan $49/month)
+    ☐ Set up Stripe webhooks endpoint with required events and get signing secret
+    ☐ Configure payment methods in Stripe (credit cards, digital wallets, bank transfers)
+    ☐ Activate customer portal in Stripe
+    ☐ Limit customers to 1 subscription per account
+
+🔐 Google Cloud Setup:
+    ☐ Create Google Cloud project and enable Google+ API
+    ☐ Create OAuth credentials in Google Cloud Console and configure consent screen
+
+⚡ Redis Setup:
+    ☐ Create Upstash Redis database and get connection details (REST URL, token)
+
+🚨 Sentry Setup:
+    ☐ Create Sentry account and project for error monitoring
+    ☐ Get Sentry DSN and configure environment variables
+
+🌐 Domain & Deployment:
+    ☐ Purchase domain and configure DNS records for production deployment
+    ☐ Deploy to Vercel and configure environment variables
+    ☐ Configure custom domain in Vercel and update service URLs
+
+🔧 Configuration:
+    ☐ Create .env.local file with all required environment variables
+
+✅ Testing & Verification:
+    ☐ Test authentication flow (signup, login, password reset, email confirmation)
+    ☐ Test payment flow with Stripe test cards and verify webhook events
+    ☐ Test rate limiting functionality and verify Redis integration
+    ☐ Test Sentry error monitoring and verify error tracking works
