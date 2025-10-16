@@ -1,0 +1,57 @@
+Todos:
+    ✔ add docs @done(25-10-01 16:18)
+    ✔ security headers @done(25-09-26 15:48)
+    ✔ rate limiting @done(25-09-29 10:56)
+    ✔ docs/readme @done(25-09-29 18:09)
+    ✔ logging (pino) @done(25-09-26 08:26)
+    ✔ emails @done(25-09-26 15:15)
+    ✔ build before pushing (add husky) @done(25-09-29 11:28)
+    ✔ cookies @done(25-12-26 12:00)
+    ✔ settings responsiveness @done(25-09-29 17:41)
+    ✔ dependabot @done(25-09-29 11:04)
+    ✔ pages for email confirmation, payment success, payment failed, invoice @started(25-09-30 14:01) @done(25-09-30 21:26) @lasted(7h25m20s)
+    ✔ check user sub creation on signup, magic and social @done(25-10-01 11:57)
+    ✔ check reset password flow @done(25-10-01 11:57)
+    ✔ redesign message component (based on forgot password page) @done(25-10-01 11:58)
+    ✔ review toasters @done(25-10-01 11:58)
+    ✔ handle different font sizes @done(25-10-04 20:07)
+    ✔ improve home page performance @done(25-10-01 17:50)
+    ✔ add footer pages like @done(25-10-02 12:05)
+    ✔ save user preferences to local storage @done(25-09-29 17:42)
+    ✔ files and functions cleanup @done(25-10-07 19:00)
+    ✔ final step-by-step setup guide @done(25-10-13 16:58)
+
+🧩 Core & Architecture:
+    ✔ Create app config (src/config/app.ts) for constants, URLs, plan limits @done(25-10-07 18:00)
+    ✔ Extract business logic to services layer (src/services/ e.g., UserService, SubscriptionService) @done(25-10-07 15:30)
+    ✔ Implement all core services (User, Auth, Subscription, Billing, Notification) @done(25-10-07 17:00)
+    ✔ Refactor all actions to use services layer @done(25-10-07 17:00)
+    ☐ Add internationalization (i18n) with next-intl and language switcher
+    ✘ Implement event emitter for domain events (user.created, subscription.updated) @cancelled(25-10-08 00:18)
+    ✘ Abstract external integrations behind interfaces (IAuthService, IStorageService) @cancelled(25-10-08 00:18)
+
+⚙️ Backend Features:
+    ✔ Handle account deletion with confirmation modal @done(25-10-07 13:38)
+    ✔ Save user preferences (theme, language, etc.) to database @started(25-10-08 00:27) @done(25-10-08 11:47) @lasted(11h20m41s)
+    ✔ Implement Export Data (GDPR) — downloadable JSON with user data @done(25-01-08 15:30)
+    ✔ Add trial handling with UI (trial countdown, trial-to-paid transition) @done(25-10-13 12:09)
+    ✔ Implement payment failure & retry handling (in-app banner or email reminder) @done(25-10-13 12:09)
+
+👤 Account & Security:
+    ✘ Add active sessions management (list + revoke sessions) @started(25-10-09 11:56) @cancelled(25-10-14 18:20) @wasted(5d6h24m7s)
+    ✘ Add connected accounts page (link/unlink OAuth providers) @cancelled(25-10-13 16:06)
+
+🪄 UI/UX & Frontend:
+    ✔ Standardize notifications (create helper for consistent toasts) @done(25-10-07 13:57)
+    ✔ Standardize form error handling with shared error component @done(25-10-07 14:02)
+    ✔ Add Suspense boundaries around async components with fallback loaders @done(25-10-07 23:12)
+    ✔ Add loading.tsx for each route group @done(25-10-07 23:25)
+    ✔ Generate sitemap, robots.txt, and structured data (JSON-LD) @done(25-10-07 23:51)
+    ✘ Document design tokens (spacing, typography, breakpoints) @cancelled(25-10-08 00:18)
+    ✘ Add event-based theme configuration (brand colors, light/dark mode) @cancelled(25-10-08 00:18)
+
+🧰 Developer Experience:
+    ✔ Add GitHub Actions CI (lint, type-check, build) @done(25-10-09 11:00)
+    ✔ Add lint-staged + Prettier config for pre-commit formatting and type-check @done(25-10-09 11:00)
+    ✔ Add local DB seed script with mock data for development @done(25-10-13 14:08)
+    ✔ Add Sentry error tracking @started(25-10-13 23:49) @done(25-10-14 00:25) @lasted(36m26s)

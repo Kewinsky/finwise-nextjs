@@ -1,0 +1,2 @@
+pnpm run type-check || { echo "Type check failed — aborting push"; exit 1; }
+pnpm run build || { echo "Build failed — aborting push"; exit 1; }
