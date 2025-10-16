@@ -61,7 +61,7 @@ interface DashboardClientWrapperProps {
     title: string;
     dueDate: string;
     priority: string;
-    assignee: string;
+    category: string;
   }>;
   subscriptionInfo: SubscriptionStatusInfo | null;
 }
@@ -295,7 +295,7 @@ export function DashboardClientWrapper({
                             <Clock className="h-3 w-3" />
                             <span>{task.dueDate}</span>
                           </div>
-                          <span>{task.assignee}</span>
+                          <span>{task.category}</span>
                         </div>
                       </div>
                     ))}
