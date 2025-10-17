@@ -6,10 +6,9 @@ import {
   IconHelp,
   IconInnerShadowTop,
   IconSearch,
-  IconChartBar,
-  IconFolder,
-  IconUsers,
-  IconReportAnalytics,
+  IconCreditCard,
+  IconBuilding,
+  IconMessageCircle,
 } from '@tabler/icons-react';
 import { NavMain } from '@/components/layout/nav-main';
 import { NavSecondary } from '@/components/layout/nav-secondary';
@@ -34,24 +33,19 @@ const data = {
       icon: IconDashboard,
     },
     {
-      title: 'Analytics',
-      url: '/analytics',
-      icon: IconChartBar,
+      title: 'Transactions',
+      url: '/transactions',
+      icon: IconCreditCard,
     },
     {
-      title: 'Projects',
-      url: '/projects',
-      icon: IconFolder,
+      title: 'Accounts',
+      url: '/accounts',
+      icon: IconBuilding,
     },
     {
-      title: 'Team',
-      url: '/team',
-      icon: IconUsers,
-    },
-    {
-      title: 'Reports',
-      url: '/reports',
-      icon: IconReportAnalytics,
+      title: 'AI Assistant',
+      url: '/assistant',
+      icon: IconMessageCircle,
     },
   ],
   navSecondary: [

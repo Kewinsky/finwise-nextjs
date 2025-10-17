@@ -2,6 +2,7 @@ import { AppSidebar } from '@/components/layout/app-sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { requireAuth } from '@/lib/actions/auth-actions';
 import { FontWrapper } from '@/components/layout/font-wrapper';
+import { SiteHeader } from '@/components/layout/site-header';
 
 // Force dynamic rendering since we use cookies for authentication
 export const dynamic = 'force-dynamic';
@@ -22,6 +23,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
       >
         <AppSidebar variant="inset" user={user} />
         <SidebarInset>
+          <SiteHeader title={`Welcome back, ${user.profile.full_name}!`} />
           <div className="flex-1">{children}</div>
         </SidebarInset>
       </SidebarProvider>
