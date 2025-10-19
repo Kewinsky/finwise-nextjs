@@ -7,6 +7,7 @@ export * from './cookies.types';
 export * from './billing.types';
 export * from './service.types';
 export * from './auth.types';
+export * from './finance.types';
 
 // Common type aliases for convenience
 export type { Tables, Database } from './database.types';
@@ -65,3 +66,29 @@ export type {
   AuthMethod,
   OAuthRedirectOptions,
 } from './auth.types';
+export type {
+  Account,
+  AccountInsert,
+  AccountUpdate,
+  Transaction,
+  TransactionInsert,
+  TransactionUpdate,
+  CreateAccountInput,
+  UpdateAccountInput,
+  CreateTransactionInput,
+  UpdateTransactionInput,
+  AccountFilters,
+  TransactionFilters,
+  MonthlySummary,
+  SpendingTrends,
+  CategorySpending,
+  AccountBalance,
+  DashboardMetrics,
+  RecentTransaction,
+  FinancialInsights,
+  AIQuestionResponse,
+  TransactionExport,
+  AccountType,
+  TransactionType,
+  PaginatedResult,
+} from './finance.types';

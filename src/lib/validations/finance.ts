@@ -1,0 +1,212 @@
+/**
+ * Zod validation schemas for Finwise financial management
+ */
+
+import { z } from 'zod';
+
+// =============================================================================
+// ENUM VALIDATION
+// =============================================================================
+
+export const accountTypeSchema = z.enum(['checking', 'savings', 'investment', 'creditcard']);
+export const transactionTypeSchema = z.enum(['income', 'expense', 'transfer']);
+
+// =============================================================================
+// ACCOUNT SCHEMAS
+// =============================================================================
+
+export const createAccountSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Account name is required')
+    .max(100, 'Account name must be less than 100 characters')
+    .trim(),
+  type: accountTypeSchema,
+  balance: z
+    .number()
+    .min(0, 'Balance cannot be negative')
+    .max(999999999.99, 'Balance is too large')
+    .optional()
+    .default(0),
+  currency: z
+    .string()
+    .length(3, 'Currency must be a 3-letter code')
+    .regex(/^[A-Z]{3}$/, 'Currency must be uppercase letters')
+    .optional()
+    .default('USD'),
+  color: z
+    .string()
+    .regex(/^#[0-9A-F]{6}$/i, 'Color must be a valid hex color')
+    .optional(),
+});
+
+export const updateAccountSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Account name is required')
+    .max(100, 'Account name must be less than 100 characters')
+    .trim()
+    .optional(),
+  type: accountTypeSchema.optional(),
+  balance: z
+    .number()
+    .min(0, 'Balance cannot be negative')
+    .max(999999999.99, 'Balance is too large')
+    .optional(),
+  currency: z
+    .string()
+    .length(3, 'Currency must be a 3-letter code')
+    .regex(/^[A-Z]{3}$/, 'Currency must be uppercase letters')
+    .optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9A-F]{6}$/i, 'Color must be a valid hex color')
+    .optional(),
+});
+
+export const accountFiltersSchema = z.object({
+  type: accountTypeSchema.optional(),
+  currency: z.string().length(3).optional(),
+  minBalance: z.number().min(0).optional(),
+  maxBalance: z.number().min(0).optional(),
+});
+
+// =============================================================================
+// TRANSACTION SCHEMAS
+// =============================================================================
+
+export const createTransactionSchema = z.object({
+  accountId: z.string().uuid('Invalid account ID'),
+  type: transactionTypeSchema,
+  description: z
+    .string()
+    .min(1, 'Description is required')
+    .max(200, 'Description must be less than 200 characters')
+    .trim(),
+  category: z
+    .string()
+    .min(1, 'Category is required')
+    .max(50, 'Category must be less than 50 characters')
+    .trim(),
+  amount: z.number().positive('Amount must be positive').max(999999999.99, 'Amount is too large'),
+  date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+    .refine((date) => !isNaN(Date.parse(date)), 'Invalid date'),
+  notes: z.string().max(500, 'Notes must be less than 500 characters').trim().optional(),
+});
+
+export const updateTransactionSchema = z.object({
+  accountId: z.string().uuid('Invalid account ID').optional(),
+  type: transactionTypeSchema.optional(),
+  description: z
+    .string()
+    .min(1, 'Description is required')
+    .max(200, 'Description must be less than 200 characters')
+    .trim()
+    .optional(),
+  category: z
+    .string()
+    .min(1, 'Category is required')
+    .max(50, 'Category must be less than 50 characters')
+    .trim()
+    .optional(),
+  amount: z
+    .number()
+    .positive('Amount must be positive')
+    .max(999999999.99, 'Amount is too large')
+    .optional(),
+  date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+    .refine((date) => !isNaN(Date.parse(date)), 'Invalid date')
+    .optional(),
+  notes: z.string().max(500, 'Notes must be less than 500 characters').trim().optional(),
+});
+
+export const transactionFiltersSchema = z.object({
+  accountId: z.string().uuid('Invalid account ID').optional(),
+  type: transactionTypeSchema.optional(),
+  category: z.string().max(50).optional(),
+  dateFrom: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+    .optional(),
+  dateTo: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+    .optional(),
+  minAmount: z.number().min(0).optional(),
+  maxAmount: z.number().min(0).optional(),
+  search: z.string().max(100).optional(),
+});
+
+// =============================================================================
+// PAGINATION SCHEMAS
+// =============================================================================
+
+export const paginationSchema = z.object({
+  page: z.number().int().min(1).optional().default(1),
+  pageSize: z.number().int().min(1).max(100).optional().default(20),
+  offset: z.number().int().min(0).optional(),
+  limit: z.number().int().min(1).max(100).optional(),
+});
+
+export const sortSchema = z.object({
+  field: z.string().min(1),
+  direction: z.enum(['asc', 'desc']).default('desc'),
+});
+
+// =============================================================================
+// AI SCHEMAS
+// =============================================================================
+
+export const aiQuestionSchema = z.object({
+  message: z
+    .string()
+    .min(1, 'Question is required')
+    .max(500, 'Question must be less than 500 characters')
+    .trim(),
+});
+
+// =============================================================================
+// EXPORT SCHEMAS
+// =============================================================================
+
+export const exportFiltersSchema = z.object({
+  dateFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
+  dateTo: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
+  accountIds: z.array(z.string().uuid()).optional(),
+  types: z.array(transactionTypeSchema).optional(),
+  categories: z.array(z.string()).optional(),
+});
+
+// =============================================================================
+// BULK OPERATIONS SCHEMAS
+// =============================================================================
+
+export const bulkDeleteTransactionsSchema = z.object({
+  transactionIds: z
+    .array(z.string().uuid())
+    .min(1, 'At least one transaction ID is required')
+    .max(100, 'Cannot delete more than 100 transactions at once'),
+});
+
+// =============================================================================
+// TYPE INFERENCE
+// =============================================================================
+
+export type CreateAccountInput = z.infer<typeof createAccountSchema>;
+export type UpdateAccountInput = z.infer<typeof updateAccountSchema>;
+export type AccountFilters = z.infer<typeof accountFiltersSchema>;
+
+export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
+export type UpdateTransactionInput = z.infer<typeof updateTransactionSchema>;
+export type TransactionFilters = z.infer<typeof transactionFiltersSchema>;
+
+export type PaginationOptions = z.infer<typeof paginationSchema>;
+export type SortOptions = z.infer<typeof sortSchema>;
+
+export type AIQuestionInput = z.infer<typeof aiQuestionSchema>;
+export type ExportFilters = z.infer<typeof exportFiltersSchema>;
+export type BulkDeleteTransactionsInput = z.infer<typeof bulkDeleteTransactionsSchema>;
