@@ -44,7 +44,8 @@ CREATE TABLE public.accounts (
     updated_at timestamptz DEFAULT now(),
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES public.profiles(id) ON DELETE CASCADE,
-    CHECK (balance >= 0),
+    CHECK (type != 'creditcard' OR balance <= 0), -- Credit cards can have negative balance (debt)
+    CHECK (type = 'creditcard' OR balance >= 0),  -- Other accounts must have non-negative balance
     CHECK (currency ~ '^[A-Z]{3}$')
 );
 
