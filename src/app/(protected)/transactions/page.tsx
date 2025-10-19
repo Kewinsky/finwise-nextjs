@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,7 +12,16 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Search, Plus, Download, Edit, Trash2, ArrowUpDown, MoreHorizontal } from 'lucide-react';
+import {
+  Search,
+  Plus,
+  Download,
+  Edit,
+  Trash2,
+  ArrowUpDown,
+  MoreHorizontal,
+  Loader2,
+} from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -30,76 +39,13 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { TransactionForm } from '@/components/transactions/transaction-form';
 import { format } from 'date-fns';
-
-interface Transaction {
-  id: string;
-  type: string;
-  description: string;
-  category: string;
-  account: string;
-  date: Date;
-  amount: number;
-}
-
-// Mock data
-const mockTransactions: Transaction[] = [
-  {
-    id: '1',
-    type: 'income',
-    description: 'Salary Deposit',
-    category: 'Salary',
-    account: 'Checking Account',
-    date: new Date('2024-01-15'),
-    amount: 2500.0,
-  },
-  {
-    id: '2',
-    type: 'expense',
-    description: 'Grocery Store',
-    category: 'Food & Dining',
-    account: 'Credit Card',
-    date: new Date('2024-01-14'),
-    amount: -85.5,
-  },
-  {
-    id: '3',
-    type: 'expense',
-    description: 'Gas Station',
-    category: 'Transportation',
-    account: 'Checking Account',
-    date: new Date('2024-01-14'),
-    amount: -45.2,
-  },
-  {
-    id: '4',
-    type: 'income',
-    description: 'Freelance Work',
-    category: 'Freelance',
-    account: 'Savings Account',
-    date: new Date('2024-01-13'),
-    amount: 450.0,
-  },
-  {
-    id: '5',
-    type: 'expense',
-    description: 'Coffee Shop',
-    category: 'Food & Dining',
-    account: 'Credit Card',
-    date: new Date('2024-01-13'),
-    amount: -12.75,
-  },
-  {
-    id: '6',
-    type: 'transfer',
-    description: 'Transfer to Savings',
-    category: 'Transfer',
-    account: 'Savings Account',
-    date: new Date('2024-01-12'),
-    amount: 500.0,
-  },
-];
-
-const mockAccounts = ['All Accounts', 'Checking Account', 'Savings Account', 'Credit Card'];
+import { notifySuccess, notifyError } from '@/lib/notifications';
+import {
+  getTransactions,
+  deleteManyTransactions,
+  getAccounts,
+} from '@/lib/actions/finance-actions';
+import type { Transaction as TransactionType, Account } from '@/types/finance.types';
 
 const mockCategories = [
   'All Categories',
@@ -123,8 +69,22 @@ const transactionTypes = [
 ];
 
 export default function TransactionsPage() {
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>(undefined);
+  const [editingTransaction, setEditingTransaction] = useState<
+    | {
+        id: string;
+        type: string;
+        amount: number;
+        description: string;
+        account: string;
+        category: string;
+        date: Date;
+        notes?: string;
+      }
+    | undefined
+  >(undefined);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState('all');
   const [selectedAccount, setSelectedAccount] = useState('All Accounts');
@@ -135,13 +95,47 @@ export default function TransactionsPage() {
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(
     null,
   );
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
+
+  // Load data on component mount
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const [transactionsResult, accountsResult] = await Promise.all([
+        getTransactions(),
+        getAccounts(),
+      ]);
+
+      if (transactionsResult.success && 'data' in transactionsResult) {
+        setTransactions(transactionsResult.data.data);
+      } else {
+        notifyError('Failed to load transactions', {
+          description: transactionsResult.error,
+        });
+      }
+
+      if (accountsResult.success && 'data' in accountsResult) {
+        setAccounts(accountsResult.data);
+      } else {
+        notifyError('Failed to load accounts', {
+          description: accountsResult.error,
+        });
+      }
+    } catch {
+      notifyError('Failed to load data');
+    }
+  };
 
   // Filter transactions based on search and filters
-  const filteredTransactions = mockTransactions.filter((transaction) => {
+  const filteredTransactions = transactions.filter((transaction) => {
     const matchesSearch = transaction.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = selectedType === 'all' || transaction.type === selectedType;
     const matchesAccount =
-      selectedAccount === 'All Accounts' || transaction.account === selectedAccount;
+      selectedAccount === 'All Accounts' ||
+      accounts.find((acc) => acc.id === transaction.account_id)?.name === selectedAccount;
     const matchesCategory =
       selectedCategory === 'All Categories' || transaction.category === selectedCategory;
 
@@ -215,9 +209,25 @@ export default function TransactionsPage() {
     }
   };
 
-  const handleBulkDelete = () => {
-    console.log('Deleting transactions:', selectedRows);
-    setSelectedRows([]);
+  const handleBulkDelete = async () => {
+    try {
+      setIsDeleting('bulk');
+      const result = await deleteManyTransactions(selectedRows);
+
+      if (result.success) {
+        notifySuccess(`${selectedRows.length} transactions deleted successfully`);
+        setSelectedRows([]);
+        await loadData();
+      } else {
+        notifyError('Failed to delete transactions', {
+          description: result.error,
+        });
+      }
+    } catch {
+      notifyError('Failed to delete transactions');
+    } finally {
+      setIsDeleting(null);
+    }
   };
 
   const handleExportCSV = () => {
@@ -235,15 +245,31 @@ export default function TransactionsPage() {
     setSortConfig({ key, direction });
   };
 
-  const handleEditTransaction = (transaction: Transaction) => {
-    setEditingTransaction(transaction);
+  const handleEditTransaction = (transaction: TransactionType) => {
+    // Map TransactionType to the format expected by TransactionForm
+    const mappedTransaction = {
+      id: transaction.id,
+      type: transaction.type,
+      amount: transaction.amount,
+      description: transaction.description,
+      account: accounts.find((acc) => acc.id === transaction.account_id)?.name || 'Unknown',
+      category: transaction.category,
+      date: new Date(transaction.date),
+      notes: transaction.notes || undefined,
+    };
+    setEditingTransaction(mappedTransaction);
     setShowForm(true);
   };
 
   const handleCloseForm = () => {
     setShowForm(false);
     setEditingTransaction(undefined);
+    // Reload data after form closes
+    loadData();
   };
+
+  // Get account names for the filter
+  const accountNames = ['All Accounts', ...accounts.map((acc) => acc.name)];
 
   return (
     <div className="flex-1 space-y-6 p-6">
@@ -304,7 +330,7 @@ export default function TransactionsPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {mockAccounts.map((account) => (
+                {accountNames.map((account) => (
                   <SelectItem key={account} value={account}>
                     {account}
                   </SelectItem>
@@ -343,8 +369,17 @@ export default function TransactionsPage() {
               </CardDescription>
             </div>
             {selectedRows.length > 0 && (
-              <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
-                <Trash2 className="mr-2 h-4 w-4" />
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleBulkDelete}
+                disabled={isDeleting === 'bulk'}
+              >
+                {isDeleting === 'bulk' ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="mr-2 h-4 w-4" />
+                )}
                 Delete Selected ({selectedRows.length})
               </Button>
             )}
@@ -409,8 +444,10 @@ export default function TransactionsPage() {
                     </TableCell>
                     <TableCell className="font-medium">{transaction.description}</TableCell>
                     <TableCell>{transaction.category}</TableCell>
-                    <TableCell>{transaction.account}</TableCell>
-                    <TableCell>{format(transaction.date, 'MMM dd, yyyy')}</TableCell>
+                    <TableCell>
+                      {accounts.find((acc) => acc.id === transaction.account_id)?.name || 'Unknown'}
+                    </TableCell>
+                    <TableCell>{format(new Date(transaction.date), 'MMM dd, yyyy')}</TableCell>
                     <TableCell
                       className={`text-right font-medium ${
                         transaction.amount > 0

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AreaChart, Area, XAxis, CartesianGrid } from 'recharts';
@@ -25,24 +25,9 @@ import {
 import { useRouter } from 'next/navigation';
 import { TransactionDialog } from '@/components/dashboard/transaction-dialog';
 import { TransferDialog } from '@/components/dashboard/transfer-dialog';
-
-// Mock data
-const mockMetrics = {
-  totalBalance: 15420.5,
-  monthlyIncome: 5200.0,
-  monthlyExpenses: 3420.75,
-  netSavings: 1779.25,
-};
-
-const mockSpendingData = [
-  { day: 'Mon', expenses: 120, income: 0 },
-  { day: 'Tue', expenses: 89, income: 0 },
-  { day: 'Wed', expenses: 156, income: 0 },
-  { day: 'Thu', expenses: 203, income: 0 },
-  { day: 'Fri', expenses: 178, income: 0 },
-  { day: 'Sat', expenses: 245, income: 0 },
-  { day: 'Sun', expenses: 98, income: 500 },
-];
+import { getDashboardData } from '@/lib/actions/finance-actions';
+import { notifyError } from '@/lib/notifications';
+import type { DashboardMetrics } from '@/types/finance.types';
 
 const chartConfig = {
   income: {
@@ -55,54 +40,33 @@ const chartConfig = {
   },
 };
 
-const mockRecentTransactions = [
-  {
-    id: 1,
-    description: 'Grocery Store',
-    amount: -85.5,
-    type: 'expense',
-    date: '2024-01-15',
-    category: 'Food & Dining',
-  },
-  {
-    id: 2,
-    description: 'Salary Deposit',
-    amount: 2500.0,
-    type: 'income',
-    date: '2024-01-14',
-    category: 'Salary',
-  },
-  {
-    id: 3,
-    description: 'Coffee Shop',
-    amount: -12.75,
-    type: 'expense',
-    date: '2024-01-14',
-    category: 'Food & Dining',
-  },
-  {
-    id: 4,
-    description: 'Freelance Work',
-    amount: 450.0,
-    type: 'income',
-    date: '2024-01-13',
-    category: 'Freelance',
-  },
-  {
-    id: 5,
-    description: 'Gas Station',
-    amount: -45.2,
-    type: 'expense',
-    date: '2024-01-13',
-    category: 'Transportation',
-  },
-];
-
 export default function DashboardPage() {
   const router = useRouter();
   const [showTransactionDialog, setShowTransactionDialog] = useState(false);
   const [showTransferDialog, setShowTransferDialog] = useState(false);
   const [transactionType, setTransactionType] = useState<'income' | 'expense'>('income');
+  const [dashboardData, setDashboardData] = useState<DashboardMetrics | null>(null);
+
+  // Load dashboard data on component mount
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      const result = await getDashboardData();
+
+      if (result.success && 'data' in result) {
+        setDashboardData(result.data as DashboardMetrics);
+      } else {
+        notifyError('Failed to load dashboard data', {
+          description: result.error,
+        });
+      }
+    } catch {
+      notifyError('Failed to load dashboard data');
+    }
+  };
 
   const handleAddTransaction = (type: 'income' | 'expense') => {
     setTransactionType(type);
@@ -123,6 +87,23 @@ export default function DashboardPage() {
     });
   };
 
+  if (!dashboardData) {
+    return (
+      <div className="flex-1 space-y-6 p-6">
+        <div className="flex items-center justify-center h-64">
+          <p className="text-muted-foreground">No data available</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Transform spending trends data for the chart
+  const chartData = dashboardData.spendingTrends.map((trend) => ({
+    day: new Date(trend.date).toLocaleDateString('en-US', { weekday: 'short' }),
+    expenses: trend.type === 'expense' ? trend.amount : 0,
+    income: trend.type === 'income' ? trend.amount : 0,
+  }));
+
   return (
     <div className="flex-1 space-y-6 p-6">
       {/* Header */}
@@ -142,7 +123,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-800 dark:text-blue-200">
-              {formatCurrency(mockMetrics.totalBalance)}
+              {formatCurrency(dashboardData.totalBalance)}
             </div>
             <p className="text-xs text-blue-600 dark:text-blue-400">
               <span className="text-blue-600 dark:text-blue-400">+2.5%</span> from last month
@@ -159,7 +140,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-800 dark:text-green-200">
-              {formatCurrency(mockMetrics.monthlyIncome)}
+              {formatCurrency(dashboardData.monthlySummary.totalIncome)}
             </div>
             <p className="text-xs text-green-600 dark:text-green-400">
               <span className="text-green-600 dark:text-green-400">+12%</span> from last month
@@ -176,7 +157,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-rose-800 dark:text-rose-200">
-              {formatCurrency(mockMetrics.monthlyExpenses)}
+              {formatCurrency(dashboardData.monthlySummary.totalExpenses)}
             </div>
             <p className="text-xs text-rose-600 dark:text-rose-400">
               <span className="text-red-600 dark:text-red-400">-5%</span> from last month
@@ -193,7 +174,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-800 dark:text-purple-200">
-              {formatCurrency(mockMetrics.netSavings)}
+              {formatCurrency(dashboardData.monthlySummary.savings)}
             </div>
             <p className="text-xs text-purple-600 dark:text-purple-400">
               <span className="text-purple-600 dark:text-purple-400">+34%</span> from last month
@@ -214,7 +195,7 @@ export default function DashboardPage() {
             <ChartContainer config={chartConfig}>
               <AreaChart
                 accessibilityLayer
-                data={mockSpendingData}
+                data={chartData}
                 margin={{
                   left: 20,
                   right: 20,
@@ -259,7 +240,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {mockRecentTransactions.map((transaction) => (
+              {dashboardData.recentTransactions.map((transaction) => (
                 <div key={transaction.id} className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <div

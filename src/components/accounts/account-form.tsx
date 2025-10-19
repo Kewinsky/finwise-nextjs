@@ -25,10 +25,13 @@ import {
 import { FormError } from '@/components/ui/form-error';
 import { cn } from '@/lib/utils';
 import { X, Save } from 'lucide-react';
+import { createAccount, updateAccount } from '@/lib/actions/finance-actions';
+import { notifySuccess, notifyError } from '@/lib/notifications';
+import type { Account } from '@/types/finance.types';
 
 const accountSchema = z.object({
   name: z.string().min(1, 'Account name is required'),
-  type: z.enum(['checking', 'savings', 'credit', 'investment']),
+  type: z.enum(['checking', 'savings', 'creditcard', 'investment']),
   balance: z.string().refine((val) => !isNaN(Number(val)), {
     message: 'Balance must be a valid number',
   }),
@@ -41,21 +44,14 @@ type AccountFormData = z.infer<typeof accountSchema>;
 interface AccountFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  account?: {
-    id: string;
-    name: string;
-    type: string;
-    balance: number;
-    currency: string;
-    color: string;
-  };
+  account?: Account;
   colors: string[];
 }
 
 const accountTypes = [
   { value: 'checking', label: 'Checking' },
   { value: 'savings', label: 'Savings' },
-  { value: 'credit', label: 'Credit Card' },
+  { value: 'creditcard', label: 'Credit Card' },
   { value: 'investment', label: 'Investment' },
 ];
 
@@ -86,10 +82,10 @@ export function AccountForm({ open, onOpenChange, account, colors }: AccountForm
     if (account) {
       form.reset({
         name: account.name,
-        type: account.type as 'checking' | 'savings' | 'credit' | 'investment',
+        type: account.type as 'checking' | 'savings' | 'creditcard' | 'investment',
         balance: account.balance.toString(),
         currency: account.currency,
-        color: account.color,
+        color: account.color || colors[0],
       });
     } else {
       form.reset({
@@ -105,13 +101,31 @@ export function AccountForm({ open, onOpenChange, account, colors }: AccountForm
   const onSubmit = async (data: AccountFormData) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log('Account data:', data);
-      onOpenChange(false);
-      form.reset();
-    } catch (error) {
-      console.error('Error saving account:', error);
+      const formData = new FormData();
+      formData.append('name', data.name);
+      formData.append('type', data.type);
+      formData.append('balance', data.balance);
+      formData.append('currency', data.currency);
+      formData.append('color', data.color);
+
+      let result;
+      if (account) {
+        result = await updateAccount(account.id, formData);
+      } else {
+        result = await createAccount(formData);
+      }
+
+      if (result.success) {
+        notifySuccess(account ? 'Account updated successfully' : 'Account created successfully');
+        onOpenChange(false);
+        form.reset();
+      } else {
+        notifyError('Failed to save account', {
+          description: result.error,
+        });
+      }
+    } catch {
+      notifyError('Failed to save account');
     } finally {
       setIsLoading(false);
     }
@@ -148,7 +162,7 @@ export function AccountForm({ open, onOpenChange, account, colors }: AccountForm
               <Label htmlFor="type">Account Type</Label>
               <Select
                 value={form.watch('type')}
-                onValueChange={(value: 'checking' | 'savings' | 'credit' | 'investment') =>
+                onValueChange={(value: 'checking' | 'savings' | 'creditcard' | 'investment') =>
                   form.setValue('type', value)
                 }
               >

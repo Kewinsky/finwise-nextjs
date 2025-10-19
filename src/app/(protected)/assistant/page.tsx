@@ -4,13 +4,10 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import {
   Send,
   Bot,
   User,
-  TrendingUp,
-  TrendingDown,
   Lightbulb,
   AlertTriangle,
   Sparkles,
@@ -20,6 +17,14 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { notifyError } from '@/lib/notifications';
+import {
+  generateInsights,
+  askAIQuestion,
+  getSpendingPatterns,
+  getFinancialHealthScore,
+} from '@/lib/actions/finance-actions';
+import type { FinancialInsights } from '@/types/finance.types';
 
 // Mock data
 const mockQuickQuestions = [
@@ -29,33 +34,6 @@ const mockQuickQuestions = [
   'Should I invest more?',
   "What's my financial health score?",
 ];
-
-const mockInsights = {
-  spendingInsights: [
-    { category: 'Food & Dining', amount: 450, trend: 'up', percentage: 15 },
-    { category: 'Transportation', amount: 320, trend: 'down', percentage: -8 },
-    { category: 'Shopping', amount: 280, trend: 'up', percentage: 22 },
-    { category: 'Utilities', amount: 150, trend: 'stable', percentage: 0 },
-  ],
-  savingsTips: [
-    'Consider switching to a high-yield savings account to earn more interest',
-    'Set up automatic transfers to your savings account on payday',
-    'Review your subscriptions and cancel unused services',
-    'Use cashback credit cards for everyday purchases',
-  ],
-  budgetOptimization: [
-    'Your food budget is 20% over target - consider meal planning',
-    'Transportation costs are well within budget - great job!',
-    'Entertainment spending could be reduced by 15%',
-    'Consider negotiating better rates for utilities',
-  ],
-  areasOfConcern: [
-    'Credit card balance increased by 12% this month',
-    'Emergency fund is below recommended 3-month expenses',
-    'Investment allocation is too conservative for your age',
-    'No retirement contributions this month',
-  ],
-};
 
 interface ChatMessage {
   id: string;
@@ -77,6 +55,16 @@ export default function AssistantPage() {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showInsights, setShowInsights] = useState(false);
+  const [insights, setInsights] = useState<FinancialInsights | null>(null);
+  const [, setHealthScore] = useState<{
+    score: number;
+    factors: string[];
+    recommendations: string[];
+  } | null>(null);
+  const [, setSpendingPatterns] = useState<{
+    patterns: string[];
+    recommendations: string[];
+  } | null>(null);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
@@ -89,20 +77,33 @@ export default function AssistantPage() {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const currentMessage = inputMessage;
     setInputMessage('');
     setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const assistantMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        type: 'assistant',
-        content: `I understand you're asking about "${inputMessage}". Based on your financial data, here's what I can tell you: Your spending patterns show that you're doing well in most categories, but there are some areas for improvement. Would you like me to generate detailed insights about your finances?`,
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
+    try {
+      const formData = new FormData();
+      formData.append('message', currentMessage);
+      const result = await askAIQuestion(formData);
+
+      if (result.success && 'data' in result) {
+        const assistantMessage: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          type: 'assistant',
+          content: result.data.answer,
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, assistantMessage]);
+      } else {
+        notifyError('Failed to get AI response', {
+          description: result.error,
+        });
+      }
+    } catch {
+      notifyError('Failed to get AI response');
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const handleQuickQuestion = (question: string) => {
@@ -111,11 +112,34 @@ export default function AssistantPage() {
 
   const handleGenerateInsights = async () => {
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setShowInsights(true);
+    try {
+      const [insightsResult, healthScoreResult, patternsResult] = await Promise.all([
+        generateInsights(),
+        getFinancialHealthScore(),
+        getSpendingPatterns(),
+      ]);
+
+      if (insightsResult.success && 'data' in insightsResult) {
+        setInsights(insightsResult.data);
+        setShowInsights(true);
+      } else {
+        notifyError('Failed to generate insights', {
+          description: insightsResult.error,
+        });
+      }
+
+      if (healthScoreResult.success && 'data' in healthScoreResult) {
+        setHealthScore(healthScoreResult.data);
+      }
+
+      if (patternsResult.success && 'data' in patternsResult) {
+        setSpendingPatterns(patternsResult.data);
+      }
+    } catch {
+      notifyError('Failed to generate insights');
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
   const formatTime = (date: Date) => {
@@ -273,25 +297,10 @@ export default function AssistantPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {mockInsights.spendingInsights.map((insight, index) => (
+                  {insights?.spendingInsights.map((insight, index) => (
                     <div key={index} className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium">{insight.category}</p>
-                        <p className="text-sm text-muted-foreground">
-                          ${insight.amount} this month
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {insight.trend === 'up' && (
-                          <TrendingUp className="h-4 w-4 text-red-500 dark:text-red-400" />
-                        )}
-                        {insight.trend === 'down' && (
-                          <TrendingDown className="h-4 w-4 text-green-500 dark:text-green-400" />
-                        )}
-                        <Badge variant={insight.percentage > 0 ? 'destructive' : 'default'}>
-                          {insight.percentage > 0 ? '+' : ''}
-                          {insight.percentage}%
-                        </Badge>
+                        <p className="font-medium">{insight}</p>
                       </div>
                     </div>
                   ))}
@@ -310,7 +319,7 @@ export default function AssistantPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {mockInsights.savingsTips.map((tip, index) => (
+                  {insights?.savingsTips.map((tip, index) => (
                     <div key={index} className="flex gap-3">
                       <Lightbulb className="h-4 w-4 text-yellow-500 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
                       <p className="text-sm">{tip}</p>
@@ -331,7 +340,7 @@ export default function AssistantPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {mockInsights.budgetOptimization.map((optimization, index) => (
+                  {insights?.budgetOptimization.map((optimization, index) => (
                     <div key={index} className="flex gap-3">
                       <Target className="h-4 w-4 text-blue-500 dark:text-blue-400 mt-0.5 flex-shrink-0" />
                       <p className="text-sm">{optimization}</p>
@@ -352,7 +361,7 @@ export default function AssistantPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {mockInsights.areasOfConcern.map((concern, index) => (
+                  {insights?.areasOfConcern.map((concern, index) => (
                     <div key={index} className="flex gap-3">
                       <AlertTriangle className="h-4 w-4 text-orange-500 dark:text-orange-400 mt-0.5 flex-shrink-0" />
                       <p className="text-sm">{concern}</p>

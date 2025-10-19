@@ -125,12 +125,11 @@ export interface AccountBalance {
 // =============================================================================
 
 export interface DashboardMetrics {
+  monthlySummary: MonthlySummary;
+  recentTransactions: RecentTransaction[];
+  spendingTrends: SpendingTrends[];
   totalBalance: number;
-  monthlyIncome: number;
-  monthlyExpenses: number;
-  monthlySavings: number;
   accountCount: number;
-  transactionCount: number;
 }
 
 export interface RecentTransaction {
