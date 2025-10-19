@@ -2,7 +2,6 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/database.types';
 import type { ServiceResult } from '@/types/service.types';
 import type {
-  SignUpInput,
   SignInInput,
   MagicLinkInput,
   OAuthProvider,
@@ -18,7 +17,7 @@ import { log } from '@/lib/logger';
  * AuthService handles authentication business logic
  *
  * Responsibilities:
- * - User signup and signin
+ * - User signin
  * - OAuth authentication
  * - Magic link authentication
  * - Password reset
@@ -35,73 +34,18 @@ import { log } from '@/lib/logger';
  * const supabase = await createClientForServer();
  * const authService = new AuthService(supabase);
  *
- * const result = await authService.signUp({
+ * const result = await authService.signIn({
  *   email: "user@example.com",
- *   password: "password123",
- *   fullName: "John Doe"
+ *   password: "password123"
  * });
  *
  * if (result.success) {
- *   console.log("User created:", result.data.user.id);
+ *   console.log("User signed in:", result.data.user.id);
  * }
  * ```
  */
 export class AuthService {
   constructor(private readonly supabase: SupabaseClient<Database>) {}
-
-  /**
-   * Sign up a new user with email and password
-   */
-  async signUp(input: SignUpInput, redirectUrl?: string): Promise<ServiceResult<AuthResult>> {
-    try {
-      log.info({ email: input.email }, 'User signup attempt');
-
-      const { data, error } = await this.supabase.auth.signUp({
-        email: input.email,
-        password: input.password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            full_name: input.fullName || '',
-          },
-        },
-      });
-
-      if (error) {
-        log.warn({ email: input.email, error: error.message }, 'Signup failed');
-        return { success: false, error: error.message };
-      }
-
-      // Check if user already exists but email not confirmed
-      if (data.user && data.user.identities && data.user.identities.length === 0) {
-        log.warn(
-          { email: input.email, userId: data.user.id },
-          'Signup attempt with existing unconfirmed email',
-        );
-        return {
-          success: false,
-          error:
-            'This email is already registered. Please check your inbox for the confirmation email.',
-        };
-      }
-
-      log.info({ userId: data.user?.id }, 'User signup successful');
-
-      return {
-        success: true,
-        data: {
-          user: data.user!,
-          session: data.session,
-        },
-      };
-    } catch (error) {
-      log.error(error, 'Signup error');
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      };
-    }
-  }
 
   /**
    * Sign in user with email and password

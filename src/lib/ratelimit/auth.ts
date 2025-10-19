@@ -24,13 +24,6 @@ export const authSignInRateLimit = new Ratelimit({
   analytics: true,
 });
 
-// Sign up - prevent spam registrations
-export const authSignUpRateLimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(2, '15 m'), // 2 requests per 15 minutes
-  analytics: true,
-});
-
 // Password reset - very low frequency (security action)
 export const authPasswordResetRateLimit = new Ratelimit({
   redis,

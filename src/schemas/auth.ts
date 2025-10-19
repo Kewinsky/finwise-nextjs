@@ -9,31 +9,6 @@ const passwordRules = {
   hasSpecialChar: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/,
 };
 
-// Sign up schema
-export const signUpSchema = z
-  .object({
-    email: z.string().email('Invalid email address'),
-    password: z
-      .string()
-      .min(
-        passwordRules.minLength,
-        `Password must be at least ${passwordRules.minLength} characters`,
-      )
-      .regex(passwordRules.hasUpperCase, 'Password must contain at least one uppercase letter')
-      .regex(passwordRules.hasLowerCase, 'Password must contain at least one lowercase letter')
-      .regex(passwordRules.hasNumber, 'Password must contain at least one number')
-      .regex(
-        passwordRules.hasSpecialChar,
-        'Password must contain at least one special character (!@#$%^&* etc.)',
-      ),
-    confirmPassword: z.string(),
-    fullName: z.string().min(2, 'Full name must be at least 2 characters'),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'],
-  });
-
 // Sign in schema
 export const signInSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -123,7 +98,6 @@ export const helpFormSchema = z.object({
 });
 
 // Type exports
-export type SignUpFormData = z.infer<typeof signUpSchema>;
 export type SignInFormData = z.infer<typeof signInSchema>;
 export type MagicLinkFormData = z.infer<typeof magicLinkSchema>;
 export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;

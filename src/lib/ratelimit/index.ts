@@ -10,7 +10,6 @@
 export {
   authRateLimit,
   authSignInRateLimit,
-  authSignUpRateLimit,
   authPasswordResetRateLimit,
   authMagicLinkRateLimit,
   authOAuthRateLimit,

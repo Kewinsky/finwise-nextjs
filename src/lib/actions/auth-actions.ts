@@ -4,7 +4,6 @@ import { createClientForServer } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import {
-  signUpSchema,
   signInSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
@@ -18,75 +17,6 @@ import { handleActionError, handleValidationError } from '@/lib/utils/error-hand
 const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL}/callback?next=/dashboard`;
 
 // Rate limiting is now handled by the consolidated utility
-
-/**
- * Sign up with email and password
- */
-export async function signUpWithEmail(formData: FormData) {
-  try {
-    // Apply rate limiting (server action responsibility)
-    const rateLimitResult = await checkAuthRateLimit('signup');
-    if (!rateLimitResult.success && rateLimitResult.isRateLimited) {
-      return {
-        success: false,
-        error:
-          rateLimitResult.error ||
-          'Too many signup attempts. Please wait 15 minutes before trying again.',
-      };
-    }
-
-    // Parse and validate input (server action responsibility)
-    const rawData = {
-      email: formData.get('email') as string,
-      password: formData.get('password') as string,
-      confirmPassword: formData.get('confirmPassword') as string,
-      fullName: formData.get('fullName') as string,
-    };
-
-    const validatedData = signUpSchema.parse(rawData);
-
-    // Delegate to service (business logic)
-    const supabase = await createClientForServer();
-    const authService = new AuthService(supabase);
-
-    const result = await authService.signUp(
-      {
-        email: validatedData.email,
-        password: validatedData.password,
-        fullName: validatedData.fullName,
-      },
-      redirectUrl,
-    );
-
-    if (!result.success) {
-      // Handle specific error cases at the action level if needed
-      if (result.error.includes('already registered')) {
-        return {
-          success: false,
-          error: ERROR_MESSAGES.EMAIL_ALREADY_EXISTS,
-        };
-      }
-      return { success: false, error: result.error };
-    }
-
-    // Check email confirmation status
-    if (result.data.user && !result.data.user.email_confirmed_at) {
-      return {
-        success: true,
-        message: 'Please check your email to confirm your account.',
-      };
-    }
-
-    return { success: true, message: 'Account created successfully!' };
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return handleValidationError(error, 'signup', {
-        validationErrors: JSON.stringify(error.issues),
-      });
-    }
-    return handleActionError(error, 'signup');
-  }
-}
 
 /**
  * Sign in with email and password

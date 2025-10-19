@@ -26,7 +26,6 @@ export type {
 // Auth service
 export { AuthService } from './auth.service';
 export type {
-  SignUpInput,
   SignInInput,
   MagicLinkInput,
   OAuthProvider,

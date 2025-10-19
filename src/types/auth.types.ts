@@ -2,15 +2,6 @@ import type { User as SupabaseUser } from '@supabase/supabase-js';
 import type { UserProfile } from '@/types/user.types';
 
 /**
- * Sign up input
- */
-export interface SignUpInput {
-  email: string;
-  password: string;
-  fullName?: string;
-}
-
-/**
  * Sign in input
  */
 export interface SignInInput {

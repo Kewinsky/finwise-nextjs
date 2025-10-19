@@ -56,7 +56,6 @@ export type {
   ServiceConfig,
 } from './service.types';
 export type {
-  SignUpInput,
   SignInInput,
   MagicLinkInput,
   OAuthProvider,

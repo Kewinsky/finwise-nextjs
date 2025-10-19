@@ -17,7 +17,7 @@ import {
 
 export type RateLimitType = 'auth' | 'billing' | 'notification';
 
-export type AuthActionType = 'signin' | 'signup' | 'reset' | 'magic' | 'oauth';
+export type AuthActionType = 'signin' | 'reset' | 'magic' | 'oauth';
 export type BillingActionType = 'checkout' | 'portal' | 'trial' | 'upgrade';
 export type NotificationActionType = 'save' | 'reset';
 
