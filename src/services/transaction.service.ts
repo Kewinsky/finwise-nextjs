@@ -60,7 +60,9 @@ export class TransactionService {
 
       // Apply filters
       if (filters?.accountId) {
-        query = query.eq('account_id', filters.accountId);
+        query = query.or(
+          `from_account_id.eq.${filters.accountId},to_account_id.eq.${filters.accountId}`,
+        );
       }
 
       if (filters?.type) {
@@ -184,7 +186,8 @@ export class TransactionService {
 
       const transactionData = {
         user_id: userId,
-        account_id: input.accountId,
+        from_account_id: input.fromAccountId || null,
+        to_account_id: input.toAccountId || null,
         type: input.type,
         description: input.description,
         category: input.category,
@@ -226,43 +229,60 @@ export class TransactionService {
     try {
       log.info({ transactionId, userId }, 'Updating transaction');
 
-      // Build update object dynamically
-      const updateData: Partial<Transaction> = {};
-
-      if (input.accountId !== undefined) {
-        updateData.account_id = input.accountId;
+      // Load current transaction to enforce DB constraints when type changes
+      const { data: current, error: loadError } = await this.supabase
+        .from('transactions')
+        .select('*')
+        .eq('id', transactionId)
+        .eq('user_id', userId)
+        .single();
+      if (loadError) {
+        if (loadError.code === 'PGRST116') {
+          log.warn({ transactionId, userId }, 'Transaction not found for update');
+          return { success: false, error: ERROR_MESSAGES.DATA_NOT_FOUND };
+        }
+        return { success: false, error: loadError.message };
       }
 
-      if (input.type !== undefined) {
-        updateData.type = input.type;
+      // Compute final values given input overrides and existing values
+      const finalType = input.type ?? (current.type as TransactionType);
+      const currentFrom = 'from_account_id' in current ? current.from_account_id : null;
+      const currentTo = 'to_account_id' in current ? current.to_account_id : null;
+      let finalFrom = input.fromAccountId ?? currentFrom ?? null;
+      let finalTo = input.toAccountId ?? currentTo ?? null;
+
+      if (finalType === 'income') {
+        finalFrom = null;
+        if (!finalTo) {
+          return { success: false, error: 'Income must have a destination account' };
+        }
+      } else if (finalType === 'expense') {
+        finalTo = null;
+        if (!finalFrom) {
+          return { success: false, error: 'Expense must have a source account' };
+        }
+      } else if (finalType === 'transfer') {
+        if (!finalFrom || !finalTo) {
+          return { success: false, error: 'Transfer must have both from and to accounts' };
+        }
+        if (finalFrom === finalTo) {
+          return { success: false, error: 'From and to accounts must be different' };
+        }
       }
 
-      if (input.description !== undefined) {
-        updateData.description = input.description;
-      }
+      // Build update object
+      const updateData: Partial<Database['public']['Tables']['transactions']['Update']> = {
+        type: finalType,
+        from_account_id: finalFrom,
+        to_account_id: finalTo,
+        updated_at: new Date().toISOString(),
+      };
 
-      if (input.category !== undefined) {
-        updateData.category = input.category;
-      }
-
-      if (input.amount !== undefined) {
-        updateData.amount = input.amount;
-      }
-
-      if (input.date !== undefined) {
-        updateData.date = input.date;
-      }
-
-      if (input.notes !== undefined) {
-        updateData.notes = input.notes;
-      }
-
-      // Check if there's anything to update
-      if (Object.keys(updateData).length === 0) {
-        return { success: false, error: 'No fields to update' };
-      }
-
-      updateData.updated_at = new Date().toISOString();
+      if (input.description !== undefined) updateData.description = input.description;
+      if (input.category !== undefined) updateData.category = input.category;
+      if (input.amount !== undefined) updateData.amount = input.amount;
+      if (input.date !== undefined) updateData.date = input.date;
+      if (input.notes !== undefined) updateData.notes = input.notes;
 
       const { data, error } = await this.supabase
         .from('transactions')
@@ -373,7 +393,8 @@ export class TransactionService {
           type,
           category,
           date,
-          accounts!inner(name)
+          to_account:accounts!transactions_to_account_id_fkey(name),
+          from_account:accounts!transactions_from_account_id_fkey(name)
         `,
         )
         .eq('user_id', userId)
@@ -386,24 +407,36 @@ export class TransactionService {
         return { success: false, error: error.message };
       }
 
-      const recentTransactions: RecentTransaction[] = data.map(
-        (transaction: {
-          id: string;
-          description: string;
-          amount: number;
-          type: string;
-          category: string;
-          date: string;
-          accounts: { name: string };
-        }) => ({
-          id: transaction.id,
-          description: transaction.description,
-          amount: Number(transaction.amount),
-          type: transaction.type as TransactionType,
-          category: transaction.category,
-          date: transaction.date,
-          accountName: transaction.accounts.name,
-        }),
+      type TransactionWithAccounts = {
+        id: string;
+        description: string;
+        amount: number;
+        type: string;
+        category: string;
+        date: string;
+        from_account?: { name: string } | null;
+        to_account?: { name: string } | null;
+      };
+
+      const recentTransactions: RecentTransaction[] = (data as TransactionWithAccounts[]).map(
+        (t) => {
+          const type = t.type as TransactionType;
+          const fromName = t.from_account?.name;
+          const toName = t.to_account?.name;
+          let accountName = fromName || toName || '';
+          if (type === 'transfer' && fromName && toName) {
+            accountName = `${fromName} → ${toName}`;
+          }
+          return {
+            id: t.id,
+            description: t.description,
+            amount: Number(t.amount),
+            type,
+            category: t.category,
+            date: t.date,
+            accountName,
+          };
+        },
       );
 
       log.info({ userId, count: recentTransactions.length }, 'Recent transactions retrieved');
@@ -610,7 +643,9 @@ export class TransactionService {
       }
 
       if (filters?.accountId) {
-        query = query.eq('account_id', filters.accountId);
+        query = query.or(
+          `from_account_id.eq.${filters.accountId},to_account_id.eq.${filters.accountId}`,
+        );
       }
 
       if (filters?.dateFrom) {

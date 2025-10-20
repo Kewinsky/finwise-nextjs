@@ -44,23 +44,25 @@ export interface UpdateAccountInput {
 }
 
 export interface CreateTransactionInput {
-  accountId: string;
   type: TransactionType;
   description: string;
   category: string;
   amount: number;
   date: string; // ISO date string
   notes?: string;
+  fromAccountId?: string;
+  toAccountId?: string;
 }
 
 export interface UpdateTransactionInput {
-  accountId?: string;
   type?: TransactionType;
   description?: string;
   category?: string;
   amount?: number;
   date?: string; // ISO date string
   notes?: string;
+  fromAccountId?: string;
+  toAccountId?: string;
 }
 
 // =============================================================================

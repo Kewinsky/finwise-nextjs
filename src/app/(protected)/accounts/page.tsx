@@ -101,21 +101,31 @@ export default function AccountsPage() {
   };
 
   const handleDeleteAccount = async (account: Account) => {
+    if (account.is_mandatory) {
+      notifyError('This account cannot be deleted', { description: 'Mandatory account' });
+      return;
+    }
     try {
       setIsDeleting(account.id);
+      // Optimistic UI: remove from list immediately
+      const previous = accounts;
+      setAccounts((prev) => prev.filter((a) => a.id !== account.id));
       const result = await deleteAccount(account.id);
 
       if (result.success) {
         notifySuccess('Account deleted successfully');
-        // Reload accounts
-        await loadAccounts();
+        // No need to reload due to optimistic update
       } else {
         notifyError('Failed to delete account', {
           description: result.error,
         });
+        // Rollback
+        setAccounts(previous);
       }
     } catch {
       notifyError('Failed to delete account');
+      // Rollback just in case
+      await loadAccounts();
     } finally {
       setIsDeleting(null);
     }
@@ -184,7 +194,14 @@ export default function AccountsPage() {
                         <IconComponent className="h-5 w-5 text-white" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-lg">{account.name}</h3>
+                        <h3 className="font-bold text-lg flex items-center gap-2">
+                          {account.name}
+                          {account.is_mandatory && (
+                            <span className="inline-flex items-center rounded px-2 py-0.5 text-xs font-medium bg-white/20 text-white border border-white/30">
+                              Mandatory
+                            </span>
+                          )}
+                        </h3>
                         <Badge variant="outline" className="bg-white/20 text-white border-white/30">
                           {typeLabel}
                         </Badge>
@@ -206,14 +223,14 @@ export default function AccountsPage() {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleDeleteAccount(account)}
-                          disabled={isDeleting === account.id}
+                          disabled={isDeleting === account.id || account.is_mandatory}
                         >
                           {isDeleting === account.id ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           ) : (
                             <Trash2 className="mr-2 h-4 w-4" />
                           )}
-                          Delete
+                          {account.is_mandatory ? 'Delete (disabled)' : 'Delete'}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

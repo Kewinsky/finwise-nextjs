@@ -11,8 +11,13 @@ import {
   bulkDeleteTransactionsSchema,
   aiQuestionSchema,
 } from '@/lib/validations/finance';
+import { z } from 'zod';
 import { ERROR_MESSAGES } from '@/lib/constants/errors';
-import { handleActionError } from '@/lib/utils/error-handler';
+import { handleActionError, handleValidationError } from '@/lib/utils/error-handler';
+import type {
+  CreateTransactionInput as ServiceCreateTransactionInput,
+  UpdateTransactionInput as ServiceUpdateTransactionInput,
+} from '@/types/finance.types';
 import type {
   TransactionFilters,
   PaginationOptions,
@@ -180,16 +185,21 @@ export async function getAccountById(accountId: string) {
 export async function createTransaction(formData: FormData) {
   try {
     const rawData = {
-      accountId: formData.get('accountId') as string,
       type: formData.get('type') as string,
       description: formData.get('description') as string,
       category: formData.get('category') as string,
       amount: Number(formData.get('amount')),
       date: formData.get('date') as string,
-      notes: formData.get('notes') as string,
+      notes: formData.get('notes') as string | null,
+      fromAccountId: formData.get('fromAccountId') as string | null,
+      toAccountId: formData.get('toAccountId') as string | null,
     };
 
-    const validatedData = createTransactionSchema.parse(rawData);
+    const parsed = createTransactionSchema.safeParse(rawData);
+    if (!parsed.success) {
+      return handleValidationError(parsed.error, 'createTransaction', { type: rawData.type });
+    }
+    const validatedData = parsed.data as ServiceCreateTransactionInput;
 
     const supabase = await createClientForServer();
     const {
@@ -211,6 +221,9 @@ export async function createTransaction(formData: FormData) {
 
     return result;
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return handleValidationError(error, 'createTransaction');
+    }
     return handleActionError(error, 'createTransaction');
   }
 }
@@ -221,16 +234,21 @@ export async function createTransaction(formData: FormData) {
 export async function updateTransaction(transactionId: string, formData: FormData) {
   try {
     const rawData = {
-      accountId: formData.get('accountId') as string,
       type: formData.get('type') as string,
       description: formData.get('description') as string,
       category: formData.get('category') as string,
       amount: formData.get('amount') ? Number(formData.get('amount')) : undefined,
       date: formData.get('date') as string,
-      notes: formData.get('notes') as string,
+      notes: formData.get('notes') as string | null,
+      fromAccountId: formData.get('fromAccountId') as string | null,
+      toAccountId: formData.get('toAccountId') as string | null,
     };
 
-    const validatedData = updateTransactionSchema.parse(rawData);
+    const parsed = updateTransactionSchema.safeParse(rawData);
+    if (!parsed.success) {
+      return handleValidationError(parsed.error, 'updateTransaction', { id: transactionId });
+    }
+    const validatedData = parsed.data as ServiceUpdateTransactionInput;
 
     const supabase = await createClientForServer();
     const {
@@ -256,6 +274,9 @@ export async function updateTransaction(transactionId: string, formData: FormDat
 
     return result;
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return handleValidationError(error, 'updateTransaction');
+    }
     return handleActionError(error, 'updateTransaction');
   }
 }

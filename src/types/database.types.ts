@@ -221,6 +221,7 @@ export type Database = {
           balance: number;
           currency: string;
           color: string | null;
+          is_mandatory: boolean;
           created_at: string | null;
           updated_at: string | null;
         };
@@ -232,6 +233,7 @@ export type Database = {
           balance?: number;
           currency?: string;
           color?: string | null;
+          is_mandatory?: boolean;
           created_at?: string | null;
           updated_at?: string | null;
         };
@@ -243,6 +245,7 @@ export type Database = {
           balance?: number;
           currency?: string;
           color?: string | null;
+          is_mandatory?: boolean;
           created_at?: string | null;
           updated_at?: string | null;
         };
@@ -260,7 +263,8 @@ export type Database = {
         Row: {
           id: string;
           user_id: string;
-          account_id: string;
+          from_account_id: string | null;
+          to_account_id: string | null;
           type: string;
           description: string;
           category: string;
@@ -273,7 +277,8 @@ export type Database = {
         Insert: {
           id?: string;
           user_id: string;
-          account_id: string;
+          from_account_id?: string | null;
+          to_account_id?: string | null;
           type: string;
           description: string;
           category: string;
@@ -286,7 +291,8 @@ export type Database = {
         Update: {
           id?: string;
           user_id?: string;
-          account_id?: string;
+          from_account_id?: string | null;
+          to_account_id?: string | null;
           type?: string;
           description?: string;
           category?: string;
@@ -305,8 +311,15 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
-            foreignKeyName: 'transactions_account_id_fkey';
-            columns: ['account_id'];
+            foreignKeyName: 'transactions_from_account_id_fkey';
+            columns: ['from_account_id'];
+            isOneToOne: false;
+            referencedRelation: 'accounts';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'transactions_to_account_id_fkey';
+            columns: ['to_account_id'];
             isOneToOne: false;
             referencedRelation: 'accounts';
             referencedColumns: ['id'];

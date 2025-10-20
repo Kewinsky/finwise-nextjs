@@ -44,6 +44,7 @@ import {
   getTransactions,
   deleteManyTransactions,
   getAccounts,
+  deleteTransaction,
 } from '@/lib/actions/finance-actions';
 import type { Transaction as TransactionType, Account } from '@/types/finance.types';
 
@@ -133,9 +134,16 @@ export default function TransactionsPage() {
   const filteredTransactions = transactions.filter((transaction) => {
     const matchesSearch = transaction.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = selectedType === 'all' || transaction.type === selectedType;
+    const txnFrom = transaction.from_account_id
+      ? accounts.find((a) => a.id === transaction.from_account_id)
+      : undefined;
+    const txnTo = transaction.to_account_id
+      ? accounts.find((a) => a.id === transaction.to_account_id)
+      : undefined;
     const matchesAccount =
       selectedAccount === 'All Accounts' ||
-      accounts.find((acc) => acc.id === transaction.account_id)?.name === selectedAccount;
+      txnFrom?.name === selectedAccount ||
+      txnTo?.name === selectedAccount;
     const matchesCategory =
       selectedCategory === 'All Categories' || transaction.category === selectedCategory;
 
@@ -252,7 +260,9 @@ export default function TransactionsPage() {
       type: transaction.type,
       amount: transaction.amount,
       description: transaction.description,
-      account: accounts.find((acc) => acc.id === transaction.account_id)?.name || 'Unknown',
+      account: '',
+      fromAccountId: transaction.from_account_id || undefined,
+      toAccountId: transaction.to_account_id || undefined,
       category: transaction.category,
       date: new Date(transaction.date),
       notes: transaction.notes || undefined,
@@ -445,17 +455,37 @@ export default function TransactionsPage() {
                     <TableCell className="font-medium">{transaction.description}</TableCell>
                     <TableCell>{transaction.category}</TableCell>
                     <TableCell>
-                      {accounts.find((acc) => acc.id === transaction.account_id)?.name || 'Unknown'}
+                      {transaction.type === 'income'
+                        ? accounts.find((acc) => acc.id === transaction.to_account_id)?.name ||
+                          'Unknown'
+                        : transaction.type === 'expense'
+                          ? accounts.find((acc) => acc.id === transaction.from_account_id)?.name ||
+                            'Unknown'
+                          : (() => {
+                              const fromName =
+                                accounts.find((acc) => acc.id === transaction.from_account_id)
+                                  ?.name || 'Unknown';
+                              const toName =
+                                accounts.find((acc) => acc.id === transaction.to_account_id)
+                                  ?.name || 'Unknown';
+                              return `${fromName} → ${toName}`;
+                            })()}
                     </TableCell>
                     <TableCell>{format(new Date(transaction.date), 'MMM dd, yyyy')}</TableCell>
                     <TableCell
                       className={`text-right font-medium ${
-                        transaction.amount > 0
+                        transaction.type === 'income'
                           ? 'text-green-600 dark:text-green-400'
-                          : 'text-red-600 dark:text-red-400'
+                          : transaction.type === 'expense'
+                            ? 'text-red-600 dark:text-red-400'
+                            : 'text-blue-600 dark:text-blue-400'
                       }`}
                     >
-                      {transaction.amount > 0 ? '+' : ''}
+                      {transaction.type === 'income'
+                        ? '+'
+                        : transaction.type === 'expense'
+                          ? '-'
+                          : ''}
                       {formatCurrency(transaction.amount)}
                     </TableCell>
                     <TableCell>
@@ -470,7 +500,26 @@ export default function TransactionsPage() {
                             <Edit className="mr-2 h-4 w-4" />
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={async () => {
+                              try {
+                                setIsDeleting(transaction.id);
+                                const result = await deleteTransaction(transaction.id);
+                                if (result.success) {
+                                  notifySuccess('Transaction deleted successfully');
+                                  await loadData();
+                                } else {
+                                  notifyError('Failed to delete transaction', {
+                                    description: result.error,
+                                  });
+                                }
+                              } catch {
+                                notifyError('Failed to delete transaction');
+                              } finally {
+                                setIsDeleting(null);
+                              }
+                            }}
+                          >
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete
                           </DropdownMenuItem>

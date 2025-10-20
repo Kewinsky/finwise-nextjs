@@ -236,11 +236,17 @@ export class AccountService {
         return accountResult;
       }
 
-      // Check if account has transactions
+      // Prevent deletion of mandatory accounts (defense-in-depth; DB trigger also enforces)
+      const account = accountResult.data;
+      if ('is_mandatory' in account && account.is_mandatory === true) {
+        return { success: false, error: 'Cannot delete mandatory account' };
+      }
+
+      // Check if account has transactions (either as source or destination account)
       const { data: transactions, error: transactionsError } = await this.supabase
         .from('transactions')
         .select('id')
-        .eq('account_id', accountId)
+        .or(`from_account_id.eq.${accountId},to_account_id.eq.${accountId}`)
         .limit(1);
 
       if (transactionsError) {

@@ -19,7 +19,7 @@ export function handleActionError(
 
   return {
     success: false,
-    error: ERROR_MESSAGES.UNEXPECTED,
+    error: error instanceof Error ? error.message : ERROR_MESSAGES.UNEXPECTED,
   };
 }
 
@@ -33,8 +33,16 @@ export function handleValidationError(
 ): { success: false; error: string } {
   log.warn({ validationError, action, ...context }, LOG_MESSAGES.VALIDATION_FAILED(action));
 
-  return {
-    success: false,
-    error: ERROR_MESSAGES.VALIDATION,
-  };
+  // Extract specific validation message when available (e.g., from Zod)
+  let message: string = ERROR_MESSAGES.VALIDATION;
+  if (validationError && typeof validationError === 'object' && 'issues' in validationError) {
+    const issues = (validationError as { issues: Array<{ message?: string }> }).issues;
+    if (issues.length > 0 && issues[0].message) {
+      message = issues[0].message;
+    }
+  } else if (validationError instanceof Error) {
+    message = validationError.message;
+  }
+
+  return { success: false, error: message };
 }

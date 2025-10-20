@@ -75,9 +75,7 @@ export const accountFiltersSchema = z.object({
 // TRANSACTION SCHEMAS
 // =============================================================================
 
-export const createTransactionSchema = z.object({
-  accountId: z.string().uuid('Invalid account ID'),
-  type: transactionTypeSchema,
+const baseTransactionSchema = z.object({
   description: z
     .string()
     .min(1, 'Description is required')
@@ -96,9 +94,48 @@ export const createTransactionSchema = z.object({
   notes: z.string().max(500, 'Notes must be less than 500 characters').trim().optional(),
 });
 
+export const createTransactionSchema = baseTransactionSchema
+  .extend({
+    type: transactionTypeSchema,
+    fromAccountId: z.string().uuid('Invalid from account ID').nullable().optional(),
+    toAccountId: z.string().uuid('Invalid to account ID').nullable().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.type === 'income' && !data.toAccountId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Income must have a destination account',
+        path: ['toAccountId'],
+      });
+    }
+    if (data.type === 'expense' && !data.fromAccountId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Expense must have a source account',
+        path: ['fromAccountId'],
+      });
+    }
+    if (data.type === 'transfer') {
+      if (!data.fromAccountId || !data.toAccountId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Transfer must have both from and to accounts',
+          path: ['fromAccountId'],
+        });
+      } else if (data.fromAccountId === data.toAccountId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'From and to accounts must be different',
+          path: ['toAccountId'],
+        });
+      }
+    }
+  });
+
 export const updateTransactionSchema = z.object({
-  accountId: z.string().uuid('Invalid account ID').optional(),
   type: transactionTypeSchema.optional(),
+  fromAccountId: z.string().uuid('Invalid from account ID').nullable().optional(),
+  toAccountId: z.string().uuid('Invalid to account ID').nullable().optional(),
   description: z
     .string()
     .min(1, 'Description is required')
@@ -121,7 +158,7 @@ export const updateTransactionSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
     .refine((date) => !isNaN(Date.parse(date)), 'Invalid date')
     .optional(),
-  notes: z.string().max(500, 'Notes must be less than 500 characters').trim().optional(),
+  notes: z.string().max(500, 'Notes must be less than 500 characters').trim().nullable().optional(),
 });
 
 export const transactionFiltersSchema = z.object({
