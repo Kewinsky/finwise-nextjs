@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { notifySuccess, notifyError } from '@/lib/notifications';
 import { getAccounts, deleteAccount } from '@/lib/actions/finance-actions';
+import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import type { Account } from '@/types/finance.types';
 
 const accountTypes = {
@@ -48,7 +49,7 @@ const ACCOUNT_COLORS = [
 ];
 
 export default function AccountsPage() {
-  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [accounts, setAccounts] = useState<Account[] | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
@@ -74,7 +75,7 @@ export default function AccountsPage() {
     }
   };
 
-  const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0);
+  const totalBalance = accounts?.reduce((sum, account) => sum + account.balance, 0) || 0;
 
   const formatCurrency = (amount: number, currency: string = 'USD') => {
     return new Intl.NumberFormat('en-US', {
@@ -109,7 +110,7 @@ export default function AccountsPage() {
       setIsDeleting(account.id);
       // Optimistic UI: remove from list immediately
       const previous = accounts;
-      setAccounts((prev) => prev.filter((a) => a.id !== account.id));
+      setAccounts((prev) => prev?.filter((a) => a.id !== account.id) || null);
       const result = await deleteAccount(account.id);
 
       if (result.success) {
@@ -130,6 +131,15 @@ export default function AccountsPage() {
       setIsDeleting(null);
     }
   };
+
+  // Show loading spinner when accounts data is not loaded yet
+  if (!accounts) {
+    return (
+      <div className="min-h-screen">
+        <LoadingSpinner message="Loading accounts..." />
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 space-y-6 p-6">

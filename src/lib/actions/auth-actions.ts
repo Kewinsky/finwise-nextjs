@@ -8,7 +8,7 @@ import {
   forgotPasswordSchema,
   resetPasswordSchema,
   updateProfileSchema,
-} from '@/schemas/auth';
+} from '@/validation/auth';
 import { checkAuthRateLimit } from '@/lib/ratelimit/rate-limit-utils';
 import { AuthService, UserService } from '@/services';
 import { ERROR_MESSAGES } from '@/lib/constants/errors';

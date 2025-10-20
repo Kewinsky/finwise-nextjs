@@ -90,5 +90,6 @@ export type {
   TransactionExport,
   AccountType,
   TransactionType,
+  TransactionFormProps,
   PaginatedResult,
 } from './finance.types';

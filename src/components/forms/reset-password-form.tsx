@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { FormError } from '@/components/ui/form-error';
 import { resetPassword } from '@/lib/actions/auth-actions';
-import { resetPasswordSchema, type ResetPasswordFormData } from '@/schemas/auth';
+import { resetPasswordSchema, type ResetPasswordFormData } from '@/validation/auth';
 import { createClientForBrowser } from '@/utils/supabase/client';
 
 export function ResetPasswordForm({ className, ...props }: React.ComponentProps<'div'>) {

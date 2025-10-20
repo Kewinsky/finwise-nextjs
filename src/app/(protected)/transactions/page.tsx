@@ -46,6 +46,7 @@ import {
   getAccounts,
   deleteTransaction,
 } from '@/lib/actions/finance-actions';
+import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import type { Transaction as TransactionType, Account } from '@/types/finance.types';
 
 const mockCategories = [
@@ -73,19 +74,18 @@ export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [editingTransaction, setEditingTransaction] = useState<
-    | {
-        id: string;
-        type: string;
-        amount: number;
-        description: string;
-        account: string;
-        category: string;
-        date: Date;
-        notes?: string;
-      }
-    | undefined
-  >(undefined);
+  const [editingTransaction, setEditingTransaction] = useState<{
+    id: string;
+    type: string;
+    amount: number;
+    description: string;
+    fromAccountId?: string | null;
+    toAccountId?: string | null;
+    account?: string;
+    category: string;
+    date: Date;
+    notes?: string;
+  } | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState('all');
   const [selectedAccount, setSelectedAccount] = useState('All Accounts');
@@ -97,14 +97,19 @@ export default function TransactionsPage() {
     null,
   );
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   // Load data on component mount
   useEffect(() => {
-    loadData();
+    loadData(true);
   }, []);
 
-  const loadData = async () => {
+  const loadData = async (isInitial = false) => {
     try {
+      if (isInitial) {
+        setIsInitialLoading(true);
+      }
+
       const [transactionsResult, accountsResult] = await Promise.all([
         getTransactions(),
         getAccounts(),
@@ -127,6 +132,10 @@ export default function TransactionsPage() {
       }
     } catch {
       notifyError('Failed to load data');
+    } finally {
+      if (isInitial) {
+        setIsInitialLoading(false);
+      }
     }
   };
 
@@ -271,15 +280,27 @@ export default function TransactionsPage() {
     setShowForm(true);
   };
 
+  const handleTransactionSuccess = () => {
+    // Only reload data when transaction is successfully saved (without showing full loading)
+    loadData(false);
+  };
+
   const handleCloseForm = () => {
     setShowForm(false);
-    setEditingTransaction(undefined);
-    // Reload data after form closes
-    loadData();
+    setEditingTransaction(null);
   };
 
   // Get account names for the filter
   const accountNames = ['All Accounts', ...accounts.map((acc) => acc.name)];
+
+  // Show loading spinner only on initial load
+  if (isInitialLoading) {
+    return (
+      <div className="min-h-screen">
+        <LoadingSpinner message="Loading transactions..." />
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 space-y-6 p-6">
@@ -437,97 +458,138 @@ export default function TransactionsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedTransactions.map((transaction) => (
-                  <TableRow key={transaction.id}>
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedRows.includes(transaction.id)}
-                        onCheckedChange={(checked: boolean) =>
-                          handleSelectRow(transaction.id, checked)
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className={getTypeBadgeClassName(transaction.type)}>
-                        {transaction.type}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="font-medium">{transaction.description}</TableCell>
-                    <TableCell>{transaction.category}</TableCell>
-                    <TableCell>
-                      {transaction.type === 'income'
-                        ? accounts.find((acc) => acc.id === transaction.to_account_id)?.name ||
-                          'Unknown'
-                        : transaction.type === 'expense'
-                          ? accounts.find((acc) => acc.id === transaction.from_account_id)?.name ||
-                            'Unknown'
-                          : (() => {
-                              const fromName =
-                                accounts.find((acc) => acc.id === transaction.from_account_id)
-                                  ?.name || 'Unknown';
-                              const toName =
-                                accounts.find((acc) => acc.id === transaction.to_account_id)
-                                  ?.name || 'Unknown';
-                              return `${fromName} → ${toName}`;
-                            })()}
-                    </TableCell>
-                    <TableCell>{format(new Date(transaction.date), 'MMM dd, yyyy')}</TableCell>
-                    <TableCell
-                      className={`text-right font-medium ${
-                        transaction.type === 'income'
-                          ? 'text-green-600 dark:text-green-400'
-                          : transaction.type === 'expense'
-                            ? 'text-red-600 dark:text-red-400'
-                            : 'text-blue-600 dark:text-blue-400'
-                      }`}
-                    >
-                      {transaction.type === 'income'
-                        ? '+'
-                        : transaction.type === 'expense'
-                          ? '-'
-                          : ''}
-                      {formatCurrency(transaction.amount)}
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleEditTransaction(transaction)}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={async () => {
-                              try {
-                                setIsDeleting(transaction.id);
-                                const result = await deleteTransaction(transaction.id);
-                                if (result.success) {
-                                  notifySuccess('Transaction deleted successfully');
-                                  await loadData();
-                                } else {
-                                  notifyError('Failed to delete transaction', {
-                                    description: result.error,
-                                  });
-                                }
-                              } catch {
-                                notifyError('Failed to delete transaction');
-                              } finally {
-                                setIsDeleting(null);
-                              }
-                            }}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                {paginatedTransactions.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="h-64 text-center">
+                      <div className="flex flex-col items-center justify-center space-y-3">
+                        {transactions.length === 0 ? (
+                          <>
+                            <div className="rounded-full bg-muted p-3">
+                              <Plus className="h-6 w-6 text-muted-foreground" />
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm font-medium">No transactions yet</p>
+                              <p className="text-sm text-muted-foreground">
+                                Get started by adding your first transaction
+                              </p>
+                            </div>
+                            <Button onClick={() => setShowForm(true)} size="sm">
+                              <Plus className="mr-2 h-4 w-4" />
+                              Add Transaction
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <div className="rounded-full bg-muted p-3">
+                              <Search className="h-6 w-6 text-muted-foreground" />
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm font-medium">No transactions found</p>
+                              <p className="text-sm text-muted-foreground">
+                                Try adjusting your filters to find what you&apos;re looking for
+                              </p>
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  paginatedTransactions.map((transaction) => (
+                    <TableRow key={transaction.id}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedRows.includes(transaction.id)}
+                          onCheckedChange={(checked: boolean) =>
+                            handleSelectRow(transaction.id, checked)
+                          }
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          className={getTypeBadgeClassName(transaction.type)}
+                        >
+                          {transaction.type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-medium">{transaction.description}</TableCell>
+                      <TableCell>{transaction.category}</TableCell>
+                      <TableCell>
+                        {transaction.type === 'income'
+                          ? accounts.find((acc) => acc.id === transaction.to_account_id)?.name ||
+                            'Unknown'
+                          : transaction.type === 'expense'
+                            ? accounts.find((acc) => acc.id === transaction.from_account_id)
+                                ?.name || 'Unknown'
+                            : (() => {
+                                const fromName =
+                                  accounts.find((acc) => acc.id === transaction.from_account_id)
+                                    ?.name || 'Unknown';
+                                const toName =
+                                  accounts.find((acc) => acc.id === transaction.to_account_id)
+                                    ?.name || 'Unknown';
+                                return `${fromName} → ${toName}`;
+                              })()}
+                      </TableCell>
+                      <TableCell>{format(new Date(transaction.date), 'MMM dd, yyyy')}</TableCell>
+                      <TableCell
+                        className={`text-right font-medium ${
+                          transaction.type === 'income'
+                            ? 'text-green-600 dark:text-green-400'
+                            : transaction.type === 'expense'
+                              ? 'text-red-600 dark:text-red-400'
+                              : 'text-blue-600 dark:text-blue-400'
+                        }`}
+                      >
+                        {transaction.type === 'income'
+                          ? '+'
+                          : transaction.type === 'expense'
+                            ? '-'
+                            : ''}
+                        {formatCurrency(transaction.amount)}
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEditTransaction(transaction)}>
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={async () => {
+                                try {
+                                  setIsDeleting(transaction.id);
+                                  const result = await deleteTransaction(transaction.id);
+                                  if (result.success) {
+                                    notifySuccess('Transaction deleted successfully');
+                                    await loadData();
+                                  } else {
+                                    notifyError('Failed to delete transaction', {
+                                      description: result.error,
+                                    });
+                                  }
+                                } catch {
+                                  notifyError('Failed to delete transaction');
+                                } finally {
+                                  setIsDeleting(null);
+                                }
+                              }}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>
@@ -596,7 +658,8 @@ export default function TransactionsPage() {
         <TransactionForm
           open={showForm}
           onOpenChange={handleCloseForm}
-          transaction={editingTransaction}
+          onSuccess={handleTransactionSuccess}
+          transaction={editingTransaction ?? undefined}
         />
       )}
     </div>

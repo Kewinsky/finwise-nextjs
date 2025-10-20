@@ -23,10 +23,10 @@ import {
   Zap,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { TransactionDialog } from '@/components/dashboard/transaction-dialog';
-import { TransferDialog } from '@/components/dashboard/transfer-dialog';
+import { TransactionForm } from '@/components/transactions/transaction-form';
 import { getDashboardData } from '@/lib/actions/finance-actions';
 import { notifyError } from '@/lib/notifications';
+import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import type { DashboardMetrics } from '@/types/finance.types';
 
 const chartConfig = {
@@ -42,9 +42,10 @@ const chartConfig = {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [showTransactionDialog, setShowTransactionDialog] = useState(false);
-  const [showTransferDialog, setShowTransferDialog] = useState(false);
-  const [transactionType, setTransactionType] = useState<'income' | 'expense'>('income');
+  const [showTransactionForm, setShowTransactionForm] = useState(false);
+  const [transactionType, setTransactionType] = useState<'income' | 'expense' | 'transfer'>(
+    'expense',
+  );
   const [dashboardData, setDashboardData] = useState<DashboardMetrics | null>(null);
 
   // Load dashboard data on component mount
@@ -68,9 +69,14 @@ export default function DashboardPage() {
     }
   };
 
-  const handleAddTransaction = (type: 'income' | 'expense') => {
+  const handleAddTransaction = (type: 'income' | 'expense' | 'transfer') => {
     setTransactionType(type);
-    setShowTransactionDialog(true);
+    setShowTransactionForm(true);
+  };
+
+  const handleTransactionSuccess = () => {
+    // Only reload dashboard data when transaction is successfully saved
+    loadDashboardData();
   };
 
   const formatCurrency = (amount: number) => {
@@ -87,12 +93,11 @@ export default function DashboardPage() {
     });
   };
 
+  // Show loading spinner only on initial load
   if (!dashboardData) {
     return (
-      <div className="flex-1 space-y-6 p-6">
-        <div className="flex items-center justify-center h-64">
-          <p className="text-muted-foreground">No data available</p>
-        </div>
+      <div className="min-h-screen">
+        <LoadingSpinner message="Loading dashboard..." />
       </div>
     );
   }
@@ -326,7 +331,7 @@ export default function DashboardPage() {
             <Button
               variant="outline"
               className="h-24 flex flex-col items-center gap-2 transition-all duration-200 group"
-              onClick={() => setShowTransferDialog(true)}
+              onClick={() => handleAddTransaction('transfer')}
             >
               <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 group-hover:scale-110 transition-transform">
                 <ArrowRightLeft className="w-4 h-4 text-white" />
@@ -354,15 +359,15 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
-      {/* Transaction Dialog */}
-      <TransactionDialog
-        open={showTransactionDialog}
-        onOpenChange={setShowTransactionDialog}
-        type={transactionType}
-      />
-
-      {/* Transfer Dialog */}
-      <TransferDialog open={showTransferDialog} onOpenChange={setShowTransferDialog} />
+      {/* Transaction Form */}
+      {showTransactionForm && (
+        <TransactionForm
+          open={showTransactionForm}
+          onOpenChange={setShowTransactionForm}
+          onSuccess={handleTransactionSuccess}
+          defaultType={transactionType}
+        />
+      )}
     </div>
   );
 }

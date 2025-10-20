@@ -32,9 +32,12 @@ import type { Account } from '@/types/finance.types';
 const accountSchema = z.object({
   name: z.string().min(1, 'Account name is required'),
   type: z.enum(['checking', 'savings', 'creditcard', 'investment']),
-  balance: z.string().refine((val) => !isNaN(Number(val)), {
-    message: 'Balance must be a valid number',
-  }),
+  balance: z
+    .string()
+    .min(1, 'Balance is required')
+    .refine((val) => !isNaN(Number(val)), {
+      message: 'Balance must be a valid number',
+    }),
   currency: z.string().min(1, 'Currency is required'),
   color: z.string().min(1, 'Color is required'),
 });
@@ -71,7 +74,7 @@ export function AccountForm({ open, onOpenChange, account, colors }: AccountForm
     defaultValues: {
       name: '',
       type: 'checking',
-      balance: '0.00',
+      balance: '',
       currency: 'USD',
       color: colors[0],
     },
@@ -91,7 +94,7 @@ export function AccountForm({ open, onOpenChange, account, colors }: AccountForm
       form.reset({
         name: '',
         type: 'checking',
-        balance: '0.00',
+        balance: '',
         currency: 'USD',
         color: colors[0],
       });
@@ -191,6 +194,7 @@ export function AccountForm({ open, onOpenChange, account, colors }: AccountForm
                   type="number"
                   step="0.01"
                   placeholder="0.00"
+                  min={0}
                   className="pl-8"
                   {...form.register('balance')}
                 />

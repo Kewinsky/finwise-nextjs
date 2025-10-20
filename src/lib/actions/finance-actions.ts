@@ -10,7 +10,7 @@ import {
   updateTransactionSchema,
   bulkDeleteTransactionsSchema,
   aiQuestionSchema,
-} from '@/lib/validations/finance';
+} from '@/validation/finance';
 import { z } from 'zod';
 import { ERROR_MESSAGES } from '@/lib/constants/errors';
 import { handleActionError, handleValidationError } from '@/lib/utils/error-handler';

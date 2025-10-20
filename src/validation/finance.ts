@@ -91,7 +91,13 @@ const baseTransactionSchema = z.object({
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
     .refine((date) => !isNaN(Date.parse(date)), 'Invalid date'),
-  notes: z.string().max(500, 'Notes must be less than 500 characters').trim().optional(),
+  notes: z
+    .string()
+    .max(500, 'Notes must be less than 500 characters')
+    .trim()
+    .nullable()
+    .optional()
+    .transform((val) => (val === '' ? null : val)),
 });
 
 export const createTransactionSchema = baseTransactionSchema
@@ -160,6 +166,40 @@ export const updateTransactionSchema = z.object({
     .optional(),
   notes: z.string().max(500, 'Notes must be less than 500 characters').trim().nullable().optional(),
 });
+
+// =============================================================================
+// TRANSACTION FORM SCHEMA
+// =============================================================================
+
+export const transactionFormSchema = z
+  .object({
+    type: transactionTypeSchema,
+    amount: z
+      .string()
+      .min(1, 'Amount is required')
+      .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+        message: 'Amount must be a positive number',
+      }),
+    description: z.string().min(1, 'Description is required'),
+    category: z.string().min(1, 'Category is required'),
+    date: z.date(),
+    notes: z.string().optional(),
+    fromAccount: z.string().optional(),
+    toAccount: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.type === 'income' && !data.toAccount) return false;
+      if (data.type === 'expense' && !data.fromAccount) return false;
+      if (
+        data.type === 'transfer' &&
+        (!data.fromAccount || !data.toAccount || data.fromAccount === data.toAccount)
+      )
+        return false;
+      return true;
+    },
+    { message: 'Please select the required accounts' },
+  );
 
 export const transactionFiltersSchema = z.object({
   accountId: z.string().uuid('Invalid account ID').optional(),
@@ -239,6 +279,7 @@ export type AccountFilters = z.infer<typeof accountFiltersSchema>;
 
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
 export type UpdateTransactionInput = z.infer<typeof updateTransactionSchema>;
+export type TransactionFormData = z.infer<typeof transactionFormSchema>;
 export type TransactionFilters = z.infer<typeof transactionFiltersSchema>;
 
 export type PaginationOptions = z.infer<typeof paginationSchema>;

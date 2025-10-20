@@ -205,6 +205,29 @@ export const COMMON_CATEGORIES = {
 };
 
 // =============================================================================
+// FORM PROPS TYPES
+// =============================================================================
+
+export interface TransactionFormProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
+  defaultType?: TransactionType;
+  transaction?: {
+    id: string;
+    type: string;
+    amount: number;
+    description: string;
+    fromAccountId?: string | null;
+    toAccountId?: string | null;
+    account?: string;
+    category: string;
+    date: Date;
+    notes?: string;
+  };
+}
+
+// =============================================================================
 // UTILITY TYPES
 // =============================================================================
 
