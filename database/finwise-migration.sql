@@ -40,6 +40,7 @@ CREATE TABLE public.accounts (
     balance numeric(12,2) DEFAULT 0 NOT NULL,
     currency text DEFAULT 'USD' NOT NULL,
     color text,
+    is_mandatory boolean DEFAULT false NOT NULL,
     created_at timestamptz DEFAULT now(),
     updated_at timestamptz DEFAULT now(),
     PRIMARY KEY (id),
@@ -67,11 +68,8 @@ CREATE TABLE public.transactions (
     FOREIGN KEY (from_account_id) REFERENCES public.accounts(id) ON DELETE CASCADE,
     FOREIGN KEY (to_account_id) REFERENCES public.accounts(id) ON DELETE CASCADE,
     CHECK (amount > 0),
-    -- For income, money flows into an account
     CHECK ((type != 'income') OR (from_account_id IS NULL AND to_account_id IS NOT NULL)),
-    -- For expense, money flows out of an account
     CHECK ((type != 'expense') OR (from_account_id IS NOT NULL AND to_account_id IS NULL)),
-    -- For transfer, money moves between two different accounts
     CHECK ((type != 'transfer') OR (from_account_id IS NOT NULL AND to_account_id IS NOT NULL AND from_account_id <> to_account_id))
 );
 
@@ -83,6 +81,7 @@ CREATE TABLE public.transactions (
 CREATE INDEX IF NOT EXISTS idx_accounts_user_id ON public.accounts USING btree (user_id);
 CREATE INDEX IF NOT EXISTS idx_accounts_type ON public.accounts USING btree (type);
 CREATE INDEX IF NOT EXISTS idx_accounts_created_at ON public.accounts USING btree (created_at);
+CREATE INDEX IF NOT EXISTS idx_accounts_is_mandatory ON public.accounts USING btree (is_mandatory);
 
 -- Transactions table indexes
 CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON public.transactions USING btree (user_id);
@@ -143,114 +142,53 @@ GRANT ALL ON TABLE public.transactions TO anon, authenticated, service_role;
 -- FUNCTIONS
 -- =============================================================================
 
--- Function to update account balance when transactions are added/updated/deleted
-CREATE OR REPLACE FUNCTION "public"."update_account_balance"() RETURNS trigger
+-- Function to update account balance for single-account transactions
+CREATE OR REPLACE FUNCTION public.update_account_balance() RETURNS trigger
 LANGUAGE plpgsql SECURITY DEFINER
 AS $$
-DECLARE
-    account_balance numeric(12,2);
 BEGIN
-    -- Calculate new balance based on transaction type
-    IF TG_OP = 'INSERT' THEN
-        -- Apply new transaction effect
-        IF NEW.type = 'income' THEN
-            UPDATE public.accounts
-            SET balance = balance + NEW.amount,
-                updated_at = NOW()
-            WHERE id = NEW.to_account_id;
-        ELSIF NEW.type = 'expense' THEN
-            UPDATE public.accounts
-            SET balance = balance - NEW.amount,
-                updated_at = NOW()
-            WHERE id = NEW.from_account_id;
-        ELSIF NEW.type = 'transfer' THEN
-            UPDATE public.accounts
-            SET balance = balance - NEW.amount,
-                updated_at = NOW()
-            WHERE id = NEW.from_account_id;
-
-            UPDATE public.accounts
-            SET balance = balance + NEW.amount,
-                updated_at = NOW()
-            WHERE id = NEW.to_account_id;
-        END IF;
-        
-        RETURN NEW;
-    ELSIF TG_OP = 'UPDATE' THEN
-        -- Handle transaction updates (remove old amount, add new amount)
-        IF OLD.type = 'income' THEN
-            UPDATE public.accounts
-            SET balance = balance - OLD.amount,
-                updated_at = NOW()
-            WHERE id = OLD.to_account_id;
-        ELSIF OLD.type = 'expense' THEN
-            UPDATE public.accounts
-            SET balance = balance + OLD.amount,
-                updated_at = NOW()
-            WHERE id = OLD.from_account_id;
-        ELSIF OLD.type = 'transfer' THEN
-            UPDATE public.accounts
-            SET balance = balance + OLD.amount,
-                updated_at = NOW()
-            WHERE id = OLD.from_account_id;
-
-            UPDATE public.accounts
-            SET balance = balance - OLD.amount,
-                updated_at = NOW()
-            WHERE id = OLD.to_account_id;
-        END IF;
-        
-        IF NEW.type = 'income' THEN
-            UPDATE public.accounts
-            SET balance = balance + NEW.amount,
-                updated_at = NOW()
-            WHERE id = NEW.to_account_id;
-        ELSIF NEW.type = 'expense' THEN
-            UPDATE public.accounts
-            SET balance = balance - NEW.amount,
-                updated_at = NOW()
-            WHERE id = NEW.from_account_id;
-        ELSIF NEW.type = 'transfer' THEN
-            UPDATE public.accounts
-            SET balance = balance - NEW.amount,
-                updated_at = NOW()
-            WHERE id = NEW.from_account_id;
-
-            UPDATE public.accounts
-            SET balance = balance + NEW.amount,
-                updated_at = NOW()
-            WHERE id = NEW.to_account_id;
-        END IF;
-        
-        RETURN NEW;
-    ELSIF TG_OP = 'DELETE' THEN
-        -- Remove transaction amount from account balance
-        IF OLD.type = 'income' THEN
-            UPDATE public.accounts
-            SET balance = balance - OLD.amount,
-                updated_at = NOW()
-            WHERE id = OLD.to_account_id;
-        ELSIF OLD.type = 'expense' THEN
-            UPDATE public.accounts
-            SET balance = balance + OLD.amount,
-                updated_at = NOW()
-            WHERE id = OLD.from_account_id;
-        ELSIF OLD.type = 'transfer' THEN
-            UPDATE public.accounts
-            SET balance = balance + OLD.amount,
-                updated_at = NOW()
-            WHERE id = OLD.from_account_id;
-
-            UPDATE public.accounts
-            SET balance = balance - OLD.amount,
-                updated_at = NOW()
-            WHERE id = OLD.to_account_id;
-        END IF;
-        
-        RETURN OLD;
+  IF TG_OP = 'INSERT' THEN
+    IF NEW.type = 'income' THEN
+      UPDATE public.accounts SET balance = balance + NEW.amount, updated_at = NOW() WHERE id = NEW.to_account_id;
+    ELSIF NEW.type = 'expense' THEN
+      UPDATE public.accounts SET balance = balance - NEW.amount, updated_at = NOW() WHERE id = NEW.from_account_id;
+    ELSIF NEW.type = 'transfer' THEN
+      UPDATE public.accounts SET balance = balance - NEW.amount, updated_at = NOW() WHERE id = NEW.from_account_id;
+      UPDATE public.accounts SET balance = balance + NEW.amount, updated_at = NOW() WHERE id = NEW.to_account_id;
     END IF;
-    
-    RETURN NULL;
+    RETURN NEW;
+  ELSIF TG_OP = 'UPDATE' THEN
+    -- Revert old
+    IF OLD.type = 'income' THEN
+      UPDATE public.accounts SET balance = balance - OLD.amount, updated_at = NOW() WHERE id = OLD.to_account_id;
+    ELSIF OLD.type = 'expense' THEN
+      UPDATE public.accounts SET balance = balance + OLD.amount, updated_at = NOW() WHERE id = OLD.from_account_id;
+    ELSIF OLD.type = 'transfer' THEN
+      UPDATE public.accounts SET balance = balance + OLD.amount, updated_at = NOW() WHERE id = OLD.from_account_id;
+      UPDATE public.accounts SET balance = balance - OLD.amount, updated_at = NOW() WHERE id = OLD.to_account_id;
+    END IF;
+    -- Apply new
+    IF NEW.type = 'income' THEN
+      UPDATE public.accounts SET balance = balance + NEW.amount, updated_at = NOW() WHERE id = NEW.to_account_id;
+    ELSIF NEW.type = 'expense' THEN
+      UPDATE public.accounts SET balance = balance - NEW.amount, updated_at = NOW() WHERE id = NEW.from_account_id;
+    ELSIF NEW.type = 'transfer' THEN
+      UPDATE public.accounts SET balance = balance - NEW.amount, updated_at = NOW() WHERE id = NEW.from_account_id;
+      UPDATE public.accounts SET balance = balance + NEW.amount, updated_at = NOW() WHERE id = NEW.to_account_id;
+    END IF;
+    RETURN NEW;
+  ELSIF TG_OP = 'DELETE' THEN
+    IF OLD.type = 'income' THEN
+      UPDATE public.accounts SET balance = balance - OLD.amount, updated_at = NOW() WHERE id = OLD.to_account_id;
+    ELSIF OLD.type = 'expense' THEN
+      UPDATE public.accounts SET balance = balance + OLD.amount, updated_at = NOW() WHERE id = OLD.from_account_id;
+    ELSIF OLD.type = 'transfer' THEN
+      UPDATE public.accounts SET balance = balance + OLD.amount, updated_at = NOW() WHERE id = OLD.from_account_id;
+      UPDATE public.accounts SET balance = balance - OLD.amount, updated_at = NOW() WHERE id = OLD.to_account_id;
+    END IF;
+    RETURN OLD;
+  END IF;
+  RETURN NULL;
 END;
 $$;
 
@@ -269,6 +207,23 @@ FOR EACH ROW EXECUTE FUNCTION public.update_account_balance();
 
 -- Grant function permissions
 GRANT ALL ON FUNCTION public.update_account_balance() TO anon, authenticated, service_role;
+
+-- Prevent deletion of mandatory accounts
+CREATE OR REPLACE FUNCTION public.prevent_mandatory_account_delete() RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER AS $$
+BEGIN
+  IF OLD.is_mandatory THEN
+    RAISE EXCEPTION 'Cannot delete mandatory account';
+  END IF;
+  RETURN OLD;
+END;
+$$;
+
+CREATE TRIGGER prevent_delete_mandatory_account
+BEFORE DELETE ON public.accounts
+FOR EACH ROW EXECUTE FUNCTION public.prevent_mandatory_account_delete();
+
+GRANT ALL ON FUNCTION public.prevent_mandatory_account_delete() TO anon, authenticated, service_role;
 
 -- =============================================================================
 -- SETUP COMPLETE
