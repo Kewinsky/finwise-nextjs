@@ -39,14 +39,12 @@
 
 🚀 Production Readiness Improvements:
     ✔ Fix hardcoded percentage changes in dashboard to use real data @done(25-10-21 13:09)
+    ✔ Implement advanced filtering (date ranges, amount ranges) @done(25-10-21 14:24)
+    ☐ Add date range selector for dashboard charts
+    ☐ Create balance history charts for accounts
+    ☐ Add refresh functionality to dashboard
     ☐ Implement CSV export functionality for transactions
     ☐ Add memoization for expensive calculations in all pages
-    ☐ Add refresh functionality to dashboard
-    ☐ Implement bulk edit functionality for transactions
-    ☐ Add date range selector for dashboard charts
     ☐ Add transaction templates for recurring transactions
-    ☐ Implement advanced filtering (date ranges, amount ranges)
-    ☐ Add account archiving functionality (soft delete)
-    ☐ Create balance history charts for accounts
-    ☐ Add transaction duplication feature
     ☐ Implement dashboard customization options
+    ☐ Add account archiving functionality (soft delete)

@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -11,8 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Search, Plus, Download, Edit, Trash2, ArrowUpDown, MoreHorizontal } from 'lucide-react';
+import { Plus, Download, Edit, Trash2, ArrowUpDown, MoreHorizontal, Search } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -29,6 +28,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TransactionForm } from '@/components/transactions/transaction-form';
+import { TransactionFiltersComponent } from '@/components/transactions/transaction-filters';
 import { format } from 'date-fns';
 import { notifySuccess, notifyError } from '@/lib/notifications';
 import {
@@ -38,31 +38,14 @@ import {
   deleteTransaction,
 } from '@/lib/actions/finance-actions';
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
-import type { Transaction as TransactionType, Account } from '@/types/finance.types';
-
-const mockCategories = [
-  'All Categories',
-  'Food & Dining',
-  'Transportation',
-  'Shopping',
-  'Utilities',
-  'Entertainment',
-  'Healthcare',
-  'Salary',
-  'Freelance',
-  'Investment',
-  'Transfer',
-];
-
-const transactionTypes = [
-  { value: 'all', label: 'All Types' },
-  { value: 'income', label: 'Income' },
-  { value: 'expense', label: 'Expense' },
-  { value: 'transfer', label: 'Transfer' },
-];
+import type {
+  Transaction as TransactionType,
+  Account,
+  TransactionFilters,
+} from '@/types/finance.types';
 
 export default function TransactionsPage() {
-  const [transactions, setTransactions] = useState<TransactionType[]>([]);
+  const [allTransactions, setAllTransactions] = useState<TransactionType[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<{
@@ -77,10 +60,7 @@ export default function TransactionsPage() {
     date: Date;
     notes?: string;
   } | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedType, setSelectedType] = useState('all');
-  const [selectedAccount, setSelectedAccount] = useState('All Accounts');
-  const [selectedCategory, setSelectedCategory] = useState('All Categories');
+  const [filters, setFilters] = useState<TransactionFilters>({});
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -90,7 +70,7 @@ export default function TransactionsPage() {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
-  // Load data on component mount
+  // Load data on component mount - ONCE
   useEffect(() => {
     loadData(true);
   }, []);
@@ -101,13 +81,14 @@ export default function TransactionsPage() {
         setIsInitialLoading(true);
       }
 
+      // Load ALL transactions without filters - get everything
       const [transactionsResult, accountsResult] = await Promise.all([
-        getTransactions(),
+        getTransactions(), // No filters - get all data
         getAccounts(),
       ]);
 
       if (transactionsResult.success && 'data' in transactionsResult) {
-        setTransactions(transactionsResult.data.data);
+        setAllTransactions(transactionsResult.data.data);
       } else {
         notifyError('Failed to load transactions', {
           description: transactionsResult.error,
@@ -130,31 +111,68 @@ export default function TransactionsPage() {
     }
   };
 
-  // Filter transactions based on search and filters
-  const filteredTransactions = transactions.filter((transaction) => {
-    const matchesSearch = transaction.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = selectedType === 'all' || transaction.type === selectedType;
-    const txnFrom = transaction.from_account_id
-      ? accounts.find((a) => a.id === transaction.from_account_id)
-      : undefined;
-    const txnTo = transaction.to_account_id
-      ? accounts.find((a) => a.id === transaction.to_account_id)
-      : undefined;
-    const matchesAccount =
-      selectedAccount === 'All Accounts' ||
-      txnFrom?.name === selectedAccount ||
-      txnTo?.name === selectedAccount;
-    const matchesCategory =
-      selectedCategory === 'All Categories' || transaction.category === selectedCategory;
+  // Client-side filtering - INSTANT results like pure React!
+  const filteredTransactions = useMemo(() => {
+    return allTransactions.filter((transaction) => {
+      // Search filter
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        const matchesSearch =
+          transaction.description.toLowerCase().includes(searchLower) ||
+          (transaction.notes && transaction.notes.toLowerCase().includes(searchLower));
+        if (!matchesSearch) return false;
+      }
 
-    return matchesSearch && matchesType && matchesAccount && matchesCategory;
-  });
+      // Type filter
+      if (filters.type && transaction.type !== filters.type) {
+        return false;
+      }
 
-  // Sort transactions
-  const sortedTransactions = [...filteredTransactions];
-  if (sortConfig) {
-    sortedTransactions.sort((a, b) => {
-      let aValue: number, bValue: number;
+      // Category filter
+      if (filters.category && transaction.category !== filters.category) {
+        return false;
+      }
+
+      // Account filter
+      if (filters.accountId) {
+        const matchesAccount =
+          transaction.from_account_id === filters.accountId ||
+          transaction.to_account_id === filters.accountId;
+        if (!matchesAccount) return false;
+      }
+
+      // Date range filter
+      if (filters.dateFrom) {
+        const transactionDate = new Date(transaction.date);
+        const fromDate = new Date(filters.dateFrom);
+        if (transactionDate < fromDate) return false;
+      }
+
+      if (filters.dateTo) {
+        const transactionDate = new Date(transaction.date);
+        const toDate = new Date(filters.dateTo);
+        if (transactionDate > toDate) return false;
+      }
+
+      // Amount range filter
+      if (filters.minAmount !== undefined && transaction.amount < filters.minAmount) {
+        return false;
+      }
+
+      if (filters.maxAmount !== undefined && transaction.amount > filters.maxAmount) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [allTransactions, filters]);
+
+  // Client-side sorting
+  const sortedTransactions = useMemo(() => {
+    if (!sortConfig) return filteredTransactions;
+
+    return [...filteredTransactions].sort((a, b) => {
+      let aValue: string | number | null, bValue: string | number | null;
 
       if (sortConfig.key === 'date') {
         aValue = new Date(a.date).getTime();
@@ -162,9 +180,18 @@ export default function TransactionsPage() {
       } else if (sortConfig.key === 'amount') {
         aValue = a.amount;
         bValue = b.amount;
+      } else if (sortConfig.key === 'description') {
+        aValue = a.description.toLowerCase();
+        bValue = b.description.toLowerCase();
       } else {
-        return 0;
+        aValue = a[sortConfig.key as keyof TransactionType];
+        bValue = b[sortConfig.key as keyof TransactionType];
       }
+
+      // Handle null values
+      if (aValue === null && bValue === null) return 0;
+      if (aValue === null) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (bValue === null) return sortConfig.direction === 'asc' ? 1 : -1;
 
       if (aValue < bValue) {
         return sortConfig.direction === 'asc' ? -1 : 1;
@@ -174,12 +201,23 @@ export default function TransactionsPage() {
       }
       return 0;
     });
-  }
+  }, [filteredTransactions, sortConfig]);
 
-  // Pagination
+  // Client-side pagination
   const totalPages = Math.ceil(sortedTransactions.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedTransactions = sortedTransactions.slice(startIndex, startIndex + itemsPerPage);
+
+  // Filter handlers - NO server calls, just local state updates
+  const handleFiltersChange = (newFilters: TransactionFilters) => {
+    setFilters(newFilters);
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  const handleClearFilters = () => {
+    setFilters({});
+    setCurrentPage(1);
+  };
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -225,7 +263,7 @@ export default function TransactionsPage() {
       if (result.success) {
         notifySuccess(`${selectedRows.length} transactions deleted successfully`);
         setSelectedRows([]);
-        setTransactions((prev) => prev.filter((t) => !selectedRows.includes(t.id)));
+        setAllTransactions((prev) => prev.filter((t) => !selectedRows.includes(t.id)));
       } else {
         notifyError('Failed to delete transactions', {
           description: result.error,
@@ -275,9 +313,9 @@ export default function TransactionsPage() {
     updatedTransaction?: TransactionType,
   ) => {
     if (newTransaction) {
-      setTransactions((prev) => [...prev, newTransaction]);
+      setAllTransactions((prev) => [...prev, newTransaction]);
     } else if (updatedTransaction) {
-      setTransactions((prev) =>
+      setAllTransactions((prev) =>
         prev.map((t) => (t.id === updatedTransaction.id ? updatedTransaction : t)),
       );
     }
@@ -287,9 +325,6 @@ export default function TransactionsPage() {
     setShowForm(false);
     setEditingTransaction(null);
   };
-
-  // Get account names for the filter
-  const accountNames = ['All Accounts', ...accounts.map((acc) => acc.name)];
 
   if (isInitialLoading) {
     return (
@@ -319,71 +354,12 @@ export default function TransactionsPage() {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="space-y-4">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Search</label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search transactions..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Type</label>
-            <Select value={selectedType} onValueChange={setSelectedType}>
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {transactionTypes.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
-                    {type.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Account</label>
-            <Select value={selectedAccount} onValueChange={setSelectedAccount}>
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {accountNames.map((account) => (
-                  <SelectItem key={account} value={account}>
-                    {account}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Category</label>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {mockCategories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </div>
+      {/* Advanced Filters */}
+      <TransactionFiltersComponent
+        accounts={accounts}
+        onFiltersChange={handleFiltersChange}
+        onClearFilters={handleClearFilters}
+      />
 
       {/* Data Table */}
       <Card>
@@ -392,8 +368,8 @@ export default function TransactionsPage() {
             <div>
               <CardTitle>Transactions</CardTitle>
               <CardDescription>
-                {sortedTransactions.length} transaction
-                {sortedTransactions.length !== 1 ? 's' : ''} found
+                {filteredTransactions.length} transaction
+                {filteredTransactions.length !== 1 ? 's' : ''} found
               </CardDescription>
             </div>
             {selectedRows.length > 0 && (
@@ -459,7 +435,7 @@ export default function TransactionsPage() {
                   <TableRow>
                     <TableCell colSpan={8} className="h-64 text-center">
                       <div className="flex flex-col items-center justify-center space-y-3">
-                        {transactions.length === 0 ? (
+                        {allTransactions.length === 0 ? (
                           <>
                             <div className="rounded-full bg-muted p-3">
                               <Plus className="h-6 w-6 text-muted-foreground" />
@@ -565,7 +541,7 @@ export default function TransactionsPage() {
                                   const result = await deleteTransaction(transaction.id);
                                   if (result.success) {
                                     notifySuccess('Transaction deleted successfully');
-                                    setTransactions((prev) =>
+                                    setAllTransactions((prev) =>
                                       prev.filter((t) => t.id !== transaction.id),
                                     );
                                   } else {
