@@ -12,16 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import {
-  Search,
-  Plus,
-  Download,
-  Edit,
-  Trash2,
-  ArrowUpDown,
-  MoreHorizontal,
-  Loader2,
-} from 'lucide-react';
+import { Search, Plus, Download, Edit, Trash2, ArrowUpDown, MoreHorizontal } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -407,7 +398,7 @@ export default function TransactionsPage() {
                 disabled={isDeleting === 'bulk'}
               >
                 {isDeleting === 'bulk' ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <LoadingSpinner size="sm" variant="default" message="" inline />
                 ) : (
                   <Trash2 className="mr-2 h-4 w-4" />
                 )}
@@ -581,7 +572,11 @@ export default function TransactionsPage() {
                                 }
                               }}
                             >
-                              <Trash2 className="mr-2 h-4 w-4" />
+                              {isDeleting === transaction.id ? (
+                                <LoadingSpinner size="sm" variant="default" message="" inline />
+                              ) : (
+                                <Trash2 className="mr-2 h-4 w-4" />
+                              )}
                               Delete
                             </DropdownMenuItem>
                           </DropdownMenuContent>

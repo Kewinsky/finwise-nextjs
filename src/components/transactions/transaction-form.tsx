@@ -384,7 +384,7 @@ export function TransactionForm({
 
             {selectedType === 'income' && (
               <div className="grid grid-cols-2 gap-4">
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="toAccount">To Account</Label>
                   <AccountSelect
                     value={toAccount || ''}
@@ -393,7 +393,7 @@ export function TransactionForm({
                     error={form.formState.errors.toAccount?.message}
                   />
                 </div>
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="category">Category</Label>
                   <CategorySelect
                     value={form.watch('category')}
@@ -406,7 +406,7 @@ export function TransactionForm({
 
             {selectedType === 'expense' && (
               <div className="grid grid-cols-2 gap-4">
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="fromAccount">From Account</Label>
                   <AccountSelect
                     value={fromAccount || ''}
@@ -415,7 +415,7 @@ export function TransactionForm({
                     error={form.formState.errors.fromAccount?.message}
                   />
                 </div>
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="category">Category</Label>
                   <CategorySelect
                     value={form.watch('category')}
@@ -428,7 +428,7 @@ export function TransactionForm({
 
             {selectedType === 'transfer' && (
               <div className="grid grid-cols-2 gap-4">
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="fromAccount">From Account</Label>
                   <AccountSelect
                     value={fromAccount || ''}
@@ -437,7 +437,7 @@ export function TransactionForm({
                     error={form.formState.errors.fromAccount?.message}
                   />
                 </div>
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="toAccount">To Account</Label>
                   <Select
                     value={toAccount}
