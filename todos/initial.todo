@@ -41,8 +41,8 @@
     ✔ Fix hardcoded percentage changes in dashboard to use real data @done(25-10-21 13:09)
     ✔ Implement advanced filtering (date ranges, amount ranges) @done(25-10-21 14:24)
     ✔ Add date range selector for dashboard charts @done(25-10-21 15:40)
+    ✔ Add refresh functionality to dashboard @done(25-10-21 15:58)
     ☐ Create balance history charts for accounts
-    ☐ Add refresh functionality to dashboard
     ☐ Implement CSV export functionality for transactions
     ☐ Add memoization for expensive calculations in all pages
     ☐ Add transaction templates for recurring transactions
