@@ -509,25 +509,59 @@ export class TransactionService {
       const startOfMonth = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
       const endOfMonth = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0);
 
-      log.info({ userId, startOfMonth, endOfMonth }, 'Fetching monthly summary');
+      // Previous month dates
+      const previousMonthDate = new Date(targetDate.getFullYear(), targetDate.getMonth() - 1, 1);
+      const startOfPreviousMonth = new Date(
+        previousMonthDate.getFullYear(),
+        previousMonthDate.getMonth(),
+        1,
+      );
+      const endOfPreviousMonth = new Date(
+        previousMonthDate.getFullYear(),
+        previousMonthDate.getMonth() + 1,
+        0,
+      );
 
-      const { data, error } = await this.supabase
+      log.info(
+        { userId, startOfMonth, endOfMonth, startOfPreviousMonth, endOfPreviousMonth },
+        'Fetching monthly summary',
+      );
+
+      // Get current month data
+      const { data: currentMonthData, error: currentError } = await this.supabase
         .from('transactions')
         .select('type, amount')
         .eq('user_id', userId)
         .gte('date', startOfMonth.toISOString().split('T')[0])
         .lte('date', endOfMonth.toISOString().split('T')[0]);
 
-      if (error) {
-        log.error({ userId, error: error.message }, 'Failed to fetch monthly summary');
-        return { success: false, error: error.message };
+      if (currentError) {
+        log.error({ userId, error: currentError.message }, 'Failed to fetch current month summary');
+        return { success: false, error: currentError.message };
       }
 
+      // Get previous month data
+      const { data: previousMonthData, error: previousError } = await this.supabase
+        .from('transactions')
+        .select('type, amount')
+        .eq('user_id', userId)
+        .gte('date', startOfPreviousMonth.toISOString().split('T')[0])
+        .lte('date', endOfPreviousMonth.toISOString().split('T')[0]);
+
+      if (previousError) {
+        log.error(
+          { userId, error: previousError.message },
+          'Failed to fetch previous month summary',
+        );
+        return { success: false, error: previousError.message };
+      }
+
+      // Calculate current month summary
       let totalIncome = 0;
       let totalExpenses = 0;
       let transactionCount = 0;
 
-      data.forEach((transaction) => {
+      currentMonthData.forEach((transaction) => {
         const amount = Number(transaction.amount);
         transactionCount++;
 
@@ -541,6 +575,25 @@ export class TransactionService {
       const netIncome = totalIncome - totalExpenses;
       const savings = netIncome;
 
+      // Calculate previous month summary
+      let prevTotalIncome = 0;
+      let prevTotalExpenses = 0;
+      let prevTransactionCount = 0;
+
+      previousMonthData.forEach((transaction) => {
+        const amount = Number(transaction.amount);
+        prevTransactionCount++;
+
+        if (transaction.type === 'income') {
+          prevTotalIncome += amount;
+        } else if (transaction.type === 'expense') {
+          prevTotalExpenses += amount;
+        }
+      });
+
+      const prevNetIncome = prevTotalIncome - prevTotalExpenses;
+      const prevSavings = prevNetIncome;
+
       const summary: MonthlySummary = {
         month: `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, '0')}`,
         totalIncome,
@@ -548,9 +601,17 @@ export class TransactionService {
         netIncome,
         savings,
         transactionCount,
+        previousMonth: {
+          month: `${previousMonthDate.getFullYear()}-${String(previousMonthDate.getMonth() + 1).padStart(2, '0')}`,
+          totalIncome: prevTotalIncome,
+          totalExpenses: prevTotalExpenses,
+          netIncome: prevNetIncome,
+          savings: prevSavings,
+          transactionCount: prevTransactionCount,
+        },
       };
 
-      log.info({ userId, summary }, 'Monthly summary calculated');
+      log.info({ userId, summary }, 'Monthly summary calculated with previous month data');
       return { success: true, data: summary };
     } catch (error) {
       log.error(error, 'Error calculating monthly summary');

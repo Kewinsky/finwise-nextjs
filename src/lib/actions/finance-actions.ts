@@ -429,12 +429,22 @@ export async function getDashboardData() {
       return { success: false, error: monthlySummaryResult.error };
     }
 
+    const currentBalance = totalBalanceResult.success ? totalBalanceResult.data : 0;
+    const monthlySummary = monthlySummaryResult.data;
+
+    // Calculate previous month balance by subtracting current month's net income
+    // This is a simplified approach - in a real system you'd want historical balance tracking
+    const previousMonthBalance = monthlySummary.previousMonth
+      ? currentBalance - monthlySummary.netIncome
+      : undefined;
+
     const dashboardData = {
       monthlySummary: monthlySummaryResult.data,
       recentTransactions: recentTransactionsResult.success ? recentTransactionsResult.data : [],
       spendingTrends: spendingTrendsResult.success ? spendingTrendsResult.data : [],
-      totalBalance: totalBalanceResult.success ? totalBalanceResult.data : 0,
+      totalBalance: currentBalance,
       accountCount: accountCountResult.success ? accountCountResult.data : 0,
+      previousMonthBalance,
     };
 
     return { success: true, data: dashboardData };

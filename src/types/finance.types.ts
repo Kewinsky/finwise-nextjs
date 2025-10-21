@@ -98,6 +98,15 @@ export interface MonthlySummary {
   netIncome: number;
   savings: number;
   transactionCount: number;
+  // Previous month data for comparison
+  previousMonth?: {
+    month: string;
+    totalIncome: number;
+    totalExpenses: number;
+    netIncome: number;
+    savings: number;
+    transactionCount: number;
+  };
 }
 
 export interface SpendingTrends {
@@ -132,6 +141,7 @@ export interface DashboardMetrics {
   spendingTrends: SpendingTrends[];
   totalBalance: number;
   accountCount: number;
+  previousMonthBalance?: number;
 }
 
 export interface RecentTransaction {

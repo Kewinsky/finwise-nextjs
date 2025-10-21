@@ -26,6 +26,7 @@ import { useRouter } from 'next/navigation';
 import { TransactionForm } from '@/components/transactions/transaction-form';
 import { getDashboardData } from '@/lib/actions/finance-actions';
 import { notifyError } from '@/lib/notifications';
+import { calculatePercentageChange, formatPercentageChange } from '@/lib/utils';
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import type { DashboardMetrics } from '@/types/finance.types';
 
@@ -131,7 +132,28 @@ export default function DashboardPage() {
               {formatCurrency(dashboardData.totalBalance)}
             </div>
             <p className="text-xs text-blue-600 dark:text-blue-400">
-              <span className="text-blue-600 dark:text-blue-400">+2.5%</span> from last month
+              {(() => {
+                if (!dashboardData.previousMonthBalance) {
+                  return <span className="text-muted-foreground">No previous data</span>;
+                }
+                const percentage = calculatePercentageChange(
+                  dashboardData.totalBalance,
+                  dashboardData.previousMonthBalance,
+                );
+                const { text, isPositive } = formatPercentageChange(percentage);
+                return (
+                  <span
+                    className={
+                      isPositive
+                        ? 'text-green-600 dark:text-green-400'
+                        : 'text-red-600 dark:text-red-400'
+                    }
+                  >
+                    {text}
+                  </span>
+                );
+              })()}{' '}
+              from last month
             </p>
           </CardContent>
         </Card>
@@ -148,7 +170,28 @@ export default function DashboardPage() {
               {formatCurrency(dashboardData.monthlySummary.totalIncome)}
             </div>
             <p className="text-xs text-green-600 dark:text-green-400">
-              <span className="text-green-600 dark:text-green-400">+12%</span> from last month
+              {(() => {
+                if (!dashboardData.monthlySummary.previousMonth) {
+                  return <span className="text-muted-foreground">No previous data</span>;
+                }
+                const percentage = calculatePercentageChange(
+                  dashboardData.monthlySummary.totalIncome,
+                  dashboardData.monthlySummary.previousMonth.totalIncome,
+                );
+                const { text, isPositive } = formatPercentageChange(percentage);
+                return (
+                  <span
+                    className={
+                      isPositive
+                        ? 'text-green-600 dark:text-green-400'
+                        : 'text-red-600 dark:text-red-400'
+                    }
+                  >
+                    {text}
+                  </span>
+                );
+              })()}{' '}
+              from last month
             </p>
           </CardContent>
         </Card>
@@ -165,7 +208,30 @@ export default function DashboardPage() {
               {formatCurrency(dashboardData.monthlySummary.totalExpenses)}
             </div>
             <p className="text-xs text-rose-600 dark:text-rose-400">
-              <span className="text-red-600 dark:text-red-400">-5%</span> from last month
+              {(() => {
+                if (!dashboardData.monthlySummary.previousMonth) {
+                  return <span className="text-muted-foreground">No previous data</span>;
+                }
+                const percentage = calculatePercentageChange(
+                  dashboardData.monthlySummary.totalExpenses,
+                  dashboardData.monthlySummary.previousMonth.totalExpenses,
+                );
+                const { text, isPositive } = formatPercentageChange(percentage);
+                // For expenses, we want to show positive change as bad (red) and negative change as good (green)
+                const isGood = !isPositive;
+                return (
+                  <span
+                    className={
+                      isGood
+                        ? 'text-green-600 dark:text-green-400'
+                        : 'text-red-600 dark:text-red-400'
+                    }
+                  >
+                    {text}
+                  </span>
+                );
+              })()}{' '}
+              from last month
             </p>
           </CardContent>
         </Card>
@@ -182,7 +248,28 @@ export default function DashboardPage() {
               {formatCurrency(dashboardData.monthlySummary.savings)}
             </div>
             <p className="text-xs text-purple-600 dark:text-purple-400">
-              <span className="text-purple-600 dark:text-purple-400">+34%</span> from last month
+              {(() => {
+                if (!dashboardData.monthlySummary.previousMonth) {
+                  return <span className="text-muted-foreground">No previous data</span>;
+                }
+                const percentage = calculatePercentageChange(
+                  dashboardData.monthlySummary.savings,
+                  dashboardData.monthlySummary.previousMonth.savings,
+                );
+                const { text, isPositive } = formatPercentageChange(percentage);
+                return (
+                  <span
+                    className={
+                      isPositive
+                        ? 'text-green-600 dark:text-green-400'
+                        : 'text-red-600 dark:text-red-400'
+                    }
+                  >
+                    {text}
+                  </span>
+                );
+              })()}{' '}
+              from last month
             </p>
           </CardContent>
         </Card>
