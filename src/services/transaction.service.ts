@@ -777,4 +777,71 @@ export class TransactionService {
       };
     }
   }
+
+  /**
+   * Export transactions to CSV format
+   */
+  async exportTransactionsToCSV(
+    userId: string,
+    filters: TransactionFilters = {},
+  ): Promise<ServiceResult<string>> {
+    try {
+      log.info({ userId, filters }, 'Starting CSV export');
+
+      // Get transactions with filters
+      const transactionsResult = await this.getTransactions(userId, filters);
+      if (!transactionsResult.success) {
+        return { success: false, error: transactionsResult.error };
+      }
+
+      const transactions = transactionsResult.data?.data || [];
+
+      if (transactions.length === 0) {
+        return { success: true, data: 'Date,Description,Amount,Type,Category,Account,Notes\n' };
+      }
+
+      // Get account names for better CSV data
+      const { data: accounts } = await this.supabase
+        .from('accounts')
+        .select('id, name')
+        .eq('user_id', userId);
+
+      const accountMap = new Map(accounts?.map((acc) => [acc.id, acc.name]) || []);
+
+      // Generate CSV content
+      const csvHeaders =
+        'Date,Description,Amount,Type,Category,Account,From Account,To Account,Notes\n';
+
+      const csvRows = transactions
+        .map((transaction) => {
+          const date = new Date(transaction.date).toLocaleDateString();
+          const description = `"${transaction.description.replace(/"/g, '""')}"`;
+          const amount = transaction.amount.toFixed(2);
+          const type = transaction.type;
+          const category = `"${transaction.category || ''}"`;
+          const account = `"${accountMap.get(transaction.from_account_id || transaction.to_account_id || '') || 'Unknown'}"`;
+          const fromAccount = transaction.from_account_id
+            ? `"${accountMap.get(transaction.from_account_id) || 'Unknown'}"`
+            : '';
+          const toAccount = transaction.to_account_id
+            ? `"${accountMap.get(transaction.to_account_id) || 'Unknown'}"`
+            : '';
+          const notes = `"${(transaction.notes || '').replace(/"/g, '""')}"`;
+
+          return `${date},${description},${amount},${type},${category},${account},${fromAccount},${toAccount},${notes}`;
+        })
+        .join('\n');
+
+      const csvContent = csvHeaders + csvRows;
+
+      log.info({ userId, transactionCount: transactions.length }, 'CSV export completed');
+      return { success: true, data: csvContent };
+    } catch (error) {
+      log.error(error, 'Error exporting transactions to CSV');
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : ERROR_MESSAGES.UNEXPECTED,
+      };
+    }
+  }
 }

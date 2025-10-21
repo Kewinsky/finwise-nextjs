@@ -42,9 +42,8 @@
     ✔ Implement advanced filtering (date ranges, amount ranges) @done(25-10-21 14:24)
     ✔ Add date range selector for dashboard charts @done(25-10-21 15:40)
     ✔ Add refresh functionality to dashboard @done(25-10-21 15:58)
+    ✔ Implement CSV export functionality for transactions @done(25-10-21 21:34)
     ☐ Create balance history charts for accounts
-    ☐ Implement CSV export functionality for transactions
-    ☐ Add memoization for expensive calculations in all pages
-    ☐ Add transaction templates for recurring transactions
     ☐ Implement dashboard customization options
+    ☐ Add memoization for expensive calculations in all pages
     ☐ Add account archiving functionality (soft delete)

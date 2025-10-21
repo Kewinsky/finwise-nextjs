@@ -594,3 +594,30 @@ export async function exportTransactions(filters?: TransactionFilters) {
     return handleActionError(error, 'exportTransactions');
   }
 }
+
+/**
+ * Export transactions to CSV format
+ */
+export async function exportTransactionsToCSV(filters: TransactionFilters = {}) {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const transactionService = new TransactionService(supabase);
+    const result = await transactionService.exportTransactionsToCSV(user.id, filters);
+
+    if (!result.success) {
+      return { success: false, error: result.error };
+    }
+
+    return { success: true, data: result.data };
+  } catch (error) {
+    return handleActionError(error, 'exportTransactionsToCSV');
+  }
+}

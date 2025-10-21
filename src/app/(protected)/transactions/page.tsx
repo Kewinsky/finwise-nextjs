@@ -29,6 +29,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { TransactionForm } from '@/components/transactions/transaction-form';
 import { TransactionFiltersComponent } from '@/components/transactions/transaction-filters';
+import { CSVExportButton } from '@/components/transactions/csv-export-button';
 import { format } from 'date-fns';
 import { notifySuccess, notifyError } from '@/lib/notifications';
 import {
@@ -276,11 +277,6 @@ export default function TransactionsPage() {
     }
   };
 
-  const handleExportCSV = () => {
-    // Simulate CSV export
-    console.log('Exporting transactions to CSV');
-  };
-
   const handleSort = (key: string) => {
     if (key !== 'date' && key !== 'amount') return;
 
@@ -342,16 +338,10 @@ export default function TransactionsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Transactions</h1>
           <p className="text-muted-foreground">Track your income, expenses, and transfers</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={handleExportCSV}>
-            <Download className="mr-2 h-4 w-4" />
-            Export CSV
-          </Button>
-          <Button onClick={() => setShowForm(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Transaction
-          </Button>
-        </div>
+        <Button onClick={() => setShowForm(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Transaction
+        </Button>
       </div>
 
       {/* Advanced Filters */}
@@ -372,21 +362,26 @@ export default function TransactionsPage() {
                 {filteredTransactions.length !== 1 ? 's' : ''} found
               </CardDescription>
             </div>
-            {selectedRows.length > 0 && (
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleBulkDelete}
-                disabled={isDeleting === 'bulk'}
-              >
-                {isDeleting === 'bulk' ? (
-                  <LoadingSpinner size="sm" variant="default" message="" inline />
-                ) : (
-                  <Trash2 className="mr-2 h-4 w-4" />
-                )}
-                Delete Selected ({selectedRows.length})
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {selectedRows.length > 0 && (
+                <>
+                  <CSVExportButton filters={filters} />
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleBulkDelete}
+                    disabled={isDeleting === 'bulk'}
+                  >
+                    {isDeleting === 'bulk' ? (
+                      <LoadingSpinner size="sm" variant="default" message="" inline />
+                    ) : (
+                      <Trash2 className="mr-2 h-4 w-4" />
+                    )}
+                    Delete Selected ({selectedRows.length})
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent>
