@@ -35,7 +35,6 @@ import { createTransaction, updateTransaction } from '@/lib/actions/finance-acti
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { transactionFormSchema, TransactionFormData } from '@/validation/finance';
 import type { Account, TransactionFormProps } from '@/types';
-import type { Transaction } from '@/types/finance.types';
 
 const categories = {
   income: [
