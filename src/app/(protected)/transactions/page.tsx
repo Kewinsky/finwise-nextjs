@@ -225,7 +225,7 @@ export default function TransactionsPage() {
       if (result.success) {
         notifySuccess(`${selectedRows.length} transactions deleted successfully`);
         setSelectedRows([]);
-        await loadData();
+        setTransactions((prev) => prev.filter((t) => !selectedRows.includes(t.id)));
       } else {
         notifyError('Failed to delete transactions', {
           description: result.error,
@@ -254,7 +254,6 @@ export default function TransactionsPage() {
   };
 
   const handleEditTransaction = (transaction: TransactionType) => {
-    // Map TransactionType to the format expected by TransactionForm
     const mappedTransaction = {
       id: transaction.id,
       type: transaction.type,
@@ -271,9 +270,17 @@ export default function TransactionsPage() {
     setShowForm(true);
   };
 
-  const handleTransactionSuccess = () => {
-    // Only reload data when transaction is successfully saved (without showing full loading)
-    loadData(false);
+  const handleTransactionSuccess = (
+    newTransaction?: TransactionType,
+    updatedTransaction?: TransactionType,
+  ) => {
+    if (newTransaction) {
+      setTransactions((prev) => [...prev, newTransaction]);
+    } else if (updatedTransaction) {
+      setTransactions((prev) =>
+        prev.map((t) => (t.id === updatedTransaction.id ? updatedTransaction : t)),
+      );
+    }
   };
 
   const handleCloseForm = () => {
@@ -284,7 +291,6 @@ export default function TransactionsPage() {
   // Get account names for the filter
   const accountNames = ['All Accounts', ...accounts.map((acc) => acc.name)];
 
-  // Show loading spinner only on initial load
   if (isInitialLoading) {
     return (
       <div className="min-h-screen">
@@ -559,7 +565,9 @@ export default function TransactionsPage() {
                                   const result = await deleteTransaction(transaction.id);
                                   if (result.success) {
                                     notifySuccess('Transaction deleted successfully');
-                                    await loadData();
+                                    setTransactions((prev) =>
+                                      prev.filter((t) => t.id !== transaction.id),
+                                    );
                                   } else {
                                     notifyError('Failed to delete transaction', {
                                       description: result.error,

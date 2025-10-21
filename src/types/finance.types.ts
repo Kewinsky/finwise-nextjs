@@ -211,7 +211,7 @@ export const COMMON_CATEGORIES = {
 export interface TransactionFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void;
+  onSuccess?: (newTransaction?: Transaction, updatedTransaction?: Transaction) => void;
   defaultType?: TransactionType;
   transaction?: {
     id: string;

@@ -97,8 +97,16 @@ export default function AccountsPage() {
   const handleCloseForm = () => {
     setShowForm(false);
     setEditingAccount(null);
-    // Reload accounts after form closes
-    loadAccounts();
+  };
+
+  const handleAccountSuccess = (newAccount?: Account, updatedAccount?: Account) => {
+    if (newAccount) {
+      setAccounts((prev) => (prev ? [...prev, newAccount] : [newAccount]));
+    } else if (updatedAccount) {
+      setAccounts((prev) =>
+        prev ? prev.map((acc) => (acc.id === updatedAccount.id ? updatedAccount : acc)) : null,
+      );
+    }
   };
 
   const handleDeleteAccount = async (account: Account) => {
@@ -108,31 +116,26 @@ export default function AccountsPage() {
     }
     try {
       setIsDeleting(account.id);
-      // Optimistic UI: remove from list immediately
       const previous = accounts;
       setAccounts((prev) => prev?.filter((a) => a.id !== account.id) || null);
       const result = await deleteAccount(account.id);
 
       if (result.success) {
         notifySuccess('Account deleted successfully');
-        // No need to reload due to optimistic update
       } else {
         notifyError('Failed to delete account', {
           description: result.error,
         });
-        // Rollback
         setAccounts(previous);
       }
     } catch {
       notifyError('Failed to delete account');
-      // Rollback just in case
       await loadAccounts();
     } finally {
       setIsDeleting(null);
     }
   };
 
-  // Show loading spinner when accounts data is not loaded yet
   if (!accounts) {
     return (
       <div className="min-h-screen">
@@ -279,6 +282,7 @@ export default function AccountsPage() {
           onOpenChange={handleCloseForm}
           account={editingAccount || undefined}
           colors={ACCOUNT_COLORS}
+          onSuccess={handleAccountSuccess}
         />
       )}
     </div>

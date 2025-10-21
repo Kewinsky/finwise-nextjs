@@ -49,6 +49,7 @@ interface AccountFormProps {
   onOpenChange: (open: boolean) => void;
   account?: Account;
   colors: string[];
+  onSuccess?: (newAccount?: Account, updatedAccount?: Account) => void;
 }
 
 const accountTypes = [
@@ -66,7 +67,7 @@ const currencies = [
   { value: 'CAD', label: 'CAD - Canadian Dollar' },
 ];
 
-export function AccountForm({ open, onOpenChange, account, colors }: AccountFormProps) {
+export function AccountForm({ open, onOpenChange, account, colors, onSuccess }: AccountFormProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<AccountFormData>({
@@ -120,6 +121,13 @@ export function AccountForm({ open, onOpenChange, account, colors }: AccountForm
 
       if (result.success) {
         notifySuccess(account ? 'Account updated successfully' : 'Account created successfully');
+
+        if (!account && result.success && 'data' in result) {
+          onSuccess?.(result.data, undefined);
+        } else if (account && result.success && 'data' in result) {
+          onSuccess?.(undefined, result.data);
+        }
+
         onOpenChange(false);
         form.reset();
       } else {

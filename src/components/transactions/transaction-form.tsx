@@ -35,6 +35,7 @@ import { createTransaction, updateTransaction } from '@/lib/actions/finance-acti
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { transactionFormSchema, TransactionFormData } from '@/validation/finance';
 import type { Account, TransactionFormProps } from '@/types';
+import type { Transaction } from '@/types/finance.types';
 
 const categories = {
   income: [
@@ -94,9 +95,15 @@ export function TransactionForm({
   const resetForm = useCallback(
     (values: Partial<TransactionFormData>) => {
       form.reset(values);
-      form.setValue('fromAccount', '');
-      form.setValue('toAccount', '');
-      form.setValue('category', '');
+      if (!values.fromAccount) {
+        form.setValue('fromAccount', '');
+      }
+      if (!values.toAccount) {
+        form.setValue('toAccount', '');
+      }
+      if (!values.category) {
+        form.setValue('category', '');
+      }
     },
     [form],
   );
@@ -134,24 +141,29 @@ export function TransactionForm({
 
     if (transaction) {
       const categoryId = getCategoryId(transaction.category, transaction.type);
-      resetForm({
-        type: transaction.type as 'income' | 'expense' | 'transfer',
-        amount: Math.abs(transaction.amount).toString(),
-        description: transaction.description,
-        category: categoryId,
-        date: transaction.date,
-        notes: transaction.notes || '',
-        fromAccount: transaction.fromAccountId || '',
-        toAccount: transaction.toAccountId || '',
-      });
+
+      if (form) {
+        resetForm({
+          type: transaction.type as 'income' | 'expense' | 'transfer',
+          amount: Math.abs(transaction.amount).toString(),
+          description: transaction.description,
+          category: categoryId,
+          date: transaction.date,
+          notes: transaction.notes || '',
+          fromAccount: transaction.fromAccountId || '',
+          toAccount: transaction.toAccountId || '',
+        });
+      }
     } else {
-      resetForm({
-        type: defaultType || 'expense',
-        ...defaultFormValues,
-      });
+      if (form) {
+        resetForm({
+          type: defaultType || 'expense',
+          ...defaultFormValues,
+        });
+      }
     }
     setIsFormReady(true);
-  }, [transaction, accounts, resetForm, getCategoryId, defaultType]);
+  }, [transaction, accounts, resetForm, getCategoryId, defaultType, form]);
 
   useEffect(() => {
     const currentCategory = form.getValues('category');
@@ -194,10 +206,16 @@ export function TransactionForm({
 
       if (result?.success) {
         notifySuccess(`Transaction ${transaction?.id ? 'updated' : 'created'} successfully`);
+
+        if (!transaction?.id && result.success && 'data' in result) {
+          onSuccess?.(result.data, undefined);
+        } else if (transaction?.id && result.success && 'data' in result) {
+          onSuccess?.(undefined, result.data);
+        }
+
         onOpenChange(false);
         resetForm({ type: defaultType || 'expense', ...defaultFormValues });
         router.refresh();
-        onSuccess?.();
       } else {
         notifyError('Failed to save transaction', { description: result?.error });
       }
