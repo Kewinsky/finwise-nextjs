@@ -1,7 +1,6 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { SiteHeader } from '@/components/layout/site-header';
 import { SettingsHeader } from '@/components/settings/settings-header';
 import { SettingsSidebar } from '@/components/settings/settings-sidebar';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
@@ -17,7 +16,6 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
 
   return (
     <>
-      <SiteHeader title="Settings" />
       <div className="flex flex-1 flex-col gap-6 overflow-hidden p-4 xl:p-6">
         <SettingsHeader title={pageTitle} description={pageDescription} />
 

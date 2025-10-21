@@ -13,7 +13,7 @@ import { FormError } from '@/components/ui/form-error';
 import { Mail, Phone, MapPin, Clock, MessageSquare, Headphones } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { notifySuccess, notifyError } from '@/lib/notifications';
-import { contactFormSchema, type ContactFormData } from '@/schemas/auth';
+import { contactFormSchema, type ContactFormData } from '@/validation/auth';
 import { appConfig } from '@/config/app';
 
 const contactMethods = [

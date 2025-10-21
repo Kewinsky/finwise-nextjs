@@ -212,6 +212,120 @@ export type Database = {
           },
         ];
       };
+      accounts: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          type: string;
+          balance: number;
+          currency: string;
+          color: string | null;
+          is_mandatory: boolean;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          type: string;
+          balance?: number;
+          currency?: string;
+          color?: string | null;
+          is_mandatory?: boolean;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          type?: string;
+          balance?: number;
+          currency?: string;
+          color?: string | null;
+          is_mandatory?: boolean;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'accounts_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      transactions: {
+        Row: {
+          id: string;
+          user_id: string;
+          from_account_id: string | null;
+          to_account_id: string | null;
+          type: string;
+          description: string;
+          category: string;
+          amount: number;
+          date: string;
+          notes: string | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          from_account_id?: string | null;
+          to_account_id?: string | null;
+          type: string;
+          description: string;
+          category: string;
+          amount: number;
+          date: string;
+          notes?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          from_account_id?: string | null;
+          to_account_id?: string | null;
+          type?: string;
+          description?: string;
+          category?: string;
+          amount?: number;
+          date?: string;
+          notes?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'transactions_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'transactions_from_account_id_fkey';
+            columns: ['from_account_id'];
+            isOneToOne: false;
+            referencedRelation: 'accounts';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'transactions_to_account_id_fkey';
+            columns: ['to_account_id'];
+            isOneToOne: false;
+            referencedRelation: 'accounts';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -229,6 +343,8 @@ export type Database = {
         | 'trialing'
         | 'unpaid';
       user_role: 'admin' | 'user';
+      account_type: 'checking' | 'savings' | 'investment' | 'creditcard';
+      transaction_type: 'income' | 'expense' | 'transfer';
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -364,6 +480,8 @@ export const Constants = {
         'unpaid',
       ],
       user_role: ['admin', 'user'],
+      account_type: ['checking', 'savings', 'investment', 'creditcard'],
+      transaction_type: ['income', 'expense', 'transfer'],
     },
   },
 } as const;

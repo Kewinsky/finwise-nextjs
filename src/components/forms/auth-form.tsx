@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { FormError } from '@/components/ui/form-error';
 import { signInWithMagicLink, signInWithOAuth } from '@/lib/actions/auth-actions';
 import { appConfig } from '@/config/app';
-import { magicLinkSchema, type MagicLinkFormData } from '@/schemas/auth';
+import { magicLinkSchema, type MagicLinkFormData } from '@/validation/auth';
 
 export function AuthForm({ className, ...props }: React.ComponentProps<'div'>) {
   const router = useRouter();

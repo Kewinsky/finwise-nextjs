@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +14,7 @@ import {
   Wallet,
   Trash2,
   MoreVertical,
+  Loader2,
 } from 'lucide-react';
 import { AccountForm } from '@/components/accounts/account-form';
 import {
@@ -22,56 +23,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
-interface Account {
-  id: string;
-  name: string;
-  type: string;
-  balance: number;
-  currency: string;
-  color: string;
-}
-
-// Mock data
-const mockAccounts: Account[] = [
-  {
-    id: '1',
-    name: 'Checking Account',
-    type: 'checking',
-    balance: 5420.5,
-    currency: 'USD',
-    color: '#3B82F6',
-  },
-  {
-    id: '2',
-    name: 'Savings Account',
-    type: 'savings',
-    balance: 10000.0,
-    currency: 'USD',
-    color: '#10B981',
-  },
-  {
-    id: '3',
-    name: 'Credit Card',
-    type: 'credit',
-    balance: -250.75,
-    currency: 'USD',
-    color: '#EF4444',
-  },
-  {
-    id: '4',
-    name: 'Investment Portfolio',
-    type: 'investment',
-    balance: 15000.0,
-    currency: 'USD',
-    color: '#8B5CF6',
-  },
-];
+import { notifySuccess, notifyError } from '@/lib/notifications';
+import { getAccounts, deleteAccount } from '@/lib/actions/finance-actions';
+import { LoadingSpinner } from '@/components/ui/custom-spinner';
+import type { Account } from '@/types/finance.types';
 
 const accountTypes = {
   checking: { label: 'Checking', icon: CreditCard },
   savings: { label: 'Savings', icon: PiggyBank },
-  credit: { label: 'Credit Card', icon: CreditCard },
+  creditcard: { label: 'Credit Card', icon: CreditCard },
   investment: { label: 'Investment', icon: TrendingUp },
 };
 
@@ -89,10 +49,33 @@ const ACCOUNT_COLORS = [
 ];
 
 export default function AccountsPage() {
+  const [accounts, setAccounts] = useState<Account[] | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
-  const totalBalance = mockAccounts.reduce((sum, account) => sum + account.balance, 0);
+  // Load accounts on component mount
+  useEffect(() => {
+    loadAccounts();
+  }, []);
+
+  const loadAccounts = async () => {
+    try {
+      const result = await getAccounts();
+
+      if (result.success && 'data' in result) {
+        setAccounts(result.data as Account[]);
+      } else {
+        notifyError('Failed to load accounts', {
+          description: result.error,
+        });
+      }
+    } catch {
+      notifyError('Failed to load accounts');
+    }
+  };
+
+  const totalBalance = accounts?.reduce((sum, account) => sum + account.balance, 0) || 0;
 
   const formatCurrency = (amount: number, currency: string = 'USD') => {
     return new Intl.NumberFormat('en-US', {
@@ -116,11 +99,50 @@ export default function AccountsPage() {
     setEditingAccount(null);
   };
 
-  const handleDeleteAccount = (account: Account) => {
-    // In a real app, this would make an API call to delete the account
-    console.log('Deleting account:', account.name);
-    // For now, just log the action
+  const handleAccountSuccess = (newAccount?: Account, updatedAccount?: Account) => {
+    if (newAccount) {
+      setAccounts((prev) => (prev ? [...prev, newAccount] : [newAccount]));
+    } else if (updatedAccount) {
+      setAccounts((prev) =>
+        prev ? prev.map((acc) => (acc.id === updatedAccount.id ? updatedAccount : acc)) : null,
+      );
+    }
   };
+
+  const handleDeleteAccount = async (account: Account) => {
+    if (account.is_mandatory) {
+      notifyError('This account cannot be deleted', { description: 'Mandatory account' });
+      return;
+    }
+    try {
+      setIsDeleting(account.id);
+      const previous = accounts;
+      setAccounts((prev) => prev?.filter((a) => a.id !== account.id) || null);
+      const result = await deleteAccount(account.id);
+
+      if (result.success) {
+        notifySuccess('Account deleted successfully');
+      } else {
+        notifyError('Failed to delete account', {
+          description: result.error,
+        });
+        setAccounts(previous);
+      }
+    } catch {
+      notifyError('Failed to delete account');
+      await loadAccounts();
+    } finally {
+      setIsDeleting(null);
+    }
+  };
+
+  if (!accounts) {
+    return (
+      <div className="min-h-screen">
+        <LoadingSpinner message="Loading accounts..." />
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 space-y-6 p-6">
@@ -151,74 +173,107 @@ export default function AccountsPage() {
       </Card>
 
       {/* Account List */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {mockAccounts.map((account) => {
-          const IconComponent =
-            accountTypes[account.type as keyof typeof accountTypes]?.icon || Building;
-          const typeLabel =
-            accountTypes[account.type as keyof typeof accountTypes]?.label || 'Other';
+      {accounts.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Building className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No accounts yet</h3>
+            <p className="text-muted-foreground text-center mb-4">
+              Get started by adding your first account to track your finances.
+            </p>
+            <Button onClick={handleAddAccount}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Your First Account
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {accounts.map((account) => {
+            const IconComponent =
+              accountTypes[account.type as keyof typeof accountTypes]?.icon || Building;
+            const typeLabel =
+              accountTypes[account.type as keyof typeof accountTypes]?.label || 'Other';
 
-          return (
-            <Card key={account.id} className="overflow-hidden p-0">
-              <CardHeader
-                className="py-3 text-white relative"
-                style={{ backgroundColor: account.color }}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-white/20">
-                      <IconComponent className="h-5 w-5 text-white" />
+            return (
+              <Card key={account.id} className="overflow-hidden p-0">
+                <CardHeader
+                  className="py-3 text-white relative"
+                  style={{ backgroundColor: account.color || '#3B82F6' }}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-white/20">
+                        <IconComponent className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg flex items-center gap-2">
+                          {account.name}
+                          {account.is_mandatory && (
+                            <span className="inline-flex items-center rounded px-2 py-0.5 text-xs font-medium bg-white/20 text-white border border-white/30">
+                              Mandatory
+                            </span>
+                          )}
+                        </h3>
+                        <Badge variant="outline" className="bg-white/20 text-white border-white/30">
+                          {typeLabel}
+                        </Badge>
+                      </div>
                     </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="h-8 w-8 p-0 text-white hover:bg-white/20"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleEditAccount(account)}>
+                          <Edit className="mr-2 h-4 w-4" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleDeleteAccount(account)}
+                          disabled={isDeleting === account.id || account.is_mandatory}
+                        >
+                          {isDeleting === account.id ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="mr-2 h-4 w-4" />
+                          )}
+                          {account.is_mandatory ? 'Delete (disabled)' : 'Delete'}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </CardHeader>
+                <CardContent className="py-6">
+                  <div className="space-y-4">
                     <div>
-                      <h3 className="font-bold text-lg">{account.name}</h3>
-                      <Badge variant="outline" className="bg-white/20 text-white border-white/30">
-                        {typeLabel}
-                      </Badge>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">Current Balance</p>
+                      <p
+                        className={`text-2xl font-bold ${
+                          account.balance >= 0
+                            ? 'text-green-600 dark:text-green-400'
+                            : 'text-red-600 dark:text-red-400'
+                        }`}
+                      >
+                        {account.currency === 'USD' ? '$' : account.currency}{' '}
+                        {Math.abs(account.balance || 0).toFixed(2)}
+                        {account.balance < 0 && (
+                          <span className="text-red-500 dark:text-red-400 ml-1">(Overdrawn)</span>
+                        )}
+                      </p>
                     </div>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0 text-white hover:bg-white/20">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleEditAccount(account)}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleDeleteAccount(account)}>
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </CardHeader>
-              <CardContent className="py-6">
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">Current Balance</p>
-                    <p
-                      className={`text-2xl font-bold ${
-                        account.balance >= 0
-                          ? 'text-green-600 dark:text-green-400'
-                          : 'text-red-600 dark:text-red-400'
-                      }`}
-                    >
-                      {account.currency === 'USD' ? '$' : account.currency}{' '}
-                      {Math.abs(account.balance || 0).toFixed(2)}
-                      {account.balance < 0 && (
-                        <span className="text-red-500 dark:text-red-400 ml-1">(Overdrawn)</span>
-                      )}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
 
       {/* Account Form */}
       {showForm && (
@@ -227,6 +282,7 @@ export default function AccountsPage() {
           onOpenChange={handleCloseForm}
           account={editingAccount || undefined}
           colors={ACCOUNT_COLORS}
+          onSuccess={handleAccountSuccess}
         />
       )}
     </div>

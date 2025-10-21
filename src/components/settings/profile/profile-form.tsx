@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { User } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
-import { profileSchema, type ProfileFormData } from '@/schemas/profile';
+import { profileSchema, type ProfileFormData } from '@/validation/profile';
 
 interface ProfileFormProps {
   initialData?: ProfileFormData;

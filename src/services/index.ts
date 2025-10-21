@@ -89,3 +89,34 @@ export {
   appToDbPreferences,
   appToDbUpdate,
 } from '@/types/user-preferences.types';
+
+// Finance services
+export { AccountService } from './account.service';
+export { TransactionService } from './transaction.service';
+export { AIAssistantService } from './ai.service';
+export type {
+  Account,
+  AccountInsert,
+  AccountUpdate,
+  Transaction,
+  TransactionInsert,
+  TransactionUpdate,
+  CreateAccountInput,
+  UpdateAccountInput,
+  CreateTransactionInput,
+  UpdateTransactionInput,
+  AccountFilters,
+  TransactionFilters,
+  MonthlySummary,
+  SpendingTrends,
+  CategorySpending,
+  AccountBalance,
+  DashboardMetrics,
+  RecentTransaction,
+  FinancialInsights,
+  AIQuestionResponse,
+  TransactionExport,
+  AccountType,
+  TransactionType,
+  PaginatedResult,
+} from '@/types/finance.types';

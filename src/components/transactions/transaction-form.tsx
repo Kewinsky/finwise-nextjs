@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import {
   Dialog,
   DialogContent,
@@ -29,46 +28,15 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { createClientForBrowser } from '@/utils/supabase/client';
+import { useRouter } from 'next/navigation';
+import { notifyError, notifySuccess } from '@/lib/notifications';
+import { createTransaction, updateTransaction } from '@/lib/actions/finance-actions';
+import { LoadingSpinner } from '@/components/ui/custom-spinner';
+import { transactionFormSchema, TransactionFormData } from '@/validation/finance';
+import type { Account, TransactionFormProps } from '@/types';
 
-const transactionSchema = z.object({
-  type: z.enum(['income', 'expense', 'transfer']),
-  amount: z
-    .string()
-    .min(1, 'Amount is required')
-    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-      message: 'Amount must be a positive number',
-    }),
-  description: z.string().min(1, 'Description is required'),
-  account: z.string().min(1, 'Account is required'),
-  category: z.string().min(1, 'Category is required'),
-  date: z.date(),
-  notes: z.string().optional(),
-});
-
-type TransactionFormData = z.infer<typeof transactionSchema>;
-
-interface TransactionFormProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  transaction?: {
-    id: string;
-    type: string;
-    amount: number;
-    description: string;
-    account: string;
-    category: string;
-    date: Date;
-    notes?: string;
-  };
-}
-
-const mockAccounts = [
-  { id: '1', name: 'Checking Account' },
-  { id: '2', name: 'Savings Account' },
-  { id: '3', name: 'Credit Card' },
-];
-
-const mockCategories = {
+const categories = {
   income: [
     { id: 'salary', name: 'Salary' },
     { id: 'freelance', name: 'Freelance' },
@@ -88,61 +56,171 @@ const mockCategories = {
   transfer: [{ id: 'transfer', name: 'Transfer' }],
 };
 
-export function TransactionForm({ open, onOpenChange, transaction }: TransactionFormProps) {
+const defaultFormValues = {
+  amount: '',
+  description: '',
+  category: '',
+  date: new Date(),
+  notes: '',
+  fromAccount: '',
+  toAccount: '',
+};
+
+export function TransactionForm({
+  open,
+  onOpenChange,
+  onSuccess,
+  defaultType,
+  transaction,
+}: TransactionFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [isFormReady, setIsFormReady] = useState(false);
+  const router = useRouter();
 
   const form = useForm<TransactionFormData>({
-    resolver: zodResolver(transactionSchema),
+    resolver: zodResolver(transactionFormSchema),
+    mode: 'onBlur',
     defaultValues: {
-      type: 'expense',
-      date: new Date(),
+      type: defaultType || 'expense',
+      ...defaultFormValues,
     },
   });
 
   const selectedType = form.watch('type');
+  const fromAccount = form.watch('fromAccount');
+  const toAccount = form.watch('toAccount');
 
-  // Helper functions to map between names and IDs
-  const getAccountIdByName = (name: string) => {
-    const account = mockAccounts.find((acc) => acc.name === name);
-    return account?.id || '';
-  };
+  const resetForm = useCallback(
+    (values: Partial<TransactionFormData>) => {
+      form.reset(values);
+      if (!values.fromAccount) {
+        form.setValue('fromAccount', '');
+      }
+      if (!values.toAccount) {
+        form.setValue('toAccount', '');
+      }
+      if (!values.category) {
+        form.setValue('category', '');
+      }
+    },
+    [form],
+  );
 
-  const getCategoryIdByName = (name: string, type: string) => {
-    const categories = mockCategories[type as keyof typeof mockCategories] || [];
-    const category = categories.find((cat) => cat.name === name);
-    return category?.id || '';
-  };
+  const loadAccounts = useCallback(async () => {
+    const supabase = createClientForBrowser();
+    const { data, error } = await supabase
+      .from('accounts')
+      .select('id, name, type, balance, currency, color, is_mandatory')
+      .order('name');
 
-  // Reset form when transaction changes
-  React.useEffect(() => {
-    if (transaction) {
-      form.reset({
-        type: transaction.type as 'income' | 'expense' | 'transfer',
-        amount: Math.abs(transaction.amount).toString(),
-        description: transaction.description,
-        account: getAccountIdByName(transaction.account),
-        category: getCategoryIdByName(transaction.category, transaction.type),
-        date: transaction.date,
-        notes: transaction.notes || '',
-      });
-    } else {
-      form.reset({
-        type: 'expense',
-        date: new Date(),
-      });
+    if (error) {
+      notifyError('Failed to load accounts', { description: error.message });
+      return;
     }
-  }, [transaction, form]);
+    setAccounts(data as Account[]);
+  }, []);
+
+  const getCategoryId = useCallback((categoryName: string, type: string) => {
+    const categoryList = categories[type as keyof typeof categories] || [];
+    return categoryList.find((cat) => cat.name === categoryName)?.id || '';
+  }, []);
+
+  const getCategoryName = useCallback((categoryId: string, type: string) => {
+    const categoryList = categories[type as keyof typeof categories] || [];
+    return categoryList.find((cat) => cat.id === categoryId)?.name || 'Other';
+  }, []);
+
+  useEffect(() => {
+    loadAccounts();
+  }, [loadAccounts]);
+
+  useEffect(() => {
+    if (!accounts.length) return;
+
+    if (transaction) {
+      const categoryId = getCategoryId(transaction.category, transaction.type);
+
+      if (form) {
+        resetForm({
+          type: transaction.type as 'income' | 'expense' | 'transfer',
+          amount: Math.abs(transaction.amount).toString(),
+          description: transaction.description,
+          category: categoryId,
+          date: transaction.date,
+          notes: transaction.notes || '',
+          fromAccount: transaction.fromAccountId || '',
+          toAccount: transaction.toAccountId || '',
+        });
+      }
+    } else {
+      if (form) {
+        resetForm({
+          type: defaultType || 'expense',
+          ...defaultFormValues,
+        });
+      }
+    }
+    setIsFormReady(true);
+  }, [transaction, accounts, resetForm, getCategoryId, defaultType, form]);
+
+  useEffect(() => {
+    const currentCategory = form.getValues('category');
+    if (currentCategory) {
+      const categoryList = categories[selectedType] || [];
+      const categoryExists = categoryList.some((cat) => cat.id === currentCategory);
+      if (!categoryExists) {
+        form.setValue('category', '');
+      }
+    }
+  }, [selectedType, form]);
+
+  useEffect(() => {
+    setIsFormReady(false);
+  }, [open]);
 
   const onSubmit = async (data: TransactionFormData) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log('Transaction data:', data);
-      onOpenChange(false);
-      form.reset();
+      const categoryName = getCategoryName(data.category, data.type);
+      const payload = {
+        type: data.type,
+        description: data.description,
+        category: categoryName,
+        amount: Number(data.amount),
+        date: format(data.date, 'yyyy-MM-dd'),
+        notes: data.notes || undefined,
+        fromAccountId: data.fromAccount || undefined,
+        toAccountId: data.toAccount || undefined,
+      };
+
+      const fd = new FormData();
+      Object.entries(payload).forEach(([k, v]) => {
+        if (v !== undefined) fd.append(k, v === null ? '' : String(v));
+      });
+
+      const result = transaction?.id
+        ? await updateTransaction(transaction.id, fd)
+        : await createTransaction(fd);
+
+      if (result?.success) {
+        notifySuccess(`Transaction ${transaction?.id ? 'updated' : 'created'} successfully`);
+
+        if (!transaction?.id && result.success && 'data' in result) {
+          onSuccess?.(result.data, undefined);
+        } else if (transaction?.id && result.success && 'data' in result) {
+          onSuccess?.(undefined, result.data);
+        }
+
+        onOpenChange(false);
+        resetForm({ type: defaultType || 'expense', ...defaultFormValues });
+        router.refresh();
+      } else {
+        notifyError('Failed to save transaction', { description: result?.error });
+      }
     } catch (error) {
-      console.error('Error creating transaction:', error);
+      console.error('Error saving transaction:', error);
+      notifyError('Failed to save transaction');
     } finally {
       setIsLoading(false);
     }
@@ -150,8 +228,81 @@ export function TransactionForm({ open, onOpenChange, transaction }: Transaction
 
   const handleCancel = () => {
     onOpenChange(false);
-    form.reset();
+    resetForm({ type: defaultType || 'expense', ...defaultFormValues });
   };
+
+  const handleAccountChange = (value: string, field: 'fromAccount' | 'toAccount') => {
+    if (value === '__add__') {
+      router.push('/accounts');
+      return;
+    }
+    form.setValue(field, value);
+    if (field === 'fromAccount' && toAccount === value) {
+      form.setValue('toAccount', '');
+    }
+  };
+
+  const availableToAccounts = accounts.filter((account) => account.id !== fromAccount);
+
+  const AccountSelect = ({
+    value,
+    onChange,
+    placeholder,
+    error,
+  }: {
+    value: string;
+    onChange: (value: string) => void;
+    placeholder: string;
+    error?: string | undefined;
+  }) => (
+    <div className="space-y-2">
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          {accounts.map((account) => (
+            <SelectItem key={account.id} value={account.id}>
+              <div className="flex items-center justify-between gap-3 w-full">
+                <span>{account.name}</span>
+                <span className="text-xs text-muted-foreground">
+                  {account.currency} {Number(account.balance).toLocaleString()}
+                </span>
+              </div>
+            </SelectItem>
+          ))}
+          <SelectItem value="__add__">+ Add new account</SelectItem>
+        </SelectContent>
+      </Select>
+      <FormError message={error} />
+    </div>
+  );
+
+  const CategorySelect = ({
+    value,
+    onChange,
+    error,
+  }: {
+    value: string;
+    onChange: (value: string) => void;
+    error?: string | undefined;
+  }) => (
+    <div className="space-y-2">
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Select category" />
+        </SelectTrigger>
+        <SelectContent>
+          {categories[selectedType]?.map((category) => (
+            <SelectItem key={category.id} value={category.id}>
+              {category.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <FormError message={error} />
+    </div>
+  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -165,149 +316,198 @@ export function TransactionForm({ open, onOpenChange, transaction }: Transaction
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="type">Transaction Type</Label>
-              <Select
-                value={form.watch('type')}
-                onValueChange={(value: 'income' | 'expense' | 'transfer') =>
-                  form.setValue('type', value)
-                }
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="income">Income</SelectItem>
-                  <SelectItem value="expense">Expense</SelectItem>
-                  <SelectItem value="transfer">Transfer</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormError message={form.formState.errors.type?.message} />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="amount">Amount</Label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                  $
-                </span>
-                <Input
-                  id="amount"
-                  type="number"
-                  step="0.01"
-                  placeholder="0.00"
-                  className="pl-8"
-                  {...form.register('amount')}
-                />
+        {!isFormReady ? (
+          <LoadingSpinner message="Loading..." size="default" variant="default" />
+        ) : (
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="type">Transaction Type</Label>
+                <Select
+                  value={selectedType}
+                  onValueChange={(value: 'income' | 'expense' | 'transfer') =>
+                    form.setValue('type', value)
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="income">Income</SelectItem>
+                    <SelectItem value="expense">Expense</SelectItem>
+                    <SelectItem value="transfer">Transfer</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormError message={form.formState.errors.type?.message} />
               </div>
-              <FormError message={form.formState.errors.amount?.message} />
-            </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Input
-                id="description"
-                placeholder="Enter description"
-                {...form.register('description')}
-              />
-              <FormError message={form.formState.errors.description?.message} />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="date">Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      'w-full justify-start text-left font-normal',
-                      !form.watch('date') && 'text-muted-foreground',
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {form.watch('date') ? format(form.watch('date'), 'PPP') : 'Pick a date'}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={form.watch('date')}
-                    onSelect={(date) => form.setValue('date', date || new Date())}
-                    initialFocus
+              <div className="space-y-2">
+                <Label htmlFor="amount">Amount</Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    $
+                  </span>
+                  <Input
+                    id="amount"
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    className="pl-8"
+                    {...form.register('amount')}
                   />
-                </PopoverContent>
-              </Popover>
-              <FormError message={form.formState.errors.date?.message} />
+                </div>
+                <FormError message={form.formState.errors.amount?.message} />
+              </div>
             </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Input
+                  id="description"
+                  placeholder="Enter description"
+                  {...form.register('description')}
+                />
+                <FormError message={form.formState.errors.description?.message} />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="date">Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        'w-full justify-start text-left font-normal',
+                        !form.watch('date') && 'text-muted-foreground',
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {form.watch('date') ? format(form.watch('date'), 'PPP') : 'Pick a date'}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={form.watch('date')}
+                      onSelect={(date) => form.setValue('date', date || new Date())}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormError message={form.formState.errors.date?.message} />
+              </div>
+            </div>
+
+            {selectedType === 'income' && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="toAccount">To Account</Label>
+                  <AccountSelect
+                    value={toAccount || ''}
+                    onChange={(value) => handleAccountChange(value, 'toAccount')}
+                    placeholder="Select account"
+                    error={form.formState.errors.toAccount?.message}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="category">Category</Label>
+                  <CategorySelect
+                    value={form.watch('category')}
+                    onChange={(value) => form.setValue('category', value)}
+                    error={form.formState.errors.category?.message}
+                  />
+                </div>
+              </div>
+            )}
+
+            {selectedType === 'expense' && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fromAccount">From Account</Label>
+                  <AccountSelect
+                    value={fromAccount || ''}
+                    onChange={(value) => handleAccountChange(value, 'fromAccount')}
+                    placeholder="Select account"
+                    error={form.formState.errors.fromAccount?.message}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="category">Category</Label>
+                  <CategorySelect
+                    value={form.watch('category')}
+                    onChange={(value) => form.setValue('category', value)}
+                    error={form.formState.errors.category?.message}
+                  />
+                </div>
+              </div>
+            )}
+
+            {selectedType === 'transfer' && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fromAccount">From Account</Label>
+                  <AccountSelect
+                    value={fromAccount || ''}
+                    onChange={(value) => handleAccountChange(value, 'fromAccount')}
+                    placeholder="Select from account"
+                    error={form.formState.errors.fromAccount?.message}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="toAccount">To Account</Label>
+                  <Select
+                    value={toAccount}
+                    onValueChange={(value) => handleAccountChange(value, 'toAccount')}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select to account" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableToAccounts.map((account) => (
+                        <SelectItem key={account.id} value={account.id}>
+                          <div className="flex items-center justify-between gap-3 w-full">
+                            <span>{account.name}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {account.currency} {Number(account.balance).toLocaleString()}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="__add__">+ Add new account</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormError message={form.formState.errors.toAccount?.message} />
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2">
-              <Label htmlFor="account">Account</Label>
-              <Select
-                value={form.watch('account')}
-                onValueChange={(value) => form.setValue('account', value)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select account" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockAccounts.map((account) => (
-                    <SelectItem key={account.id} value={account.id}>
-                      {account.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormError message={form.formState.errors.account?.message} />
+              <Label htmlFor="notes">Notes (Optional)</Label>
+              <Textarea
+                id="notes"
+                placeholder="Add any additional notes..."
+                className="resize-none h-20 overflow-y-auto"
+                {...form.register('notes')}
+              />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
-              <Select
-                value={form.watch('category')}
-                onValueChange={(value) => form.setValue('category', value)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockCategories[selectedType]?.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormError message={form.formState.errors.category?.message} />
-            </div>
-          </div>
+            {form.formState.errors.root && (
+              <div className="text-sm text-red-600">{form.formState.errors.root.message}</div>
+            )}
 
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notes (Optional)</Label>
-            <Textarea
-              id="notes"
-              placeholder="Add any additional notes..."
-              className="resize-none h-20 overflow-y-auto"
-              {...form.register('notes')}
-            />
-          </div>
-
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleCancel}>
-              <X className="mr-2 h-4 w-4" />
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              <Save className="mr-2 h-4 w-4" />
-              {isLoading ? 'Saving...' : 'Save Transaction'}
-            </Button>
-          </DialogFooter>
-        </form>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={handleCancel}>
+                <X className="mr-2 h-4 w-4" />
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isLoading}>
+                <Save className="mr-2 h-4 w-4" />
+                {isLoading ? 'Saving...' : 'Save Transaction'}
+              </Button>
+            </DialogFooter>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );

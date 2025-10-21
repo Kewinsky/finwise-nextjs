@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,76 +30,15 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { TransactionForm } from '@/components/transactions/transaction-form';
 import { format } from 'date-fns';
-
-interface Transaction {
-  id: string;
-  type: string;
-  description: string;
-  category: string;
-  account: string;
-  date: Date;
-  amount: number;
-}
-
-// Mock data
-const mockTransactions: Transaction[] = [
-  {
-    id: '1',
-    type: 'income',
-    description: 'Salary Deposit',
-    category: 'Salary',
-    account: 'Checking Account',
-    date: new Date('2024-01-15'),
-    amount: 2500.0,
-  },
-  {
-    id: '2',
-    type: 'expense',
-    description: 'Grocery Store',
-    category: 'Food & Dining',
-    account: 'Credit Card',
-    date: new Date('2024-01-14'),
-    amount: -85.5,
-  },
-  {
-    id: '3',
-    type: 'expense',
-    description: 'Gas Station',
-    category: 'Transportation',
-    account: 'Checking Account',
-    date: new Date('2024-01-14'),
-    amount: -45.2,
-  },
-  {
-    id: '4',
-    type: 'income',
-    description: 'Freelance Work',
-    category: 'Freelance',
-    account: 'Savings Account',
-    date: new Date('2024-01-13'),
-    amount: 450.0,
-  },
-  {
-    id: '5',
-    type: 'expense',
-    description: 'Coffee Shop',
-    category: 'Food & Dining',
-    account: 'Credit Card',
-    date: new Date('2024-01-13'),
-    amount: -12.75,
-  },
-  {
-    id: '6',
-    type: 'transfer',
-    description: 'Transfer to Savings',
-    category: 'Transfer',
-    account: 'Savings Account',
-    date: new Date('2024-01-12'),
-    amount: 500.0,
-  },
-];
-
-const mockAccounts = ['All Accounts', 'Checking Account', 'Savings Account', 'Credit Card'];
+import { notifySuccess, notifyError } from '@/lib/notifications';
+import {
+  getTransactions,
+  deleteManyTransactions,
+  getAccounts,
+  deleteTransaction,
+} from '@/lib/actions/finance-actions';
+import { LoadingSpinner } from '@/components/ui/custom-spinner';
+import type { Transaction as TransactionType, Account } from '@/types/finance.types';
 
 const mockCategories = [
   'All Categories',
@@ -123,8 +62,21 @@ const transactionTypes = [
 ];
 
 export default function TransactionsPage() {
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>(undefined);
+  const [editingTransaction, setEditingTransaction] = useState<{
+    id: string;
+    type: string;
+    amount: number;
+    description: string;
+    fromAccountId?: string | null;
+    toAccountId?: string | null;
+    account?: string;
+    category: string;
+    date: Date;
+    notes?: string;
+  } | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState('all');
   const [selectedAccount, setSelectedAccount] = useState('All Accounts');
@@ -135,13 +87,63 @@ export default function TransactionsPage() {
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(
     null,
   );
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+
+  // Load data on component mount
+  useEffect(() => {
+    loadData(true);
+  }, []);
+
+  const loadData = async (isInitial = false) => {
+    try {
+      if (isInitial) {
+        setIsInitialLoading(true);
+      }
+
+      const [transactionsResult, accountsResult] = await Promise.all([
+        getTransactions(),
+        getAccounts(),
+      ]);
+
+      if (transactionsResult.success && 'data' in transactionsResult) {
+        setTransactions(transactionsResult.data.data);
+      } else {
+        notifyError('Failed to load transactions', {
+          description: transactionsResult.error,
+        });
+      }
+
+      if (accountsResult.success && 'data' in accountsResult) {
+        setAccounts(accountsResult.data);
+      } else {
+        notifyError('Failed to load accounts', {
+          description: accountsResult.error,
+        });
+      }
+    } catch {
+      notifyError('Failed to load data');
+    } finally {
+      if (isInitial) {
+        setIsInitialLoading(false);
+      }
+    }
+  };
 
   // Filter transactions based on search and filters
-  const filteredTransactions = mockTransactions.filter((transaction) => {
+  const filteredTransactions = transactions.filter((transaction) => {
     const matchesSearch = transaction.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = selectedType === 'all' || transaction.type === selectedType;
+    const txnFrom = transaction.from_account_id
+      ? accounts.find((a) => a.id === transaction.from_account_id)
+      : undefined;
+    const txnTo = transaction.to_account_id
+      ? accounts.find((a) => a.id === transaction.to_account_id)
+      : undefined;
     const matchesAccount =
-      selectedAccount === 'All Accounts' || transaction.account === selectedAccount;
+      selectedAccount === 'All Accounts' ||
+      txnFrom?.name === selectedAccount ||
+      txnTo?.name === selectedAccount;
     const matchesCategory =
       selectedCategory === 'All Categories' || transaction.category === selectedCategory;
 
@@ -215,9 +217,25 @@ export default function TransactionsPage() {
     }
   };
 
-  const handleBulkDelete = () => {
-    console.log('Deleting transactions:', selectedRows);
-    setSelectedRows([]);
+  const handleBulkDelete = async () => {
+    try {
+      setIsDeleting('bulk');
+      const result = await deleteManyTransactions(selectedRows);
+
+      if (result.success) {
+        notifySuccess(`${selectedRows.length} transactions deleted successfully`);
+        setSelectedRows([]);
+        setTransactions((prev) => prev.filter((t) => !selectedRows.includes(t.id)));
+      } else {
+        notifyError('Failed to delete transactions', {
+          description: result.error,
+        });
+      }
+    } catch {
+      notifyError('Failed to delete transactions');
+    } finally {
+      setIsDeleting(null);
+    }
   };
 
   const handleExportCSV = () => {
@@ -235,15 +253,51 @@ export default function TransactionsPage() {
     setSortConfig({ key, direction });
   };
 
-  const handleEditTransaction = (transaction: Transaction) => {
-    setEditingTransaction(transaction);
+  const handleEditTransaction = (transaction: TransactionType) => {
+    const mappedTransaction = {
+      id: transaction.id,
+      type: transaction.type,
+      amount: transaction.amount,
+      description: transaction.description,
+      account: '',
+      fromAccountId: transaction.from_account_id || undefined,
+      toAccountId: transaction.to_account_id || undefined,
+      category: transaction.category,
+      date: new Date(transaction.date),
+      notes: transaction.notes || undefined,
+    };
+    setEditingTransaction(mappedTransaction);
     setShowForm(true);
+  };
+
+  const handleTransactionSuccess = (
+    newTransaction?: TransactionType,
+    updatedTransaction?: TransactionType,
+  ) => {
+    if (newTransaction) {
+      setTransactions((prev) => [...prev, newTransaction]);
+    } else if (updatedTransaction) {
+      setTransactions((prev) =>
+        prev.map((t) => (t.id === updatedTransaction.id ? updatedTransaction : t)),
+      );
+    }
   };
 
   const handleCloseForm = () => {
     setShowForm(false);
-    setEditingTransaction(undefined);
+    setEditingTransaction(null);
   };
+
+  // Get account names for the filter
+  const accountNames = ['All Accounts', ...accounts.map((acc) => acc.name)];
+
+  if (isInitialLoading) {
+    return (
+      <div className="min-h-screen">
+        <LoadingSpinner message="Loading transactions..." />
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 space-y-6 p-6">
@@ -304,7 +358,7 @@ export default function TransactionsPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {mockAccounts.map((account) => (
+                {accountNames.map((account) => (
                   <SelectItem key={account} value={account}>
                     {account}
                   </SelectItem>
@@ -343,8 +397,17 @@ export default function TransactionsPage() {
               </CardDescription>
             </div>
             {selectedRows.length > 0 && (
-              <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
-                <Trash2 className="mr-2 h-4 w-4" />
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleBulkDelete}
+                disabled={isDeleting === 'bulk'}
+              >
+                {isDeleting === 'bulk' ? (
+                  <LoadingSpinner size="sm" variant="default" message="" inline />
+                ) : (
+                  <Trash2 className="mr-2 h-4 w-4" />
+                )}
                 Delete Selected ({selectedRows.length})
               </Button>
             )}
@@ -392,56 +455,144 @@ export default function TransactionsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedTransactions.map((transaction) => (
-                  <TableRow key={transaction.id}>
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedRows.includes(transaction.id)}
-                        onCheckedChange={(checked: boolean) =>
-                          handleSelectRow(transaction.id, checked)
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className={getTypeBadgeClassName(transaction.type)}>
-                        {transaction.type}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="font-medium">{transaction.description}</TableCell>
-                    <TableCell>{transaction.category}</TableCell>
-                    <TableCell>{transaction.account}</TableCell>
-                    <TableCell>{format(transaction.date, 'MMM dd, yyyy')}</TableCell>
-                    <TableCell
-                      className={`text-right font-medium ${
-                        transaction.amount > 0
-                          ? 'text-green-600 dark:text-green-400'
-                          : 'text-red-600 dark:text-red-400'
-                      }`}
-                    >
-                      {transaction.amount > 0 ? '+' : ''}
-                      {formatCurrency(transaction.amount)}
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleEditTransaction(transaction)}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                {paginatedTransactions.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="h-64 text-center">
+                      <div className="flex flex-col items-center justify-center space-y-3">
+                        {transactions.length === 0 ? (
+                          <>
+                            <div className="rounded-full bg-muted p-3">
+                              <Plus className="h-6 w-6 text-muted-foreground" />
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm font-medium">No transactions yet</p>
+                              <p className="text-sm text-muted-foreground">
+                                Get started by adding your first transaction
+                              </p>
+                            </div>
+                            <Button onClick={() => setShowForm(true)} size="sm">
+                              <Plus className="mr-2 h-4 w-4" />
+                              Add Transaction
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <div className="rounded-full bg-muted p-3">
+                              <Search className="h-6 w-6 text-muted-foreground" />
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm font-medium">No transactions found</p>
+                              <p className="text-sm text-muted-foreground">
+                                Try adjusting your filters to find what you&apos;re looking for
+                              </p>
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  paginatedTransactions.map((transaction) => (
+                    <TableRow key={transaction.id}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedRows.includes(transaction.id)}
+                          onCheckedChange={(checked: boolean) =>
+                            handleSelectRow(transaction.id, checked)
+                          }
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          className={getTypeBadgeClassName(transaction.type)}
+                        >
+                          {transaction.type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-medium">{transaction.description}</TableCell>
+                      <TableCell>{transaction.category}</TableCell>
+                      <TableCell>
+                        {transaction.type === 'income'
+                          ? accounts.find((acc) => acc.id === transaction.to_account_id)?.name ||
+                            'Unknown'
+                          : transaction.type === 'expense'
+                            ? accounts.find((acc) => acc.id === transaction.from_account_id)
+                                ?.name || 'Unknown'
+                            : (() => {
+                                const fromName =
+                                  accounts.find((acc) => acc.id === transaction.from_account_id)
+                                    ?.name || 'Unknown';
+                                const toName =
+                                  accounts.find((acc) => acc.id === transaction.to_account_id)
+                                    ?.name || 'Unknown';
+                                return `${fromName} → ${toName}`;
+                              })()}
+                      </TableCell>
+                      <TableCell>{format(new Date(transaction.date), 'MMM dd, yyyy')}</TableCell>
+                      <TableCell
+                        className={`text-right font-medium ${
+                          transaction.type === 'income'
+                            ? 'text-green-600 dark:text-green-400'
+                            : transaction.type === 'expense'
+                              ? 'text-red-600 dark:text-red-400'
+                              : 'text-blue-600 dark:text-blue-400'
+                        }`}
+                      >
+                        {transaction.type === 'income'
+                          ? '+'
+                          : transaction.type === 'expense'
+                            ? '-'
+                            : ''}
+                        {formatCurrency(transaction.amount)}
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEditTransaction(transaction)}>
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={async () => {
+                                try {
+                                  setIsDeleting(transaction.id);
+                                  const result = await deleteTransaction(transaction.id);
+                                  if (result.success) {
+                                    notifySuccess('Transaction deleted successfully');
+                                    setTransactions((prev) =>
+                                      prev.filter((t) => t.id !== transaction.id),
+                                    );
+                                  } else {
+                                    notifyError('Failed to delete transaction', {
+                                      description: result.error,
+                                    });
+                                  }
+                                } catch {
+                                  notifyError('Failed to delete transaction');
+                                } finally {
+                                  setIsDeleting(null);
+                                }
+                              }}
+                            >
+                              {isDeleting === transaction.id ? (
+                                <LoadingSpinner size="sm" variant="default" message="" inline />
+                              ) : (
+                                <Trash2 className="mr-2 h-4 w-4" />
+                              )}
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>
@@ -510,7 +661,8 @@ export default function TransactionsPage() {
         <TransactionForm
           open={showForm}
           onOpenChange={handleCloseForm}
-          transaction={editingTransaction}
+          onSuccess={handleTransactionSuccess}
+          transaction={editingTransaction ?? undefined}
         />
       )}
     </div>

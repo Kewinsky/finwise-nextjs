@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { FormError } from '@/components/ui/form-error';
 import { forgotPassword } from '@/lib/actions/auth-actions';
-import { forgotPasswordSchema, type ForgotPasswordFormData } from '@/schemas/auth';
+import { forgotPasswordSchema, type ForgotPasswordFormData } from '@/validation/auth';
 import { MessageComponent } from '@/components/common/message-component';
 
 export function ForgotPasswordForm({ className, ...props }: React.ComponentProps<'div'>) {

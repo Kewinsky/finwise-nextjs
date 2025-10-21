@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { notifySuccess, notifyError } from '@/lib/notifications';
 import { updateProfile, getCurrentUser } from '@/lib/actions/auth-actions';
 import { ProfileForm } from '@/components/settings/profile/profile-form';
-import { ProfileFormData } from '@/schemas/profile';
+import { ProfileFormData } from '@/validation/profile';
 import { User } from '@/types/user.types';
 
 /**

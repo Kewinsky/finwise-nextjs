@@ -19,7 +19,7 @@ import {
 import { MessageSquare, Mail } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { notifySuccess, notifyError } from '@/lib/notifications';
-import { contactUsSchema, type ContactUsFormData } from '@/schemas/auth';
+import { contactUsSchema, type ContactUsFormData } from '@/validation/auth';
 
 const contactReasons = [
   'General inquiry',
