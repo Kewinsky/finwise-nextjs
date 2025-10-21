@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { TransactionForm } from '@/components/transactions/transaction-form';
+import { DateRangeSelector, type DateRange } from '@/components/dashboard/date-range-selector';
 import { getDashboardData } from '@/lib/actions/finance-actions';
 import { notifyError } from '@/lib/notifications';
 import { calculatePercentageChange, formatPercentageChange } from '@/lib/utils';
@@ -48,11 +49,20 @@ export default function DashboardPage() {
     'expense',
   );
   const [dashboardData, setDashboardData] = useState<DashboardMetrics | null>(null);
+  const [dateRange, setDateRange] = useState<DateRange>({ from: undefined, to: undefined });
+  const [isLoadingChart, setIsLoadingChart] = useState(false);
 
   // Load dashboard data on component mount
   useEffect(() => {
     loadDashboardData();
   }, []);
+
+  // Reload chart data when date range changes
+  useEffect(() => {
+    if (dashboardData && (dateRange.from || dateRange.to)) {
+      loadChartData();
+    }
+  }, [dateRange]);
 
   const loadDashboardData = async () => {
     try {
@@ -68,6 +78,38 @@ export default function DashboardPage() {
     } catch {
       notifyError('Failed to load dashboard data');
     }
+  };
+
+  const loadChartData = async () => {
+    if (!dateRange.from && !dateRange.to) return;
+
+    setIsLoadingChart(true);
+    try {
+      const result = await getDashboardData(dateRange);
+
+      if (result.success && 'data' in result && result.data) {
+        setDashboardData((prev) =>
+          prev
+            ? {
+                ...prev,
+                spendingTrends: result.data.spendingTrends,
+              }
+            : (result.data as DashboardMetrics),
+        );
+      } else {
+        notifyError('Failed to load chart data', {
+          description: result.error,
+        });
+      }
+    } catch {
+      notifyError('Failed to load chart data');
+    } finally {
+      setIsLoadingChart(false);
+    }
+  };
+
+  const handleDateRangeChange = (newDateRange: DateRange) => {
+    setDateRange(newDateRange);
   };
 
   const handleAddTransaction = (type: 'income' | 'expense' | 'transfer') => {
@@ -119,7 +161,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Key Metrics Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-4">
         <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 border-blue-200/50 dark:border-blue-800/30 shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">
@@ -276,45 +318,75 @@ export default function DashboardPage() {
       </div>
 
       {/* Charts and Recent Activity */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 xl:grid-cols-2">
         {/* Spending Trend Chart */}
         <Card>
           <CardHeader>
-            <CardTitle>Financial Overview</CardTitle>
-            <CardDescription>Daily income and expenses over the last 7 days</CardDescription>
+            <div className="flex flex-col space-y-3 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
+              <div className="min-w-0 flex-1">
+                <CardTitle>Financial Overview</CardTitle>
+                <CardDescription className="text-sm leading-relaxed">
+                  {dateRange.from && dateRange.to ? (
+                    <span className="block sm:inline">
+                      Income and expenses from{' '}
+                      <span className="font-medium">
+                        {formatDate(dateRange.from.toISOString())}
+                      </span>{' '}
+                      to{' '}
+                      <span className="font-medium">{formatDate(dateRange.to.toISOString())}</span>
+                    </span>
+                  ) : (
+                    'Daily income and expenses over the last 7 days'
+                  )}
+                </CardDescription>
+              </div>
+              <div className="w-full sm:w-auto sm:flex-shrink-0 sm:ml-4">
+                <DateRangeSelector
+                  dateRange={dateRange}
+                  onDateRangeChange={handleDateRangeChange}
+                  isLoading={isLoadingChart}
+                />
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig}>
-              <AreaChart
-                accessibilityLayer
-                data={chartData}
-                margin={{
-                  left: 20,
-                  right: 20,
-                }}
-              >
-                <CartesianGrid vertical={true} />
-                <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={10} />
-                <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
-                <Area
-                  dataKey="income"
-                  type="linear"
-                  fill="var(--color-income)"
-                  fillOpacity={0.4}
-                  stroke="var(--color-income)"
-                  stackId="a"
-                />
-                <Area
-                  dataKey="expenses"
-                  type="linear"
-                  fill="var(--color-expenses)"
-                  fillOpacity={0.4}
-                  stroke="var(--color-expenses)"
-                  stackId="a"
-                />
-                <ChartLegend content={<ChartLegendContent />} />
-              </AreaChart>
-            </ChartContainer>
+            {isLoadingChart ? (
+              <div className="flex items-center justify-center h-64">
+                <LoadingSpinner message="Loading chart data..." />
+              </div>
+            ) : (
+              <ChartContainer config={chartConfig}>
+                <AreaChart
+                  accessibilityLayer
+                  data={chartData}
+                  margin={{
+                    left: 20,
+                    right: 20,
+                  }}
+                >
+                  <CartesianGrid vertical={true} />
+                  <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={10} />
+                  <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
+                  <Area
+                    dataKey="income"
+                    type="linear"
+                    fill="var(--color-income)"
+                    fillOpacity={0.4}
+                    stroke="var(--color-income)"
+                    stackId="a"
+                  />
+                  <Area
+                    dataKey="expenses"
+                    type="linear"
+                    fill="var(--color-expenses)"
+                    fillOpacity={0.4}
+                    stroke="var(--color-expenses)"
+                    stackId="a"
+                  />
+                  <ChartLegend content={<ChartLegendContent />} />
+                </AreaChart>
+              </ChartContainer>
+            )}
           </CardContent>
         </Card>
 
@@ -386,10 +458,10 @@ export default function DashboardPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             <Button
               variant="outline"
-              className="h-24 flex flex-col items-center gap-2 transition-all duration-200 group"
+              className="h-20 sm:h-24 flex flex-col items-center gap-1 sm:gap-2 transition-all duration-200 group"
               onClick={() => handleAddTransaction('income')}
             >
               <div className="p-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 group-hover:scale-110 transition-transform">
@@ -403,7 +475,7 @@ export default function DashboardPage() {
 
             <Button
               variant="outline"
-              className="h-24 flex flex-col items-center gap-2 transition-all duration-200 group"
+              className="h-20 sm:h-24 flex flex-col items-center gap-1 sm:gap-2 transition-all duration-200 group"
               onClick={() => handleAddTransaction('expense')}
             >
               <div className="p-2 rounded-lg bg-gradient-to-r from-red-500 to-rose-500 group-hover:scale-110 transition-transform">
@@ -417,7 +489,7 @@ export default function DashboardPage() {
 
             <Button
               variant="outline"
-              className="h-24 flex flex-col items-center gap-2 transition-all duration-200 group"
+              className="h-20 sm:h-24 flex flex-col items-center gap-1 sm:gap-2 transition-all duration-200 group"
               onClick={() => handleAddTransaction('transfer')}
             >
               <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 group-hover:scale-110 transition-transform">
@@ -431,7 +503,7 @@ export default function DashboardPage() {
 
             <Button
               variant="outline"
-              className="h-24 flex flex-col items-center gap-2 transition-all duration-200 group"
+              className="h-20 sm:h-24 flex flex-col items-center gap-1 sm:gap-2 transition-all duration-200 group"
               onClick={() => router.push('/accounts')}
             >
               <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 group-hover:scale-110 transition-transform">

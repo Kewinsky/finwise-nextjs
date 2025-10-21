@@ -397,7 +397,7 @@ export async function getTransactionById(transactionId: string) {
 /**
  * Get dashboard data
  */
-export async function getDashboardData() {
+export async function getDashboardData(dateRange?: { from?: Date; to?: Date }) {
   try {
     const supabase = await createClientForServer();
     const {
@@ -420,7 +420,7 @@ export async function getDashboardData() {
     ] = await Promise.all([
       transactionService.getMonthlySummary(user.id),
       transactionService.getRecentTransactions(user.id, 5),
-      transactionService.getSpendingTrends(user.id, 7),
+      transactionService.getSpendingTrends(user.id, 7, dateRange),
       accountService.getTotalBalance(user.id),
       accountService.getAccountCount(user.id),
     ]);

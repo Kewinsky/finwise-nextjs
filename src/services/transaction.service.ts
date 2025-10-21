@@ -453,13 +453,25 @@ export class TransactionService {
   /**
    * Get spending trends for dashboard charts
    */
-  async getSpendingTrends(userId: string, days = 7): Promise<ServiceResult<SpendingTrends[]>> {
+  async getSpendingTrends(
+    userId: string,
+    days = 7,
+    dateRange?: { from?: Date; to?: Date },
+  ): Promise<ServiceResult<SpendingTrends[]>> {
     try {
-      log.info({ userId, days }, 'Fetching spending trends');
+      log.info({ userId, days, dateRange }, 'Fetching spending trends');
 
-      const endDate = new Date();
-      const startDate = new Date();
-      startDate.setDate(endDate.getDate() - days);
+      let startDate: Date;
+      let endDate: Date;
+
+      if (dateRange?.from && dateRange?.to) {
+        startDate = dateRange.from;
+        endDate = dateRange.to;
+      } else {
+        endDate = new Date();
+        startDate = new Date();
+        startDate.setDate(endDate.getDate() - days);
+      }
 
       const { data, error } = await this.supabase
         .from('transactions')

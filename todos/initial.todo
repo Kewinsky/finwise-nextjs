@@ -40,7 +40,7 @@
 🚀 Production Readiness Improvements:
     ✔ Fix hardcoded percentage changes in dashboard to use real data @done(25-10-21 13:09)
     ✔ Implement advanced filtering (date ranges, amount ranges) @done(25-10-21 14:24)
-    ☐ Add date range selector for dashboard charts
+    ✔ Add date range selector for dashboard charts @done(25-10-21 15:40)
     ☐ Create balance history charts for accounts
     ☐ Add refresh functionality to dashboard
     ☐ Implement CSV export functionality for transactions
