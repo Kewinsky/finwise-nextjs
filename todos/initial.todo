@@ -36,3 +36,17 @@
     ☐ Test payment flow with Stripe test cards and verify webhook events
     ☐ Test rate limiting functionality and verify Redis integration
     ☐ Test Sentry error monitoring and verify error tracking works
+
+🚀 Production Readiness Improvements:
+    ☐ Fix hardcoded percentage changes in dashboard to use real data
+    ☐ Implement CSV export functionality for transactions
+    ☐ Add memoization for expensive calculations in all pages
+    ☐ Add refresh functionality to dashboard
+    ☐ Implement bulk edit functionality for transactions
+    ☐ Add date range selector for dashboard charts
+    ☐ Add transaction templates for recurring transactions
+    ☐ Implement advanced filtering (date ranges, amount ranges)
+    ☐ Add account archiving functionality (soft delete)
+    ☐ Create balance history charts for accounts
+    ☐ Add transaction duplication feature
+    ☐ Implement dashboard customization options
