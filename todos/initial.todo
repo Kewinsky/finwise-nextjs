@@ -45,5 +45,6 @@
     ✔ Implement CSV export functionality for transactions @done(25-10-21 21:34)
     ✔ Create balance history charts for accounts @done(25-10-22 08:04)
     ✔ Use <LoadingSpinner> component for loading states @done(25-10-22 08:07)
+    ✔ Implement dynamic header title generation @done(25-10-22 11:20)
     ☐ Add memoization for expensive calculations in all pages
     ☐ Add account archiving functionality (soft delete)

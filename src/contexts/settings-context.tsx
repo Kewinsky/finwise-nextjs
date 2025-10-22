@@ -10,6 +10,7 @@ import { UserPreferencesService } from '@/services/user-preferences.service';
 import type { UserPreferences, PartialUserPreferences } from '@/types/user-preferences.types';
 import { defaultUserPreferences, preferencesHelpers } from '@/types/user-preferences.types';
 import type { LanguageCode } from '@/config/app';
+import type { HeaderTitleType } from '@/types/header.types';
 import { migrateLocalStoragePreferencesToDatabase } from '@/lib/user/preferences-migration';
 
 interface SettingsContextType {
@@ -19,12 +20,14 @@ interface SettingsContextType {
   language: string;
   fontSize: string;
   darkMode: boolean;
+  headerTitlePreference: HeaderTitleType;
 
   // Preference setters (direct updates)
   setSystemFont: (font: FontKey) => void;
   setLanguage: (language: string) => void;
   setFontSize: (fontSize: string) => void;
   setDarkMode: (enabled: boolean) => void;
+  setHeaderTitlePreference: (preference: HeaderTitleType) => void;
   setPreferences: (preferences: PartialUserPreferences) => void;
 
   // State
@@ -203,6 +206,10 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     [setTheme],
   );
 
+  const setHeaderTitlePreference = useCallback((preference: HeaderTitleType) => {
+    setPreferences((prev) => ({ ...prev, headerTitlePreference: preference }));
+  }, []);
+
   const setPreferencesCallback = useCallback((newPreferences: PartialUserPreferences) => {
     setPreferences((prev) => ({ ...prev, ...newPreferences }));
   }, []);
@@ -245,12 +252,14 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     language: preferences.language,
     fontSize: preferences.fontSize,
     darkMode: false, // Theme is now managed by next-themes directly
+    headerTitlePreference: preferences.headerTitlePreference,
 
     // Preference setters (direct updates)
     setSystemFont,
     setLanguage,
     setFontSize,
     setDarkMode,
+    setHeaderTitlePreference,
     setPreferences: setPreferencesCallback,
 
     // State

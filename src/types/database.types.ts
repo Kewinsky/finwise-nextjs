@@ -8,6 +8,53 @@ export type Database = {
   };
   public: {
     Tables: {
+      accounts: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          type: 'checking' | 'savings' | 'investment' | 'creditcard';
+          balance: number;
+          currency: string;
+          color: string | null;
+          is_mandatory: boolean;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          type: 'checking' | 'savings' | 'investment' | 'creditcard';
+          balance?: number;
+          currency?: string;
+          color?: string | null;
+          is_mandatory?: boolean;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          type?: 'checking' | 'savings' | 'investment' | 'creditcard';
+          balance?: number;
+          currency?: string;
+          color?: string | null;
+          is_mandatory?: boolean;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'accounts_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       notification_preferences: {
         Row: {
           created_at: string | null;
@@ -174,98 +221,13 @@ export type Database = {
           },
         ];
       };
-      user_preferences: {
-        Row: {
-          created_at: string | null;
-          font_size: string;
-          id: string;
-          language: string;
-          system_font: string;
-          updated_at: string | null;
-          user_id: string;
-        };
-        Insert: {
-          created_at?: string | null;
-          font_size?: string;
-          id?: string;
-          language?: string;
-          system_font?: string;
-          updated_at?: string | null;
-          user_id: string;
-        };
-        Update: {
-          created_at?: string | null;
-          font_size?: string;
-          id?: string;
-          language?: string;
-          system_font?: string;
-          updated_at?: string | null;
-          user_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'user_preferences_user_id_fkey';
-            columns: ['user_id'];
-            isOneToOne: true;
-            referencedRelation: 'profiles';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
-      accounts: {
-        Row: {
-          id: string;
-          user_id: string;
-          name: string;
-          type: string;
-          balance: number;
-          currency: string;
-          color: string | null;
-          is_mandatory: boolean;
-          created_at: string | null;
-          updated_at: string | null;
-        };
-        Insert: {
-          id?: string;
-          user_id: string;
-          name: string;
-          type: string;
-          balance?: number;
-          currency?: string;
-          color?: string | null;
-          is_mandatory?: boolean;
-          created_at?: string | null;
-          updated_at?: string | null;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          name?: string;
-          type?: string;
-          balance?: number;
-          currency?: string;
-          color?: string | null;
-          is_mandatory?: boolean;
-          created_at?: string | null;
-          updated_at?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'accounts_user_id_fkey';
-            columns: ['user_id'];
-            isOneToOne: false;
-            referencedRelation: 'profiles';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
       transactions: {
         Row: {
           id: string;
           user_id: string;
           from_account_id: string | null;
           to_account_id: string | null;
-          type: string;
+          type: 'income' | 'expense' | 'transfer';
           description: string;
           category: string;
           amount: number;
@@ -279,7 +241,7 @@ export type Database = {
           user_id: string;
           from_account_id?: string | null;
           to_account_id?: string | null;
-          type: string;
+          type: 'income' | 'expense' | 'transfer';
           description: string;
           category: string;
           amount: number;
@@ -293,7 +255,7 @@ export type Database = {
           user_id?: string;
           from_account_id?: string | null;
           to_account_id?: string | null;
-          type?: string;
+          type?: 'income' | 'expense' | 'transfer';
           description?: string;
           category?: string;
           amount?: number;
@@ -326,14 +288,59 @@ export type Database = {
           },
         ];
       };
+      user_preferences: {
+        Row: {
+          created_at: string | null;
+          font_size: string;
+          header_title_preference: string | null;
+          id: string;
+          language: string;
+          system_font: string;
+          updated_at: string | null;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string | null;
+          font_size?: string;
+          header_title_preference?: string | null;
+          id?: string;
+          language?: string;
+          system_font?: string;
+          updated_at?: string | null;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string | null;
+          font_size?: string;
+          header_title_preference?: string | null;
+          id?: string;
+          language?: string;
+          system_font?: string;
+          updated_at?: string | null;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'user_preferences_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: true;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      cleanup_expired_sessions: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
+      };
     };
     Enums: {
+      account_type: 'checking' | 'savings' | 'investment' | 'creditcard';
       subscription_status:
         | 'active'
         | 'canceled'
@@ -342,9 +349,8 @@ export type Database = {
         | 'past_due'
         | 'trialing'
         | 'unpaid';
-      user_role: 'admin' | 'user';
-      account_type: 'checking' | 'savings' | 'investment' | 'creditcard';
       transaction_type: 'income' | 'expense' | 'transfer';
+      user_role: 'admin' | 'user';
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -470,6 +476,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      account_type: ['checking', 'savings', 'investment', 'creditcard'],
       subscription_status: [
         'active',
         'canceled',
@@ -479,9 +486,8 @@ export const Constants = {
         'trialing',
         'unpaid',
       ],
-      user_role: ['admin', 'user'],
-      account_type: ['checking', 'savings', 'investment', 'creditcard'],
       transaction_type: ['income', 'expense', 'transfer'],
+      user_role: ['admin', 'user'],
     },
   },
 } as const;

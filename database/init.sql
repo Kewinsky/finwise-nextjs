@@ -131,13 +131,15 @@ CREATE TABLE public.user_preferences (
     language text DEFAULT 'en' NOT NULL,
     system_font text DEFAULT 'system' NOT NULL,
     font_size text DEFAULT 'medium' NOT NULL,
+    header_title_preference text DEFAULT 'time-based' NOT NULL,
     created_at timestamptz DEFAULT now(),
     updated_at timestamptz DEFAULT now(),
     PRIMARY KEY (id),
     UNIQUE (user_id),
     FOREIGN KEY (user_id) REFERENCES public.profiles(id) ON DELETE CASCADE,
     CHECK (theme IN ('light','dark','system')),
-    CHECK (font_size IN ('small','medium','large'))
+    CHECK (font_size IN ('small','medium','large')),
+    CHECK (header_title_preference IN ('time-based', 'page-based', 'financial-status', 'quick-stats', 'motivational'))
 );
 
 -- Notification preferences table - stores user notification settings

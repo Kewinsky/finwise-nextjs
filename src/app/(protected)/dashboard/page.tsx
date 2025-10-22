@@ -20,7 +20,6 @@ import {
   ArrowRightLeft,
   Building,
   ArrowRight,
-  Zap,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { TransactionForm } from '@/components/transactions/transaction-form';

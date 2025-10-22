@@ -1,4 +1,5 @@
 import type { Tables } from '@/types/database.types';
+import type { HeaderTitleType } from '@/types/header.types';
 import {
   DEFAULT_LANGUAGE,
   DEFAULT_FONT,
@@ -19,6 +20,9 @@ export interface UserPreferences {
   // Font preferences
   systemFont: FontValue;
   fontSize: FontSizeValue;
+
+  // UI preferences
+  headerTitlePreference: HeaderTitleType;
 }
 
 /**
@@ -28,6 +32,7 @@ export const defaultUserPreferences: UserPreferences = {
   language: DEFAULT_LANGUAGE,
   systemFont: DEFAULT_FONT,
   fontSize: DEFAULT_FONT_SIZE,
+  headerTitlePreference: 'time-based',
 };
 
 /**
@@ -118,6 +123,22 @@ export const preferencesHelpers = {
       }
     }
 
+    // Validate header title preference
+    if (preferences.headerTitlePreference !== undefined) {
+      const validHeaderTypes = [
+        'time-based',
+        'page-based',
+        'financial-status',
+        'quick-stats',
+        'motivational',
+      ];
+      if (validHeaderTypes.includes(preferences.headerTitlePreference)) {
+        sanitized.headerTitlePreference = preferences.headerTitlePreference;
+      } else {
+        errors.push('Invalid header title preference');
+      }
+    }
+
     return {
       isValid: errors.length === 0,
       errors,
@@ -167,6 +188,7 @@ export type UserPreferencesInsert = {
   language?: string;
   system_font?: string;
   font_size?: string;
+  header_title_preference?: string;
 };
 
 /**
@@ -176,6 +198,7 @@ export type UserPreferencesUpdate = {
   language?: string;
   system_font?: string;
   font_size?: string;
+  header_title_preference?: string;
 };
 
 /**
@@ -186,6 +209,7 @@ export function dbToAppPreferences(db: UserPreferencesDB): UserPreferences {
     language: db.language as LanguageCode,
     systemFont: db.system_font as FontValue,
     fontSize: db.font_size as FontSizeValue,
+    headerTitlePreference: (db.header_title_preference as HeaderTitleType) || 'time-based',
   };
 }
 
@@ -198,6 +222,7 @@ export function appToDbPreferences(app: UserPreferences, userId: string): UserPr
     language: app.language,
     system_font: app.systemFont,
     font_size: app.fontSize,
+    header_title_preference: app.headerTitlePreference,
   };
 }
 
@@ -210,6 +235,8 @@ export function appToDbUpdate(app: PartialUserPreferences): UserPreferencesUpdat
   if (app.language !== undefined) update.language = app.language;
   if (app.systemFont !== undefined) update.system_font = app.systemFont;
   if (app.fontSize !== undefined) update.font_size = app.fontSize;
+  if (app.headerTitlePreference !== undefined)
+    update.header_title_preference = app.headerTitlePreference;
 
   return update;
 }

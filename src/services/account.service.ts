@@ -355,7 +355,7 @@ export class AccountService {
   /**
    * Get accounts by type
    */
-  async getAccountsByType(userId: string, type: string): Promise<ServiceResult<Account[]>> {
+  async getAccountsByType(userId: string, type: AccountType): Promise<ServiceResult<Account[]>> {
     try {
       log.info({ userId, type }, 'Fetching accounts by type');
 

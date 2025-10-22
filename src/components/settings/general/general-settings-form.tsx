@@ -40,6 +40,19 @@ import { notifySuccess, notifyError } from '@/lib/notifications';
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { Key } from 'lucide-react';
 import { LANGUAGE_OPTIONS, FONT_OPTIONS, FONT_SIZE_OPTIONS } from '@/config/app';
+import type { HeaderTitleType } from '@/types/header.types';
+
+const HEADER_TITLE_OPTIONS = [
+  { value: 'time-based', label: 'Time-Based Greetings', description: 'Good morning, John!' },
+  { value: 'page-based', label: 'Page Names', description: 'Dashboard, Accounts, etc.' },
+  { value: 'financial-status', label: 'Financial Status', description: 'Total Balance: $12,450' },
+  {
+    value: 'quick-stats',
+    label: 'Quick Stats',
+    description: '3 Accounts • $3,200 In • $2,000 Out • $1,200 Net (40%)',
+  },
+  { value: 'motivational', label: 'Motivational Messages', description: 'Keep up the great work!' },
+] as const;
 
 interface GeneralSettingsFormProps {
   isLoading?: boolean;
@@ -57,6 +70,7 @@ export interface GeneralSettingsFormData {
   animationsEnabled?: boolean;
   fontSize?: string;
   fontFamily?: FontKey;
+  headerTitlePreference?: HeaderTitleType;
 }
 
 export function GeneralSettingsForm({
@@ -68,9 +82,11 @@ export function GeneralSettingsForm({
     systemFont,
     language,
     fontSize,
+    headerTitlePreference,
     setSystemFont,
     setLanguage,
     setFontSize,
+    setHeaderTitlePreference,
     isLoading: settingsLoading,
     isSaving,
     savePreferences,
@@ -87,6 +103,7 @@ export function GeneralSettingsForm({
     showSidebarLabels: true,
     animationsEnabled: true,
     fontFamily: 'system',
+    headerTitlePreference,
   });
   const [showCookieDialog, setShowCookieDialog] = useState(false);
   const [tempCookiePreferences, setTempCookiePreferences] =
@@ -109,8 +126,9 @@ export function GeneralSettingsForm({
       systemFont,
       language,
       fontSize,
+      headerTitlePreference,
     }));
-  }, [systemFont, language, fontSize]);
+  }, [systemFont, language, fontSize, headerTitlePreference]);
 
   const handleInputChange = (field: keyof GeneralSettingsFormData, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -122,6 +140,8 @@ export function GeneralSettingsForm({
       setLanguage(value as string);
     } else if (field === 'fontSize') {
       setFontSize(value as string);
+    } else if (field === 'headerTitlePreference') {
+      setHeaderTitlePreference(value as HeaderTitleType);
     }
   };
 
@@ -334,6 +354,44 @@ export function GeneralSettingsForm({
                   {LANGUAGE_OPTIONS.map((lang) => (
                     <SelectItem key={lang.code} value={lang.code}>
                       {lang.flag} {lang.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Separator />
+
+            {/* Header Title Preference */}
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1">
+                <Label htmlFor="header_title" className="text-sm font-medium">
+                  Header Title Style
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Choose how the header title is displayed
+                </p>
+              </div>
+              <Select
+                value={formData.headerTitlePreference}
+                onValueChange={(value) => handleInputChange('headerTitlePreference', value)}
+                disabled={settingsLoading}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Header Style">
+                    {formData.headerTitlePreference &&
+                      HEADER_TITLE_OPTIONS.find(
+                        (opt) => opt.value === formData.headerTitlePreference,
+                      )?.label}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {HEADER_TITLE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      <div className="flex flex-col">
+                        <span>{option.label}</span>
+                        <span className="text-xs text-muted-foreground">{option.description}</span>
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>

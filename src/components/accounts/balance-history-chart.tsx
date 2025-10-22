@@ -12,7 +12,6 @@ import {
 import { AreaChart } from 'lucide-react';
 import { notifyError } from '@/lib/notifications';
 import { getBalanceHistory } from '@/lib/actions/finance-actions';
-import { Spinner } from '@/components/ui/spinner';
 import type { Account, BalanceHistoryChart, BalanceHistoryFilters } from '@/types/finance.types';
 import {
   ChartContainer,

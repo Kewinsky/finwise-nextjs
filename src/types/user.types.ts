@@ -1,4 +1,5 @@
 import type { Tables } from '@/types/database.types';
+import type { HeaderTitleType } from '@/types/header.types';
 
 /**
  * User profile from database
@@ -25,6 +26,7 @@ export interface UpdateProfileInput {
   fullName?: string;
   avatarUrl?: string;
   role?: string;
+  headerTitlePreference?: HeaderTitleType;
 }
 
 /**

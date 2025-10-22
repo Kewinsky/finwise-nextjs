@@ -475,6 +475,61 @@ export async function getDashboardData(dateRange?: { from?: Date; to?: Date }) {
   }
 }
 
+/**
+ * Get financial summary for header display
+ */
+export async function getFinancialSummary() {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const transactionService = new TransactionService(supabase);
+    const accountService = new AccountService(supabase);
+
+    const [monthlySummaryResult, totalBalanceResult, accountCountResult, transactionCountResult] =
+      await Promise.all([
+        transactionService.getMonthlySummary(user.id),
+        accountService.getTotalBalance(user.id),
+        accountService.getAccountCount(user.id),
+        transactionService.getTransactionCount(user.id),
+      ]);
+
+    const totalBalance = totalBalanceResult.success ? totalBalanceResult.data : 0;
+    const accountCount = accountCountResult.success ? accountCountResult.data : 0;
+    const transactionCount = transactionCountResult.success ? transactionCountResult.data : 0;
+    const monthlyChange = monthlySummaryResult.success ? monthlySummaryResult.data.netIncome : 0;
+
+    // Calculate savings rate (simplified - income vs expenses)
+    const monthlySummary = monthlySummaryResult.success ? monthlySummaryResult.data : null;
+    const savingsRate =
+      monthlySummary && monthlySummary.totalIncome > 0
+        ? (monthlySummary.netIncome / monthlySummary.totalIncome) * 100
+        : 0;
+
+    const financialSummary = {
+      totalBalance,
+      netWorth: totalBalance, // Simplified - in real app this would include assets/debts
+      monthlyChange,
+      accountsCount: accountCount,
+      transactionsCount: transactionCount,
+      savingsRate,
+      // Add actual income/expense data
+      totalIncome: monthlySummary ? monthlySummary.totalIncome : 0,
+      totalExpenses: monthlySummary ? monthlySummary.totalExpenses : 0,
+    };
+
+    return { success: true, data: financialSummary };
+  } catch (error) {
+    return handleActionError(error, 'getFinancialSummary');
+  }
+}
+
 // =============================================================================
 // AI ASSISTANT ACTIONS
 // =============================================================================
