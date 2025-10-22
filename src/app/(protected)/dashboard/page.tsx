@@ -34,6 +34,7 @@ import {
   formatDisplayDate,
 } from '@/lib/utils';
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
+import { NumberTicker } from '@/components/ui/number-ticker';
 import type { DashboardMetrics } from '@/types/finance.types';
 
 const chartConfig = {
@@ -54,7 +55,12 @@ export default function DashboardPage() {
     'expense',
   );
   const [dashboardData, setDashboardData] = useState<DashboardMetrics | null>(null);
-  const [dateRange, setDateRange] = useState<DateRange>({ from: undefined, to: undefined });
+  const [dateRange, setDateRange] = useState<DateRange>(() => {
+    const now = new Date();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(now.getDate() - 7);
+    return { from: sevenDaysAgo, to: now };
+  });
   const [isLoadingChart, setIsLoadingChart] = useState(false);
 
   const loadDashboardData = async () => {
@@ -77,7 +83,8 @@ export default function DashboardPage() {
   };
 
   const loadChartData = useCallback(async () => {
-    if (!dateRange.from && !dateRange.to) return;
+    // Always load chart data when we have a date range (including default)
+    if (!dateRange.from || !dateRange.to) return;
 
     setIsLoadingChart(true);
     try {
@@ -111,10 +118,10 @@ export default function DashboardPage() {
 
   // Reload chart data when date range changes
   useEffect(() => {
-    if (dashboardData && (dateRange.from || dateRange.to)) {
+    if (dashboardData && dateRange.from && dateRange.to) {
       loadChartData();
     }
-  }, [dateRange, loadChartData, dashboardData]);
+  }, [dateRange]);
 
   const handleDateRangeChange = (newDateRange: DateRange) => {
     setDateRange(newDateRange);
@@ -173,7 +180,12 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-800 dark:text-blue-200">
-              {formatCurrency(dashboardData.totalBalance)}
+              <NumberTicker
+                value={dashboardData.totalBalance}
+                decimalPlaces={2}
+                delay={0.1}
+                className="text-blue-800 dark:text-blue-200"
+              />
             </div>
             <p className="text-xs text-blue-600 dark:text-blue-400">
               {(() => {
@@ -211,7 +223,12 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-800 dark:text-green-200">
-              {formatCurrency(dashboardData.monthlySummary.totalIncome)}
+              <NumberTicker
+                value={dashboardData.monthlySummary.totalIncome}
+                decimalPlaces={2}
+                delay={0.2}
+                className="text-green-800 dark:text-green-200"
+              />
             </div>
             <p className="text-xs text-green-600 dark:text-green-400">
               {(() => {
@@ -249,7 +266,12 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-rose-800 dark:text-rose-200">
-              {formatCurrency(dashboardData.monthlySummary.totalExpenses)}
+              <NumberTicker
+                value={dashboardData.monthlySummary.totalExpenses}
+                decimalPlaces={2}
+                delay={0.3}
+                className="text-rose-800 dark:text-rose-200"
+              />
             </div>
             <p className="text-xs text-rose-600 dark:text-rose-400">
               {(() => {
@@ -289,7 +311,12 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-800 dark:text-purple-200">
-              {formatCurrency(dashboardData.monthlySummary.savings)}
+              <NumberTicker
+                value={dashboardData.monthlySummary.savings}
+                decimalPlaces={2}
+                delay={0.4}
+                className="text-purple-800 dark:text-purple-200"
+              />
             </div>
             <p className="text-xs text-purple-600 dark:text-purple-400">
               {(() => {
@@ -413,13 +440,17 @@ export default function DashboardPage() {
                       className={`rounded-full p-2 ${
                         transaction.type === 'income'
                           ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
-                          : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
+                          : transaction.type === 'expense'
+                            ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
+                            : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
                       }`}
                     >
                       {transaction.type === 'income' ? (
                         <TrendingUp className="h-4 w-4" />
-                      ) : (
+                      ) : transaction.type === 'expense' ? (
                         <TrendingDown className="h-4 w-4" />
+                      ) : (
+                        <ArrowRightLeft className="h-4 w-4" />
                       )}
                     </div>
                     <div>
@@ -433,10 +464,16 @@ export default function DashboardPage() {
                     className={`text-sm font-medium ${
                       transaction.type === 'income'
                         ? 'text-green-600 dark:text-green-400'
-                        : 'text-red-600 dark:text-red-400'
+                        : transaction.type === 'expense'
+                          ? 'text-red-600 dark:text-red-400'
+                          : 'text-blue-600 dark:text-blue-400'
                     }`}
                   >
-                    {transaction.type === 'income' ? '+' : ''}
+                    {transaction.type === 'income'
+                      ? '+'
+                      : transaction.type === 'expense'
+                        ? '-'
+                        : ''}
                     {formatCurrency(transaction.amount)}
                   </div>
                 </div>
@@ -450,11 +487,8 @@ export default function DashboardPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-gradient-to-r from-orange-500 to-yellow-500">
-              <Zap className="w-5 h-5 text-white" />
-            </div>
             <div>
-              <CardTitle className="text-xl font-bold">Quick Actions</CardTitle>
+              <CardTitle>Quick Actions</CardTitle>
               <CardDescription>Common tasks at your fingertips</CardDescription>
             </div>
           </div>

@@ -24,6 +24,7 @@ import {
 import { LineChart, Line } from 'recharts';
 import { CartesianGrid } from 'recharts';
 import { YAxis, XAxis } from 'recharts';
+import { LoadingSpinner } from '../ui/custom-spinner';
 
 interface BalanceHistoryChartProps {
   accounts: Account[];
@@ -244,7 +245,17 @@ export function BalanceHistoryChartComponent({ accounts }: BalanceHistoryChartPr
         <div className="w-full h-80">
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
-              <Spinner className="h-8 w-8" />
+              <LoadingSpinner message="Loading chart data..." />
+            </div>
+          ) : chartData.length === 0 || allBalanceHistory.length === 0 ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <AreaChart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">No balance history data available</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Chart will appear once you have transaction data
+                </p>
+              </div>
             </div>
           ) : (
             <ChartContainer config={chartConfig} className="w-full h-full">
