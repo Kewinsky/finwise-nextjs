@@ -43,7 +43,7 @@
     ✔ Add date range selector for dashboard charts @done(25-10-21 15:40)
     ✔ Add refresh functionality to dashboard @done(25-10-21 15:58)
     ✔ Implement CSV export functionality for transactions @done(25-10-21 21:34)
-    ☐ Create balance history charts for accounts
-    ☐ Implement dashboard customization options
+    ✔ Create balance history charts for accounts @done(25-10-22 08:04)
     ☐ Add memoization for expensive calculations in all pages
     ☐ Add account archiving functionality (soft delete)
+    ☐ Use @custom-spinner component for loading states

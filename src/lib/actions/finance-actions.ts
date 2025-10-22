@@ -23,6 +23,7 @@ import type {
   PaginationOptions,
   SortOptions,
   AccountFilters,
+  BalanceHistoryFilters,
 } from '@/types/finance.types';
 
 // =============================================================================
@@ -172,6 +173,27 @@ export async function getAccountById(accountId: string) {
     return await accountService.getAccountById(accountId, user.id);
   } catch (error) {
     return handleActionError(error, 'getAccountById');
+  }
+}
+
+/**
+ * Get balance history for accounts
+ */
+export async function getBalanceHistory(filters: BalanceHistoryFilters) {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const transactionService = new TransactionService(supabase);
+    return await transactionService.getBalanceHistory(user.id, filters);
+  } catch (error) {
+    return handleActionError(error, 'getBalanceHistory');
   }
 }
 

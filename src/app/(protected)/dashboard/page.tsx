@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AreaChart, Area, XAxis, CartesianGrid } from 'recharts';
@@ -52,18 +52,6 @@ export default function DashboardPage() {
   const [dateRange, setDateRange] = useState<DateRange>({ from: undefined, to: undefined });
   const [isLoadingChart, setIsLoadingChart] = useState(false);
 
-  // Load dashboard data on component mount
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
-
-  // Reload chart data when date range changes
-  useEffect(() => {
-    if (dashboardData && (dateRange.from || dateRange.to)) {
-      loadChartData();
-    }
-  }, [dateRange]);
-
   const loadDashboardData = async () => {
     try {
       const result = await getDashboardData();
@@ -80,7 +68,7 @@ export default function DashboardPage() {
     }
   };
 
-  const loadChartData = async () => {
+  const loadChartData = useCallback(async () => {
     if (!dateRange.from && !dateRange.to) return;
 
     setIsLoadingChart(true);
@@ -106,7 +94,20 @@ export default function DashboardPage() {
     } finally {
       setIsLoadingChart(false);
     }
-  };
+  }, [dateRange]);
+
+  // Load dashboard data on component mount
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  // Reload chart data when date range changes
+  useEffect(() => {
+    if (dashboardData && (dateRange.from || dateRange.to)) {
+      loadChartData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dateRange, loadChartData]);
 
   const handleDateRangeChange = (newDateRange: DateRange) => {
     setDateRange(newDateRange);

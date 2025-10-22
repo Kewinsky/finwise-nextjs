@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, Download, Edit, Trash2, ArrowUpDown, MoreHorizontal, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, ArrowUpDown, MoreHorizontal, Search } from 'lucide-react';
 import {
   Table,
   TableBody,

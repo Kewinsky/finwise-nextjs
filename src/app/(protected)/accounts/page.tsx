@@ -17,6 +17,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { AccountForm } from '@/components/accounts/account-form';
+import { BalanceHistoryChartComponent } from '@/components/accounts/balance-history-chart';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -274,6 +275,9 @@ export default function AccountsPage() {
           })}
         </div>
       )}
+
+      {/* Balance History Chart */}
+      {accounts.length > 0 && <BalanceHistoryChartComponent accounts={accounts} />}
 
       {/* Account Form */}
       {showForm && (

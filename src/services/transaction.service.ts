@@ -14,6 +14,9 @@ import type {
   PaginationOptions,
   SortOptions,
   TransactionType,
+  BalanceHistoryFilters,
+  BalanceHistoryChart,
+  BalanceHistoryPoint,
 } from '@/types/finance.types';
 import { log } from '@/lib/logger';
 import { ERROR_MESSAGES } from '@/lib/constants/errors';
@@ -779,6 +782,152 @@ export class TransactionService {
   }
 
   /**
+   * Get balance history for accounts
+   */
+  async getBalanceHistory(
+    userId: string,
+    filters: BalanceHistoryFilters,
+  ): Promise<ServiceResult<BalanceHistoryChart[]>> {
+    try {
+      log.info({ userId, filters }, 'Getting balance history');
+
+      const { data: transactions, error } = await this.supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', userId)
+        .gte('date', filters.startDate.toISOString().split('T')[0])
+        .lte('date', filters.endDate.toISOString().split('T')[0])
+        .order('date', { ascending: true });
+
+      if (error) {
+        log.error(error, 'Error fetching transactions for balance history');
+        return { success: false, error: error.message };
+      }
+
+      if (!transactions || transactions.length === 0) {
+        return { success: true, data: [] };
+      }
+
+      // Get current account balances
+      const { data: accounts } = await this.supabase
+        .from('accounts')
+        .select('id, balance')
+        .eq('user_id', userId)
+        .in('id', filters.accountIds);
+
+      if (!accounts) {
+        return { success: true, data: [] };
+      }
+
+      const accountMap = new Map(accounts.map((acc) => [acc.id, acc.balance]));
+
+      // Group transactions by account and period
+      const groupedTransactions = this.groupTransactionsByPeriod(transactions, filters.period);
+
+      // Calculate balance history for each account
+      const balanceHistory: BalanceHistoryChart[] = [];
+
+      for (const accountId of filters.accountIds) {
+        const currentBalance = accountMap.get(accountId) || 0;
+        const accountTransactions = groupedTransactions[accountId] || [];
+
+        // Calculate balance for each period by working backwards from current balance
+        const balanceData: BalanceHistoryPoint[] = [];
+        let runningBalance = currentBalance;
+
+        // Process periods in reverse order to calculate historical balances
+        const periods = this.getPeriodsInRange(filters.startDate, filters.endDate, filters.period);
+
+        for (let i = periods.length - 1; i >= 0; i--) {
+          const period = periods[i];
+          const periodTransactions = accountTransactions[period] || [];
+
+          // Calculate net change for this period
+          const netChange = periodTransactions.reduce((sum, transaction) => {
+            if (transaction.from_account_id === accountId) {
+              return sum - transaction.amount; // Money going out
+            } else if (transaction.to_account_id === accountId) {
+              return sum + transaction.amount; // Money coming in
+            }
+            return sum;
+          }, 0);
+
+          // Calculate balance at the end of this period
+          const periodEndBalance = runningBalance - netChange;
+
+          balanceData.unshift({
+            period: period,
+            balance: Math.max(0, periodEndBalance), // Ensure non-negative
+            month: this.getMonthFromPeriod(period, filters.period),
+          });
+
+          runningBalance = periodEndBalance;
+        }
+
+        balanceHistory.push({
+          accountId,
+          data: balanceData,
+        });
+      }
+
+      log.info({ userId, accountCount: balanceHistory.length }, 'Balance history retrieved');
+      return { success: true, data: balanceHistory };
+    } catch (error) {
+      log.error(error, 'Error getting balance history');
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : ERROR_MESSAGES.UNEXPECTED,
+      };
+    }
+  }
+
+  /**
+   * Get periods in a date range
+   */
+  private getPeriodsInRange(
+    startDate: Date,
+    endDate: Date,
+    period: 'daily' | 'weekly' | 'monthly',
+  ): string[] {
+    const periods: string[] = [];
+    const current = new Date(startDate);
+
+    while (current <= endDate) {
+      let periodKey: string;
+
+      if (period === 'daily') {
+        periodKey = current.toISOString().split('T')[0];
+        current.setDate(current.getDate() + 1);
+      } else if (period === 'weekly') {
+        const weekStart = new Date(current);
+        weekStart.setDate(current.getDate() - current.getDay());
+        periodKey = weekStart.toISOString().split('T')[0];
+        current.setDate(current.getDate() + 7);
+      } else {
+        // monthly
+        periodKey = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}`;
+        current.setMonth(current.getMonth() + 1);
+      }
+
+      periods.push(periodKey);
+    }
+
+    return periods;
+  }
+
+  /**
+   * Get month number from period string
+   */
+  private getMonthFromPeriod(period: string, periodType: 'daily' | 'weekly' | 'monthly'): number {
+    if (periodType === 'monthly') {
+      return parseInt(period.split('-')[1]);
+    }
+
+    const date = new Date(period);
+    return date.getMonth() + 1;
+  }
+
+  /**
    * Export transactions to CSV format
    */
   async exportTransactionsToCSV(
@@ -843,5 +992,46 @@ export class TransactionService {
         error: error instanceof Error ? error.message : ERROR_MESSAGES.UNEXPECTED,
       };
     }
+  }
+
+  /**
+   * Group transactions by account and period
+   */
+  private groupTransactionsByPeriod(
+    transactions: Transaction[],
+    period: 'daily' | 'weekly' | 'monthly',
+  ): Record<string, Record<string, Transaction[]>> {
+    const grouped: Record<string, Record<string, Transaction[]>> = {};
+
+    transactions.forEach((transaction) => {
+      const accountId = transaction.from_account_id || transaction.to_account_id;
+      if (!accountId) return;
+
+      if (!grouped[accountId]) {
+        grouped[accountId] = {};
+      }
+
+      const date = new Date(transaction.date);
+      let periodKey: string;
+
+      if (period === 'daily') {
+        periodKey = date.toISOString().split('T')[0];
+      } else if (period === 'weekly') {
+        const weekStart = new Date(date);
+        weekStart.setDate(date.getDate() - date.getDay());
+        periodKey = weekStart.toISOString().split('T')[0];
+      } else {
+        // monthly
+        periodKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      }
+
+      if (!grouped[accountId][periodKey]) {
+        grouped[accountId][periodKey] = [];
+      }
+
+      grouped[accountId][periodKey].push(transaction);
+    });
+
+    return grouped;
   }
 }

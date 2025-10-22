@@ -260,3 +260,25 @@ export interface PaginationOptions {
   offset?: number;
   limit?: number;
 }
+
+// =============================================================================
+// BALANCE HISTORY TYPES
+// =============================================================================
+
+export interface BalanceHistoryPoint {
+  period: string;
+  balance: number;
+  month: number;
+}
+
+export interface BalanceHistoryChart {
+  accountId: string;
+  data: BalanceHistoryPoint[];
+}
+
+export interface BalanceHistoryFilters {
+  accountIds: string[];
+  startDate: Date;
+  endDate: Date;
+  period: 'daily' | 'weekly' | 'monthly';
+}
