@@ -32,3 +32,23 @@ export function formatPercentageChange(percentage: number): { text: string; isPo
     isPositive,
   };
 }
+
+/**
+ * Format currency amount with proper localization
+ */
+export function formatCurrency(amount: number, currency: string = 'USD'): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currency,
+  }).format(amount);
+}
+
+/**
+ * Format date for display
+ */
+export function formatDisplayDate(dateString: string): string {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
+}

@@ -133,7 +133,7 @@ export function TransactionFiltersComponent({
       {isOpen && (
         <Card className="gap-0">
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex justify-between">
               <CardTitle>Advanced Filters</CardTitle>
               <Button
                 variant="ghost"

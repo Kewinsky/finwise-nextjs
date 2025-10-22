@@ -32,6 +32,7 @@ import { TransactionFiltersComponent } from '@/components/transactions/transacti
 import { CSVExportButton } from '@/components/transactions/csv-export-button';
 import { format } from 'date-fns';
 import { notifySuccess, notifyError } from '@/lib/notifications';
+import { formatCurrency } from '@/lib/utils';
 import {
   getTransactions,
   deleteManyTransactions,
@@ -218,13 +219,6 @@ export default function TransactionsPage() {
   const handleClearFilters = () => {
     setFilters({});
     setCurrentPage(1);
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(Math.abs(amount));
   };
 
   const getTypeBadgeClassName = (type: string) => {
@@ -515,7 +509,7 @@ export default function TransactionsPage() {
                           : transaction.type === 'expense'
                             ? '-'
                             : ''}
-                        {formatCurrency(transaction.amount)}
+                        {formatCurrency(Math.abs(transaction.amount))}
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>

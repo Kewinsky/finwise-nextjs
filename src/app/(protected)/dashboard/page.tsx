@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AreaChart, Area, XAxis, CartesianGrid } from 'recharts';
@@ -27,7 +27,12 @@ import { TransactionForm } from '@/components/transactions/transaction-form';
 import { DateRangeSelector, type DateRange } from '@/components/dashboard/date-range-selector';
 import { getDashboardData } from '@/lib/actions/finance-actions';
 import { notifyError } from '@/lib/notifications';
-import { calculatePercentageChange, formatPercentageChange } from '@/lib/utils';
+import {
+  calculatePercentageChange,
+  formatPercentageChange,
+  formatCurrency,
+  formatDisplayDate,
+} from '@/lib/utils';
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import type { DashboardMetrics } from '@/types/finance.types';
 
@@ -60,11 +65,14 @@ export default function DashboardPage() {
         setDashboardData(result.data as DashboardMetrics);
       } else {
         notifyError('Failed to load dashboard data', {
-          description: result.error,
+          description: result.error || 'Unknown error occurred',
         });
       }
-    } catch {
-      notifyError('Failed to load dashboard data');
+    } catch (error) {
+      console.error('Dashboard data loading error:', error);
+      notifyError('Failed to load dashboard data', {
+        description: 'Please try refreshing the page',
+      });
     }
   };
 
@@ -106,8 +114,7 @@ export default function DashboardPage() {
     if (dashboardData && (dateRange.from || dateRange.to)) {
       loadChartData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dateRange, loadChartData]);
+  }, [dateRange, loadChartData, dashboardData]);
 
   const handleDateRangeChange = (newDateRange: DateRange) => {
     setDateRange(newDateRange);
@@ -123,19 +130,20 @@ export default function DashboardPage() {
     loadDashboardData();
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
+  const formatDate = (dateString: string) => {
+    return formatDisplayDate(dateString);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-    });
-  };
+  // Transform spending trends data for the chart - memoized for performance
+  const chartData = useMemo(() => {
+    return (
+      dashboardData?.spendingTrends.map((trend) => ({
+        day: new Date(trend.date).toLocaleDateString('en-US', { weekday: 'short' }),
+        expenses: trend.type === 'expense' ? trend.amount : 0,
+        income: trend.type === 'income' ? trend.amount : 0,
+      })) || []
+    );
+  }, [dashboardData?.spendingTrends]);
 
   // Show loading spinner only on initial load
   if (!dashboardData) {
@@ -145,13 +153,6 @@ export default function DashboardPage() {
       </div>
     );
   }
-
-  // Transform spending trends data for the chart
-  const chartData = dashboardData.spendingTrends.map((trend) => ({
-    day: new Date(trend.date).toLocaleDateString('en-US', { weekday: 'short' }),
-    expenses: trend.type === 'expense' ? trend.amount : 0,
-    income: trend.type === 'income' ? trend.amount : 0,
-  }));
 
   return (
     <div className="flex-1 space-y-6 p-6">

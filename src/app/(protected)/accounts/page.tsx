@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { notifySuccess, notifyError } from '@/lib/notifications';
 import { getAccounts, deleteAccount } from '@/lib/actions/finance-actions';
+import { formatCurrency } from '@/lib/utils';
 import type { Account } from '@/types/finance.types';
 
 const accountTypes = {
@@ -76,13 +77,6 @@ export default function AccountsPage() {
   };
 
   const totalBalance = accounts?.reduce((sum, account) => sum + account.balance, 0) || 0;
-
-  const formatCurrency = (amount: number, currency: string = 'USD') => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency,
-    }).format(amount);
-  };
 
   const handleAddAccount = () => {
     setEditingAccount(null);
