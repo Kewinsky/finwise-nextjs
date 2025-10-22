@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Loader2 } from 'lucide-react';
+import { Download } from 'lucide-react';
+import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { exportTransactionsToCSV } from '@/lib/actions/finance-actions';
 import { downloadCSV, generateCSVFilename } from '@/lib/utils/csv-export';
 import type { TransactionFilters } from '@/types/finance.types';
@@ -49,7 +50,7 @@ export function CSVExportButton({ filters = {}, className }: CSVExportButtonProp
       className={className}
     >
       {isExporting ? (
-        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+        <LoadingSpinner size="sm" inline className="mr-2" />
       ) : (
         <Download className="h-4 w-4 mr-2" />
       )}

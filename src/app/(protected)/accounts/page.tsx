@@ -14,10 +14,10 @@ import {
   Wallet,
   Trash2,
   MoreVertical,
-  Loader2,
 } from 'lucide-react';
 import { AccountForm } from '@/components/accounts/account-form';
 import { BalanceHistoryChartComponent } from '@/components/accounts/balance-history-chart';
+import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,7 +26,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { notifySuccess, notifyError } from '@/lib/notifications';
 import { getAccounts, deleteAccount } from '@/lib/actions/finance-actions';
-import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import type { Account } from '@/types/finance.types';
 
 const accountTypes = {
@@ -240,7 +239,7 @@ export default function AccountsPage() {
                           disabled={isDeleting === account.id || account.is_mandatory}
                         >
                           {isDeleting === account.id ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            <LoadingSpinner size="sm" inline className="mr-2" />
                           ) : (
                             <Trash2 className="mr-2 h-4 w-4" />
                           )}
