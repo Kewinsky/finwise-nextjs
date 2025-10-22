@@ -324,7 +324,7 @@ export class AccountService {
 
       const { data, error } = await this.supabase
         .from('accounts')
-        .select('id, name, type, balance, currency')
+        .select('id, name, type, balance, currency, color')
         .eq('user_id', userId)
         .order('name');
 
@@ -339,6 +339,7 @@ export class AccountService {
         accountType: account.type as AccountType,
         balance: Number(account.balance),
         currency: account.currency,
+        color: account.color || undefined,
       }));
 
       log.info({ userId, count: balances.length }, 'Account balances retrieved');
