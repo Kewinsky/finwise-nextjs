@@ -625,6 +625,147 @@ export async function getMonthlyCashFlowTrend(dateRange: {
 }
 
 /**
+ * Get daily cash flow trend data
+ */
+export async function getDailyCashFlowTrend(dateRange: {
+  from: Date | undefined;
+  to: Date | undefined;
+}) {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    if (!dateRange.from || !dateRange.to) {
+      return { success: false, error: 'Date range is required' };
+    }
+
+    const trendData = [];
+
+    const startDate = new Date(dateRange.from);
+    const endDate = new Date(dateRange.to);
+
+    const currentDate = new Date(startDate);
+
+    while (currentDate <= endDate) {
+      const dayStart = new Date(currentDate);
+      dayStart.setHours(0, 0, 0, 0);
+
+      const dayEnd = new Date(currentDate);
+      dayEnd.setHours(23, 59, 59, 999);
+
+      const { data: transactions } = await supabase
+        .from('transactions')
+        .select('amount, type')
+        .eq('user_id', user.id)
+        .gte('date', dayStart.toISOString())
+        .lte('date', dayEnd.toISOString())
+        .order('date', { ascending: true });
+
+      if (transactions) {
+        const income = transactions
+          .filter((t) => t.type === 'income')
+          .reduce((sum, t) => sum + Number(t.amount), 0);
+        const expenses = transactions
+          .filter((t) => t.type === 'expense')
+          .reduce((sum, t) => sum + Number(t.amount), 0);
+
+        trendData.push({
+          date: currentDate.toISOString(),
+          income,
+          expenses,
+        });
+      }
+
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return { success: true, data: trendData };
+  } catch (error) {
+    return handleActionError(error, 'getDailyCashFlowTrend');
+  }
+}
+
+/**
+ * Get weekly cash flow trend data
+ */
+export async function getWeeklyCashFlowTrend(dateRange: {
+  from: Date | undefined;
+  to: Date | undefined;
+}) {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    if (!dateRange.from || !dateRange.to) {
+      return { success: false, error: 'Date range is required' };
+    }
+
+    const trendData = [];
+
+    const startDate = new Date(dateRange.from);
+    const endDate = new Date(dateRange.to);
+
+    // Start from the beginning of the week
+    const currentDate = new Date(startDate);
+    const dayOfWeek = currentDate.getDay();
+    const daysToMonday = (dayOfWeek + 6) % 7;
+    currentDate.setDate(currentDate.getDate() - daysToMonday);
+    currentDate.setHours(0, 0, 0, 0);
+
+    let weekNumber = 1;
+
+    while (currentDate <= endDate) {
+      const weekEnd = new Date(currentDate);
+      weekEnd.setDate(currentDate.getDate() + 6);
+      weekEnd.setHours(23, 59, 59, 999);
+
+      const { data: transactions } = await supabase
+        .from('transactions')
+        .select('amount, type')
+        .eq('user_id', user.id)
+        .gte('date', currentDate.toISOString())
+        .lte('date', weekEnd.toISOString())
+        .order('date', { ascending: true });
+
+      if (transactions) {
+        const income = transactions
+          .filter((t) => t.type === 'income')
+          .reduce((sum, t) => sum + Number(t.amount), 0);
+        const expenses = transactions
+          .filter((t) => t.type === 'expense')
+          .reduce((sum, t) => sum + Number(t.amount), 0);
+
+        trendData.push({
+          week: `Week ${weekNumber}`,
+          income,
+          expenses,
+        });
+
+        weekNumber++;
+      }
+
+      currentDate.setDate(currentDate.getDate() + 7);
+    }
+
+    return { success: true, data: trendData };
+  } catch (error) {
+    return handleActionError(error, 'getWeeklyCashFlowTrend');
+  }
+}
+
+/**
  * Get yearly cash flow trend data
  */
 export async function getYearlyCashFlowTrend(years = 3) {

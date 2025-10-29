@@ -3,7 +3,18 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { XAxis, CartesianGrid, BarChart, Bar } from 'recharts';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  XAxis,
+  CartesianGrid,
+  BarChart,
+  Bar,
+  AreaChart,
+  Area,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import {
   TrendingUp,
@@ -20,11 +31,10 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { TransactionForm } from '@/components/transactions/transaction-form';
-import { DateRangeSelector, type DateRange } from '@/components/dashboard/date-range-selector';
 import {
   getDashboardData,
   getMonthlyCashFlowTrend,
-  getCategorySpendingBreakdown,
+  getDailyCashFlowTrend,
   getCategorySpendingForMonth,
   getSimpleFinancialHealthScore,
   generateInsights,
@@ -46,6 +56,20 @@ interface CashFlowData {
   year?: string;
   income: number;
   expenses: number;
+}
+
+interface ChartDataItem {
+  date?: string;
+  month?: string;
+  week?: string;
+  income: number;
+  expenses: number;
+}
+
+interface AreaChartDataPoint {
+  date: string;
+  label: string;
+  value: number;
 }
 
 interface CategorySpending {
@@ -75,6 +99,18 @@ const chartConfig = {
     label: 'Expenses',
     color: 'var(--destructive)',
   },
+  balance: {
+    label: 'Balance',
+    color: 'var(--blue)',
+  },
+  savings: {
+    label: 'Savings',
+    color: 'var(--purple)',
+  },
+  value: {
+    label: 'Value',
+    color: 'var(--primary)',
+  },
 };
 
 export default function DashboardPage() {
@@ -84,23 +120,12 @@ export default function DashboardPage() {
     'expense',
   );
   const [dashboardData, setDashboardData] = useState<DashboardMetrics | null>(null);
-  const [dateRange, setDateRange] = useState<DateRange>(() => {
-    const now = new Date();
-    // Go back 2 months so we get exactly 3 months total (including current month)
-    const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 2, 1);
-    const endOfCurrentMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    return { from: threeMonthsAgo, to: endOfCurrentMonth };
-  });
-  const [isLoadingChart, setIsLoadingChart] = useState(false);
 
   // Additional data states
-  const [monthlyCashFlowTrend, setMonthlyCashFlowTrend] = useState<CashFlowData[]>([]);
-  const [categorySpending, setCategorySpending] = useState<CategorySpending[]>([]);
   const [monthlyCategorySpending, setMonthlyCategorySpending] = useState<CategorySpending[]>([]);
   const [financialHealthScore, setFinancialHealthScore] = useState<FinancialHealthScore | null>(
     null,
   );
-  const [isLoadingAdditionalData, setIsLoadingAdditionalData] = useState(false);
 
   // AI Insights state
   const [aiInsights, setAiInsights] = useState<{
@@ -111,11 +136,21 @@ export default function DashboardPage() {
   const [isLoadingInsights, setIsLoadingInsights] = useState(false);
 
   // Selected month for spending analysis
-  const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
+  const [selectedMonth] = useState<Date>(new Date());
+
+  const [selectedTimeRange, setSelectedTimeRange] = useState<'1W' | '1M' | '3M' | '6M' | '1Y'>(
+    '1M',
+  );
+  const [selectedSeries, setSelectedSeries] = useState<
+    'balance' | 'income' | 'expenses' | 'savings'
+  >('balance');
+  const [areaChartData, setAreaChartData] = useState<AreaChartDataPoint[]>([]);
+  const [isLoadingAreaChart, setIsLoadingAreaChart] = useState(false);
 
   // Cache for chart data to avoid repeated server calls
   const chartCacheRef = useRef<Map<string, CashFlowData[]>>(new Map());
   const categoryCacheRef = useRef<Map<string, CategorySpending[]>>(new Map());
+  const areaChartCacheRef = useRef<Map<string, AreaChartDataPoint[]>>(new Map());
 
   const loadDashboardData = async () => {
     try {
@@ -136,35 +171,154 @@ export default function DashboardPage() {
     }
   };
 
-  const loadChartData = useCallback(async () => {
-    // Always load chart data when we have a date range (including default)
-    if (!dateRange.from || !dateRange.to) return;
-
-    // Create cache key from date range
-    const cacheKey = `${dateRange.from.toISOString().split('T')[0]}-${dateRange.to.toISOString().split('T')[0]}`;
+  // Load area chart data based on time range and series
+  const loadAreaChartData = useCallback(async () => {
+    const cacheKey = `${selectedTimeRange}-${selectedSeries}`;
 
     // Check cache first
-    if (chartCacheRef.current.has(cacheKey)) {
-      setMonthlyCashFlowTrend(chartCacheRef.current.get(cacheKey)!);
+    if (areaChartCacheRef.current.has(cacheKey)) {
+      setAreaChartData(areaChartCacheRef.current.get(cacheKey)!);
       return;
     }
 
-    setIsLoadingChart(true);
+    setIsLoadingAreaChart(true);
     try {
-      // Pass the date range directly to getMonthlyCashFlowTrend
-      const result = await getMonthlyCashFlowTrend(dateRange);
+      // Calculate date range based on selected time range
+      const now = new Date();
+      let from: Date,
+        to: Date = now;
+
+      switch (selectedTimeRange) {
+        case '1W':
+          from = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          break;
+        case '1M':
+          from = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          break;
+        case '3M':
+          // Exactly 3 months ago (including current month = 3 months total)
+          from = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+          break;
+        case '6M':
+          // Exactly 6 months ago (including current month = 6 months total)
+          from = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+          break;
+        case '1Y':
+          // Exactly 12 months ago (including current month = 12 months total)
+          from = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+          break;
+        default:
+          from = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      }
+
+      // Set end date to end of current month for monthly aggregations
+      if (selectedTimeRange === '3M' || selectedTimeRange === '6M' || selectedTimeRange === '1Y') {
+        to = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Last day of current month
+      }
+
+      // Get data based on time range with appropriate aggregation
+      let result;
+      if (selectedTimeRange === '1W' || selectedTimeRange === '1M') {
+        // Daily aggregation for 1W and 1M
+        result = await getDailyCashFlowTrend({ from, to });
+      } else {
+        // Monthly aggregation for 3M, 6M, and 1Y
+        result = await getMonthlyCashFlowTrend({ from, to });
+      }
+
       if (result.success) {
         const data = result.data || [];
-        setMonthlyCashFlowTrend(data);
-        // Cache the result
-        chartCacheRef.current.set(cacheKey, data);
+
+        // Transform data based on selected series
+        const cumulativeBalance = dashboardData?.totalBalance || 0;
+
+        // For balance series, we need to work backwards from current balance
+        // by subtracting net transactions from each period
+        if (selectedSeries === 'balance') {
+          // Start from current balance and work backwards
+          let runningBalance = cumulativeBalance;
+          const balanceData: AreaChartDataPoint[] = [];
+
+          for (let i = data.length - 1; i >= 0; i--) {
+            const item = data[i] as ChartDataItem;
+            const netChange = (item.income || 0) - (item.expenses || 0);
+            runningBalance -= netChange;
+
+            let label = '';
+            let date = '';
+
+            if (selectedTimeRange === '1W' || selectedTimeRange === '1M') {
+              const dayDate = item.date ? new Date(item.date) : new Date();
+              label = dayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+              date = item.date?.split('T')[0] || '';
+            } else {
+              // Monthly data (3M, 6M, 1Y all use monthly aggregation)
+              label = item.month || `Month ${i + 1}`;
+              date = item.month || `Month ${i + 1}`;
+            }
+
+            balanceData.unshift({
+              date,
+              label,
+              value: Math.max(0, runningBalance),
+            });
+          }
+
+          setAreaChartData(balanceData);
+          areaChartCacheRef.current.set(cacheKey, balanceData);
+          return;
+        }
+
+        // For income and expenses, show period totals
+        // For savings, show cumulative (running total from start)
+        let cumulativeSavings = 0;
+        const transformedData: AreaChartDataPoint[] = data.map((item, index) => {
+          const chartItem = item as ChartDataItem;
+          let label = '';
+          let date = '';
+
+          if (selectedTimeRange === '1W' || selectedTimeRange === '1M') {
+            // For daily data (1W and 1M both use daily aggregation)
+            const dayDate = chartItem.date ? new Date(chartItem.date) : new Date();
+            label = dayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            date = chartItem.date?.split('T')[0] || '';
+          } else {
+            // For monthly data (3M, 6M, 1Y all use monthly aggregation)
+            label = chartItem.month || `Month ${index + 1}`;
+            date = chartItem.month || `Month ${index + 1}`;
+          }
+
+          let value = 0;
+          if (selectedSeries === 'income') {
+            // Period total: income for this day/month
+            value = chartItem.income || 0;
+          } else if (selectedSeries === 'expenses') {
+            // Period total: expenses for this day/month
+            value = chartItem.expenses || 0;
+          } else if (selectedSeries === 'savings') {
+            // Cumulative: running total of savings from start of period
+            const periodSavings = (chartItem.income || 0) - (chartItem.expenses || 0);
+            cumulativeSavings += periodSavings;
+            value = cumulativeSavings;
+          }
+
+          return {
+            date,
+            label,
+            value: selectedSeries === 'savings' ? value : Math.max(0, value), // Allow negative cumulative savings
+          };
+        });
+
+        setAreaChartData(transformedData);
+        areaChartCacheRef.current.set(cacheKey, transformedData);
       }
-    } catch {
-      notifyError('Failed to load chart data');
+    } catch (error) {
+      console.error('Error loading area chart data:', error);
+      notifyError('Failed to load area chart data');
     } finally {
-      setIsLoadingChart(false);
+      setIsLoadingAreaChart(false);
     }
-  }, [dateRange]);
+  }, [selectedTimeRange, selectedSeries, dashboardData]);
 
   const loadMonthlyCategoryData = useCallback(async () => {
     try {
@@ -193,20 +347,11 @@ export default function DashboardPage() {
   }, [selectedMonth]);
 
   const loadAdditionalData = useCallback(async () => {
-    setIsLoadingAdditionalData(true);
     try {
-      const [categoryResult, healthResult] = await Promise.all([
-        getCategorySpendingBreakdown(),
-        getSimpleFinancialHealthScore(),
-      ]);
-
-      // Load account distribution (removed - no longer needed)
-      if (categoryResult.success) setCategorySpending(categoryResult.data || []);
+      const healthResult = await getSimpleFinancialHealthScore();
       if (healthResult.success) setFinancialHealthScore(healthResult.data || null);
     } catch (error) {
       console.error('Failed to load additional data:', error);
-    } finally {
-      setIsLoadingAdditionalData(false);
     }
   }, []);
 
@@ -269,21 +414,18 @@ export default function DashboardPage() {
     loadAdditionalData();
   }, [loadAdditionalData]);
 
-  // Reload chart data when date range changes
+  // Load area chart data when time range or series changes
   useEffect(() => {
-    if (dateRange.from && dateRange.to) {
-      loadChartData();
+    if (dashboardData) {
+      loadAreaChartData();
     }
-  }, [dateRange]);
-
-  const handleDateRangeChange = (newDateRange: DateRange) => {
-    setDateRange(newDateRange);
-  };
+  }, [selectedTimeRange, selectedSeries, dashboardData, loadAreaChartData]);
 
   // Clear cache when transactions are added/updated
   const clearCache = useCallback(() => {
     chartCacheRef.current.clear();
     categoryCacheRef.current.clear();
+    areaChartCacheRef.current.clear();
   }, []);
 
   const handleAddTransaction = (type: 'income' | 'expense' | 'transfer') => {
@@ -302,36 +444,41 @@ export default function DashboardPage() {
     return formatDisplayDate(dateString);
   };
 
-  // Transform spending trends data for the chart - simplified
-  const monthlyCashFlowChartData = useMemo(() => {
-    return monthlyCashFlowTrend.map((month) => ({
-      month: month.month,
-      income: Math.round(month.income),
-      expenses: Math.round(month.expenses),
-    }));
-  }, [monthlyCashFlowTrend]);
+  // Pie chart data for current month distribution
+  const pieChartData = useMemo(() => {
+    if (!dashboardData) return [];
 
-  // Get chart data - always monthly aggregation
-  const getChartData = useMemo(() => {
-    return monthlyCashFlowChartData.map((item) => ({
-      ...item,
-      day: item.month || 'Month',
-    }));
-  }, [monthlyCashFlowChartData]);
+    const totalIncome = dashboardData.monthlySummary.totalIncome;
+    const totalExpenses = dashboardData.monthlySummary.totalExpenses;
+    const savings = dashboardData.monthlySummary.savings;
 
-  const categoryChartData = useMemo(() => {
+    return [
+      {
+        name: 'Income',
+        value: totalIncome,
+        fill: '#10b981', // green
+      },
+      {
+        name: 'Expenses',
+        value: totalExpenses,
+        fill: '#ef4444', // red
+      },
+      {
+        name: 'Savings',
+        value: savings,
+        fill: '#8b5cf6', // purple
+      },
+    ].filter((item) => item.value > 0);
+  }, [dashboardData]);
+
+  // Top 5 categories chart data
+  const topCategoriesData = useMemo(() => {
     if (monthlyCategorySpending.length === 0) return [];
 
-    // Calculate total expenses for percentage calculation
-    const totalExpenses = monthlyCategorySpending.reduce(
-      (sum, category) => sum + category.amount,
-      0,
-    );
-
-    return monthlyCategorySpending.slice(0, 8).map((category) => ({
-      ...category,
-      amount: Math.round(category.amount),
-      percentage: totalExpenses > 0 ? Math.round((category.amount / totalExpenses) * 100) : 0,
+    return monthlyCategorySpending.slice(0, 5).map((category, index) => ({
+      name: category.category,
+      value: category.amount,
+      fill: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'][index],
     }));
   }, [monthlyCategorySpending]);
 
@@ -349,7 +496,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">Here&apos;s an overview of your finances.</p>
+        <p className="text-muted-foreground">Advanced financial insights and analytics.</p>
       </div>
 
       {/* Key Metrics Cards */}
@@ -357,7 +504,7 @@ export default function DashboardPage() {
         <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 border-blue-200/50 dark:border-blue-800/30 shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">
-              Total Balance
+              My Balance
             </CardTitle>
             <DollarSign className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           </CardHeader>
@@ -400,7 +547,7 @@ export default function DashboardPage() {
         <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-200/50 dark:border-green-800/30 shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">
-              This Month Income
+              Incomes This Month
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
           </CardHeader>
@@ -443,7 +590,7 @@ export default function DashboardPage() {
         <Card className="bg-gradient-to-br from-rose-50 to-red-50 dark:from-rose-950/20 dark:to-red-950/20 border-rose-200/50 dark:border-rose-800/30 shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-rose-700 dark:text-rose-300">
-              This Month Expenses
+              Expenses This Month
             </CardTitle>
             <TrendingDown className="h-4 w-4 text-rose-600 dark:text-rose-400" />
           </CardHeader>
@@ -488,7 +635,7 @@ export default function DashboardPage() {
         <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-indigo-950/20 border-purple-200/50 dark:border-purple-800/30 shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">
-              Net Savings
+              My Savings
             </CardTitle>
             <Wallet className="h-4 w-4 text-purple-600 dark:text-purple-400" />
           </CardHeader>
@@ -529,222 +676,319 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Financial Trends Section */}
-      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
-        {/* Financial Trends Chart */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <div className="flex flex-col space-y-3 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  Financial Trends
-                </CardTitle>
-                <CardDescription>
-                  Track your financial performance with monthly aggregation
-                </CardDescription>
-              </div>
-              <div className="w-full sm:w-auto sm:flex-shrink-0">
-                <DateRangeSelector
-                  dateRange={dateRange}
-                  onDateRangeChange={handleDateRangeChange}
-                  isLoading={isLoadingChart}
-                />
-              </div>
+      {/* Area Chart with Time Range and Series Tabs */}
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+            <div className="flex flex-col gap-2">
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                Financial Trends
+              </CardTitle>
+              <CardDescription>Track your financial performance over time</CardDescription>
             </div>
+
+            {/* Time Range Buttons */}
+            <div className="flex gap-2">
+              {(['1W', '1M', '3M', '6M', '1Y'] as const).map((range) => (
+                <Button
+                  key={range}
+                  variant={selectedTimeRange === range ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedTimeRange(range)}
+                  className="min-w-[40px]"
+                >
+                  {range}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Series Tabs */}
+          <Tabs
+            value={selectedSeries}
+            onValueChange={(value) =>
+              setSelectedSeries(value as 'balance' | 'income' | 'expenses' | 'savings')
+            }
+          >
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="balance">Total Balance</TabsTrigger>
+              <TabsTrigger value="income">Incomes</TabsTrigger>
+              <TabsTrigger value="expenses">Expenses</TabsTrigger>
+              <TabsTrigger value="savings">Savings</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </CardHeader>
+        <CardContent>
+          {isLoadingAreaChart ? (
+            <div className="flex items-center justify-center h-[400px]">
+              <LoadingSpinner message="Loading chart data..." />
+            </div>
+          ) : (
+            <ChartContainer config={chartConfig} className="h-[400px] w-full">
+              <AreaChart
+                accessibilityLayer
+                data={areaChartData}
+                margin={{
+                  left: 16,
+                  right: 16,
+                }}
+              >
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="label"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={10}
+                  minTickGap={selectedTimeRange === '1M' ? 100 : 50}
+                  interval={selectedTimeRange === '1M' ? Math.floor(areaChartData.length / 15) : 0}
+                  padding={{ left: 16, right: 16 }}
+                />
+                <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
+                <Area
+                  dataKey="value"
+                  stroke={`var(--color-${selectedSeries})`}
+                  fill={`var(--color-${selectedSeries})`}
+                  fillOpacity={0.3}
+                />
+              </AreaChart>
+            </ChartContainer>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Charts Row */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* Rounded Pie Chart - Current Month Distribution */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Current Month Distribution
+            </CardTitle>
+            <CardDescription>
+              How your income, expenses, and savings are distributed
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col space-y-4">
-              {/* Chart */}
-              {isLoadingChart ? (
-                <div className="flex items-center justify-center h-64">
-                  <LoadingSpinner message="Loading chart data..." />
-                </div>
-              ) : (
-                <ChartContainer config={chartConfig}>
-                  <BarChart
-                    accessibilityLayer
-                    data={getChartData}
-                    margin={{
-                      left: 20,
-                      right: 20,
-                    }}
+            {pieChartData.length > 0 ? (
+              <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
+                <PieChart>
+                  <Pie
+                    data={pieChartData}
+                    innerRadius="80%"
+                    outerRadius="100%"
+                    cornerRadius="50%"
+                    paddingAngle={5}
+                    dataKey="value"
+                    isAnimationActive={true}
                   >
-                    <CartesianGrid vertical={false} />
-                    <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={10} />
-                    <ChartTooltip
-                      cursor={false}
-                      content={<ChartTooltipContent indicator="dashed" />}
-                    />
-                    <Bar dataKey="income" fill="var(--color-income)" radius={4} />
-                    <Bar dataKey="expenses" fill="var(--color-expenses)" radius={4} />
-                  </BarChart>
-                </ChartContainer>
-              )}
+                    {pieChartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Pie>
+                  <ChartTooltip
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        const data = payload[0];
+                        return (
+                          <div className="rounded-lg border bg-background p-2 shadow-md">
+                            <div className="grid gap-2">
+                              <div className="flex flex-col">
+                                <span className="text-[0.70rem] uppercase text-muted-foreground">
+                                  {data.payload.name}
+                                </span>
+                                <span className="font-bold text-muted-foreground">
+                                  {formatCurrency(data.value as number)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                </PieChart>
+              </ChartContainer>
+            ) : (
+              <div className="flex items-center justify-center h-[300px] text-center text-muted-foreground">
+                <p>No data available</p>
+              </div>
+            )}
+
+            {/* Legend */}
+            <div className="mt-4 flex flex-wrap gap-4 justify-center">
+              {pieChartData.map((item, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.fill }} />
+                  <span className="text-sm text-muted-foreground">
+                    {item.name}: {formatCurrency(item.value)}
+                  </span>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
 
-        {/* Financial Health Score */}
+        {/* Top 5 Categories Chart */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Target className="h-4 w-4" />
-              Financial Health Score
+              <BarChart3 className="h-4 w-4" />
+              Top 5 Categories
             </CardTitle>
-            <CardDescription>Your overall financial health assessment</CardDescription>
+            <CardDescription>Your highest spending categories this month</CardDescription>
           </CardHeader>
           <CardContent>
-            {isLoadingAdditionalData ? (
-              <div className="flex items-center justify-center h-32">
-                <LoadingSpinner message="Loading..." />
-              </div>
-            ) : financialHealthScore ? (
-              <>
-                <div className="text-2xl font-bold mb-2">
-                  <NumberTicker
-                    value={financialHealthScore.overallScore}
-                    decimalPlaces={0}
-                    delay={0.1}
+            {topCategoriesData.length > 0 ? (
+              <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
+                <BarChart accessibilityLayer data={topCategoriesData}>
+                  <CartesianGrid vertical={false} />
+                  <ChartTooltip
+                    cursor={false}
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        const data = payload[0];
+                        return (
+                          <div className="rounded-lg border bg-background p-2 shadow-md">
+                            <div className="grid gap-2">
+                              <div className="flex flex-col">
+                                <span className="text-[0.70rem] uppercase text-muted-foreground">
+                                  {data.payload.name}
+                                </span>
+                                <span className="font-bold text-muted-foreground">
+                                  {formatCurrency(data.value as number)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
                   />
-                  <span className="text-sm text-muted-foreground ml-1">/100</span>
-                </div>
-
-                {/* AI Score Explanation */}
-                {aiInsights && (
-                  <div className="mb-4 p-3 bg-muted/50 rounded-lg">
-                    <p className="text-sm text-muted-foreground mb-2">
-                      <Zap className="h-3 w-3 inline mr-1" />
-                      AI Insight
-                    </p>
-                    <p className="text-sm">{aiInsights.scoreExplanation}</p>
-                  </div>
-                )}
-
-                <div className="space-y-2 mb-4">
-                  {Object.entries(financialHealthScore.breakdown).map(
-                    ([key, value]: [string, { score: number; weight: number }]) => (
-                      <div key={key} className="flex justify-between text-xs">
-                        <span className="capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
-                        <span className="font-medium">{value.score}/100</span>
-                      </div>
-                    ),
-                  )}
-                </div>
-
-                {/* AI Recommendations */}
-                {isLoadingInsights ? (
-                  <div className="flex items-center justify-center py-2">
-                    <LoadingSpinner message="Generating insights..." />
-                  </div>
-                ) : aiInsights && aiInsights.recommendations.length > 0 ? (
-                  <div className="space-y-2">
-                    <p className="text-xs font-medium text-muted-foreground mb-2">
-                      <Zap className="h-3 w-3 inline mr-1" />
-                      AI Recommendations
-                    </p>
-                    <div className="space-y-1">
-                      {aiInsights.recommendations.slice(0, 2).map((recommendation, index) => (
-                        <div
-                          key={index}
-                          className="text-xs text-muted-foreground flex items-start gap-2"
-                        >
-                          <span className="text-primary mt-0.5">•</span>
-                          <span>{recommendation}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-              </>
+                  <Bar dataKey="value" radius={8} />
+                </BarChart>
+              </ChartContainer>
             ) : (
-              <p className="text-sm text-muted-foreground">No data available</p>
+              <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+                <p>No category data available</p>
+              </div>
             )}
+
+            {/* Category List */}
+            <div className="mt-4 flex flex-wrap gap-4 justify-center">
+              {topCategoriesData.map((category, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: category.fill }}
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    {category.name}: {formatCurrency(category.value)}
+                  </span>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Top Categories & Recent Activity */}
+      {/* AI Suggestions and Recent Activity */}
       <div className="grid gap-4 lg:grid-cols-2">
+        {/* Smart AI Suggestions */}
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4" />
-                  Top Categories
-                </CardTitle>
-                <CardDescription>Your top categories by spending</CardDescription>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const prevMonth = new Date(selectedMonth);
-                    prevMonth.setMonth(prevMonth.getMonth() - 1);
-                    setSelectedMonth(prevMonth);
-                  }}
-                >
-                  ←
-                </Button>
-                <span className="text-sm font-medium min-w-[120px] text-center">
-                  {selectedMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const nextMonth = new Date(selectedMonth);
-                    nextMonth.setMonth(nextMonth.getMonth() + 1);
-                    setSelectedMonth(nextMonth);
-                  }}
-                  disabled={
-                    selectedMonth.getMonth() === new Date().getMonth() &&
-                    selectedMonth.getFullYear() === new Date().getFullYear()
-                  }
-                >
-                  →
-                </Button>
-              </div>
-            </div>
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="h-4 w-4" />
+              Smart AI Suggestions
+            </CardTitle>
+            <CardDescription>
+              Personalized recommendations based on your financial data
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            {/* Monthly Category Summary */}
-            {isLoadingAdditionalData ? (
-              // center the spinner
+            {isLoadingInsights ? (
               <div className="flex items-center justify-center h-32">
-                <LoadingSpinner message="Loading category data..." />
+                <LoadingSpinner message="Generating insights..." />
               </div>
-            ) : monthlyCategorySpending.length > 0 ? (
-              <div className="space-y-3">
-                {monthlyCategorySpending.map((category, index) => (
-                  <div key={category.category} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium">
-                        {index + 1}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">{category.category}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {category.transactionCount} transactions
-                        </p>
-                      </div>
+            ) : aiInsights && aiInsights.recommendations.length > 0 ? (
+              <div className="space-y-4">
+                {/* Financial Health Score */}
+                {financialHealthScore && (
+                  <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-lg border">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-semibold">Financial Health Score</span>
+                      <span className="text-2xl font-bold text-primary">
+                        {financialHealthScore.overallScore}/100
+                      </span>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium">
-                        {formatCurrency(category.amount)} ({category.percentage}%)
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Avg: {formatCurrency(category.avgCategory || 0)}
-                      </p>
+                    <div className="w-full bg-muted rounded-full h-2 mb-2">
+                      <div
+                        className={`h-2 rounded-full transition-all duration-500 ${
+                          financialHealthScore.overallScore >= 80
+                            ? 'bg-green-500'
+                            : financialHealthScore.overallScore >= 60
+                              ? 'bg-yellow-500'
+                              : 'bg-red-500'
+                        }`}
+                        style={{ width: `${financialHealthScore.overallScore}%` }}
+                      />
+                    </div>
+                    <p className="text-sm text-muted-foreground">{aiInsights.scoreExplanation}</p>
+                  </div>
+                )}
+
+                {/* AI Recommendations */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Zap className="h-4 w-4 text-primary" />
+                    <span className="text-sm font-semibold">AI Recommendations</span>
+                  </div>
+                  <div className="space-y-3">
+                    {aiInsights.recommendations.slice(0, 4).map((recommendation, index) => (
+                      <div
+                        key={index}
+                        className="p-3 bg-muted/50 rounded-lg border-l-4 border-primary/20"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="flex-shrink-0 w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center">
+                            <span className="text-xs font-semibold text-primary">{index + 1}</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {recommendation}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* AI Insights */}
+                {aiInsights.insights.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Target className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-semibold">Key Insights</span>
+                    </div>
+                    <div className="space-y-2">
+                      {aiInsights.insights.slice(0, 3).map((insight, index) => (
+                        <div key={index} className="p-2 bg-muted/30 rounded-lg">
+                          <p className="text-sm text-muted-foreground">{insight}</p>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))}
+                )}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-32 text-center">
-                <p className="text-sm text-muted-foreground mb-2">No spending data available</p>
+                <Target className="h-8 w-8 text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground">No AI suggestions available</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Add more transaction data to get personalized recommendations
+                </p>
               </div>
             )}
           </CardContent>
@@ -753,7 +997,7 @@ export default function DashboardPage() {
         {/* Recent Activity */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <div>
+            <div className="flex flex-col gap-2">
               <CardTitle className="flex items-center gap-2">
                 <ArrowRightLeft className="h-4 w-4" />
                 Recent Activity
