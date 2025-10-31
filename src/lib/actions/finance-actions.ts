@@ -585,34 +585,67 @@ export async function getMonthlyCashFlowTrend(dateRange: {
       return { success: false, error: 'Date range is required' };
     }
 
-    const transactionService = new TransactionService(supabase);
-    const trendData = [];
-
-    // Simple approach: iterate month by month from start to end
+    // Optimized: Single batch query instead of loop
     const startDate = new Date(dateRange.from);
-    const endDate = new Date(dateRange.to);
-
-    // Set to first day of month for consistency
     startDate.setDate(1);
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(dateRange.to);
     endDate.setDate(1);
+    // Set to last day of the end month
+    const lastDayOfEndMonth = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0);
+    lastDayOfEndMonth.setHours(23, 59, 59, 999);
 
+    // Single query for all transactions in date range
+    const { data: transactions, error } = await supabase
+      .from('transactions')
+      .select('date, amount, type')
+      .eq('user_id', user.id)
+      .gte('date', startDate.toISOString())
+      .lte('date', lastDayOfEndMonth.toISOString())
+      .order('date', { ascending: true });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    if (!transactions) {
+      return { success: true, data: [] };
+    }
+
+    // Group transactions by month and aggregate
+    const monthlyMap = new Map<string, { income: number; expenses: number }>();
+
+    transactions.forEach((transaction) => {
+      const date = new Date(transaction.date);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`; // YYYY-MM
+
+      if (!monthlyMap.has(monthKey)) {
+        monthlyMap.set(monthKey, { income: 0, expenses: 0 });
+      }
+
+      const monthData = monthlyMap.get(monthKey)!;
+      const amount = Number(transaction.amount) || 0;
+
+      if (transaction.type === 'income') {
+        monthData.income += amount;
+      } else if (transaction.type === 'expense') {
+        monthData.expenses += amount;
+      }
+    });
+
+    // Convert map to array with all months (including months with no transactions)
+    const trendData = [];
     const currentDate = new Date(startDate);
 
     while (currentDate <= endDate) {
-      const result = await transactionService.getMonthlySummary(
-        user.id,
-        currentDate.getFullYear(),
-        currentDate.getMonth() + 1,
-      );
+      const monthKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+      const monthData = monthlyMap.get(monthKey) || { income: 0, expenses: 0 };
 
-      if (result.success) {
-        const monthData = result.data;
-        trendData.push({
-          month: currentDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-          income: monthData.totalIncome,
-          expenses: monthData.totalExpenses,
-        });
-      }
+      trendData.push({
+        month: currentDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        income: monthData.income,
+        expenses: monthData.expenses,
+      });
 
       // Move to next month
       currentDate.setMonth(currentDate.getMonth() + 1);
@@ -645,42 +678,59 @@ export async function getDailyCashFlowTrend(dateRange: {
       return { success: false, error: 'Date range is required' };
     }
 
-    const trendData = [];
-
+    // Optimized: Single batch query instead of loop
     const startDate = new Date(dateRange.from);
+    startDate.setHours(0, 0, 0, 0);
     const endDate = new Date(dateRange.to);
+    endDate.setHours(23, 59, 59, 999);
 
+    // Single query for all transactions in date range
+    const { data: transactions } = await supabase
+      .from('transactions')
+      .select('date, amount, type')
+      .eq('user_id', user.id)
+      .gte('date', startDate.toISOString())
+      .lte('date', endDate.toISOString())
+      .order('date', { ascending: true });
+
+    if (!transactions) {
+      return { success: true, data: [] };
+    }
+
+    // Group transactions by day and aggregate
+    const dailyMap = new Map<string, { income: number; expenses: number }>();
+
+    transactions.forEach((transaction) => {
+      const date = new Date(transaction.date);
+      const dateKey = date.toISOString().split('T')[0]; // YYYY-MM-DD
+
+      if (!dailyMap.has(dateKey)) {
+        dailyMap.set(dateKey, { income: 0, expenses: 0 });
+      }
+
+      const dayData = dailyMap.get(dateKey)!;
+      const amount = Number(transaction.amount) || 0;
+
+      if (transaction.type === 'income') {
+        dayData.income += amount;
+      } else if (transaction.type === 'expense') {
+        dayData.expenses += amount;
+      }
+    });
+
+    // Convert map to array with all days (including days with no transactions)
+    const trendData = [];
     const currentDate = new Date(startDate);
 
     while (currentDate <= endDate) {
-      const dayStart = new Date(currentDate);
-      dayStart.setHours(0, 0, 0, 0);
+      const dateKey = currentDate.toISOString().split('T')[0];
+      const dayData = dailyMap.get(dateKey) || { income: 0, expenses: 0 };
 
-      const dayEnd = new Date(currentDate);
-      dayEnd.setHours(23, 59, 59, 999);
-
-      const { data: transactions } = await supabase
-        .from('transactions')
-        .select('amount, type')
-        .eq('user_id', user.id)
-        .gte('date', dayStart.toISOString())
-        .lte('date', dayEnd.toISOString())
-        .order('date', { ascending: true });
-
-      if (transactions) {
-        const income = transactions
-          .filter((t) => t.type === 'income')
-          .reduce((sum, t) => sum + Number(t.amount), 0);
-        const expenses = transactions
-          .filter((t) => t.type === 'expense')
-          .reduce((sum, t) => sum + Number(t.amount), 0);
-
-        trendData.push({
-          date: currentDate.toISOString(),
-          income,
-          expenses,
-        });
-      }
+      trendData.push({
+        date: currentDate.toISOString(),
+        income: dayData.income,
+        expenses: dayData.expenses,
+      });
 
       currentDate.setDate(currentDate.getDate() + 1);
     }
