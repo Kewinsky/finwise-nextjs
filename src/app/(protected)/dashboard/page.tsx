@@ -15,7 +15,8 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
+import { SimpleChartTooltip } from '@/components/charts/simple-chart-tooltip';
 import {
   TrendingUp,
   TrendingDown,
@@ -500,7 +501,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Key Metrics Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 border-blue-200/50 dark:border-blue-800/30 shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">
@@ -729,10 +730,7 @@ export default function DashboardPage() {
               <AreaChart
                 accessibilityLayer
                 data={areaChartData}
-                margin={{
-                  left: 16,
-                  right: 16,
-                }}
+                margin={{ top: 16, bottom: 16, left: 32, right: 32 }}
               >
                 <CartesianGrid vertical={false} />
                 <XAxis
@@ -742,9 +740,8 @@ export default function DashboardPage() {
                   tickMargin={10}
                   minTickGap={selectedTimeRange === '1M' ? 100 : 50}
                   interval={selectedTimeRange === '1M' ? Math.floor(areaChartData.length / 15) : 0}
-                  padding={{ left: 16, right: 16 }}
                 />
-                <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
+                <ChartTooltip cursor={false} content={<SimpleChartTooltip labelKey="label" />} />
                 <Area
                   dataKey="value"
                   stroke={`var(--color-${selectedSeries})`}
@@ -758,7 +755,7 @@ export default function DashboardPage() {
       </Card>
 
       {/* Charts Row */}
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2">
         {/* Rounded Pie Chart - Current Month Distribution */}
         <Card>
           <CardHeader>
@@ -787,28 +784,7 @@ export default function DashboardPage() {
                       <Cell key={`cell-${index}`} fill={entry.fill} />
                     ))}
                   </Pie>
-                  <ChartTooltip
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        const data = payload[0];
-                        return (
-                          <div className="rounded-lg border bg-background p-2 shadow-md">
-                            <div className="grid gap-2">
-                              <div className="flex flex-col">
-                                <span className="text-[0.70rem] uppercase text-muted-foreground">
-                                  {data.payload.name}
-                                </span>
-                                <span className="font-bold text-muted-foreground">
-                                  {formatCurrency(data.value as number)}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
+                  <ChartTooltip cursor={false} content={<SimpleChartTooltip labelKey="name" />} />
                 </PieChart>
               </ChartContainer>
             ) : (
@@ -845,29 +821,7 @@ export default function DashboardPage() {
               <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
                 <BarChart accessibilityLayer data={topCategoriesData}>
                   <CartesianGrid vertical={false} />
-                  <ChartTooltip
-                    cursor={false}
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        const data = payload[0];
-                        return (
-                          <div className="rounded-lg border bg-background p-2 shadow-md">
-                            <div className="grid gap-2">
-                              <div className="flex flex-col">
-                                <span className="text-[0.70rem] uppercase text-muted-foreground">
-                                  {data.payload.name}
-                                </span>
-                                <span className="font-bold text-muted-foreground">
-                                  {formatCurrency(data.value as number)}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
+                  <ChartTooltip cursor={false} content={<SimpleChartTooltip labelKey="name" />} />
                   <Bar dataKey="value" radius={8} />
                 </BarChart>
               </ChartContainer>
@@ -896,7 +850,7 @@ export default function DashboardPage() {
       </div>
 
       {/* AI Suggestions and Recent Activity */}
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2">
         {/* Smart AI Suggestions */}
         <Card>
           <CardHeader>
@@ -1002,7 +956,7 @@ export default function DashboardPage() {
                 <ArrowRightLeft className="h-4 w-4" />
                 Recent Activity
               </CardTitle>
-              <CardDescription className="mt-1">Your latest transactions</CardDescription>
+              <CardDescription>Your latest transactions</CardDescription>
             </div>
             <Button variant="outline" size="sm" onClick={() => router.push('/transactions')}>
               View All
@@ -1063,16 +1017,12 @@ export default function DashboardPage() {
 
       {/* Quick Actions */}
       <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-4 w-4" />
-                Quick Actions
-              </CardTitle>
-              <CardDescription className="mt-1">Common tasks at your fingertips</CardDescription>
-            </div>
-          </div>
+        <CardHeader className="flex flex-col gap-2">
+          <CardTitle className="flex items-center gap-2">
+            <Zap className="h-4 w-4" />
+            Quick Actions
+          </CardTitle>
+          <CardDescription>Common tasks at your fingertips</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">

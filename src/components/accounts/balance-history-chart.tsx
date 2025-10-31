@@ -258,12 +258,15 @@ export function BalanceHistoryChartComponent({ accounts }: BalanceHistoryChartPr
             </div>
           ) : (
             <ChartContainer config={chartConfig} className="w-full h-full">
-              <LineChart accessibilityLayer data={chartData} className="w-full h-full">
+              <LineChart
+                accessibilityLayer
+                data={chartData}
+                className="w-full h-full"
+                margin={{ top: 16, bottom: 16, left: 32, right: 32 }}
+              >
                 <CartesianGrid vertical={false} />
-                <YAxis tickLine={false} axisLine={false} domain={yAxisDomain} tickCount={6} />
                 <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={10} />
                 <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
-
                 {Array.from(selectedAccounts).map((accountId) => {
                   const account = accounts.find((acc) => acc.id === accountId);
                   if (!account) return null;
