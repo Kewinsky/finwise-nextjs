@@ -530,6 +530,599 @@ export async function getFinancialSummary() {
   }
 }
 
+/**
+ * Get account balance distribution for pie chart
+ */
+export async function getAccountDistribution() {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const accountService = new AccountService(supabase);
+    const result = await accountService.getAccountBalances(user.id);
+
+    if (!result.success) {
+      return { success: false, error: result.error };
+    }
+
+    const distribution = result.data.map((account) => ({
+      name: account.accountName,
+      type: account.accountType,
+      value: account.balance,
+      color: account.color || '#3b82f6', // Use account color or default blue
+    }));
+
+    return { success: true, data: distribution };
+  } catch (error) {
+    return handleActionError(error, 'getAccountDistribution');
+  }
+}
+
+/**
+ * Get monthly cash flow trend data
+ */
+export async function getMonthlyCashFlowTrend(dateRange: {
+  from: Date | undefined;
+  to: Date | undefined;
+}) {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    if (!dateRange.from || !dateRange.to) {
+      return { success: false, error: 'Date range is required' };
+    }
+
+    // Optimized: Single batch query instead of loop
+    const startDate = new Date(dateRange.from);
+    startDate.setDate(1);
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(dateRange.to);
+    endDate.setDate(1);
+    // Set to last day of the end month
+    const lastDayOfEndMonth = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0);
+    lastDayOfEndMonth.setHours(23, 59, 59, 999);
+
+    // Single query for all transactions in date range
+    const { data: transactions, error } = await supabase
+      .from('transactions')
+      .select('date, amount, type')
+      .eq('user_id', user.id)
+      .gte('date', startDate.toISOString())
+      .lte('date', lastDayOfEndMonth.toISOString())
+      .order('date', { ascending: true });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    if (!transactions) {
+      return { success: true, data: [] };
+    }
+
+    // Group transactions by month and aggregate
+    const monthlyMap = new Map<string, { income: number; expenses: number }>();
+
+    transactions.forEach((transaction) => {
+      const date = new Date(transaction.date);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`; // YYYY-MM
+
+      if (!monthlyMap.has(monthKey)) {
+        monthlyMap.set(monthKey, { income: 0, expenses: 0 });
+      }
+
+      const monthData = monthlyMap.get(monthKey)!;
+      const amount = Number(transaction.amount) || 0;
+
+      if (transaction.type === 'income') {
+        monthData.income += amount;
+      } else if (transaction.type === 'expense') {
+        monthData.expenses += amount;
+      }
+    });
+
+    // Convert map to array with all months (including months with no transactions)
+    const trendData = [];
+    const currentDate = new Date(startDate);
+
+    while (currentDate <= endDate) {
+      const monthKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+      const monthData = monthlyMap.get(monthKey) || { income: 0, expenses: 0 };
+
+      trendData.push({
+        month: currentDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        income: monthData.income,
+        expenses: monthData.expenses,
+      });
+
+      // Move to next month
+      currentDate.setMonth(currentDate.getMonth() + 1);
+    }
+
+    return { success: true, data: trendData };
+  } catch (error) {
+    return handleActionError(error, 'getMonthlyCashFlowTrend');
+  }
+}
+
+/**
+ * Get daily cash flow trend data
+ */
+export async function getDailyCashFlowTrend(dateRange: {
+  from: Date | undefined;
+  to: Date | undefined;
+}) {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    if (!dateRange.from || !dateRange.to) {
+      return { success: false, error: 'Date range is required' };
+    }
+
+    // Optimized: Single batch query instead of loop
+    const startDate = new Date(dateRange.from);
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(dateRange.to);
+    endDate.setHours(23, 59, 59, 999);
+
+    // Single query for all transactions in date range
+    const { data: transactions } = await supabase
+      .from('transactions')
+      .select('date, amount, type')
+      .eq('user_id', user.id)
+      .gte('date', startDate.toISOString())
+      .lte('date', endDate.toISOString())
+      .order('date', { ascending: true });
+
+    if (!transactions) {
+      return { success: true, data: [] };
+    }
+
+    // Group transactions by day and aggregate
+    const dailyMap = new Map<string, { income: number; expenses: number }>();
+
+    transactions.forEach((transaction) => {
+      const date = new Date(transaction.date);
+      const dateKey = date.toISOString().split('T')[0]; // YYYY-MM-DD
+
+      if (!dailyMap.has(dateKey)) {
+        dailyMap.set(dateKey, { income: 0, expenses: 0 });
+      }
+
+      const dayData = dailyMap.get(dateKey)!;
+      const amount = Number(transaction.amount) || 0;
+
+      if (transaction.type === 'income') {
+        dayData.income += amount;
+      } else if (transaction.type === 'expense') {
+        dayData.expenses += amount;
+      }
+    });
+
+    // Convert map to array with all days (including days with no transactions)
+    const trendData = [];
+    const currentDate = new Date(startDate);
+
+    while (currentDate <= endDate) {
+      const dateKey = currentDate.toISOString().split('T')[0];
+      const dayData = dailyMap.get(dateKey) || { income: 0, expenses: 0 };
+
+      trendData.push({
+        date: dateKey,
+        income: dayData.income,
+        expenses: dayData.expenses,
+      });
+
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return { success: true, data: trendData };
+  } catch (error) {
+    return handleActionError(error, 'getDailyCashFlowTrend');
+  }
+}
+
+/**
+ * Get weekly cash flow trend data
+ */
+export async function getWeeklyCashFlowTrend(dateRange: {
+  from: Date | undefined;
+  to: Date | undefined;
+}) {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    if (!dateRange.from || !dateRange.to) {
+      return { success: false, error: 'Date range is required' };
+    }
+
+    const trendData = [];
+
+    const startDate = new Date(dateRange.from);
+    const endDate = new Date(dateRange.to);
+
+    // Start from the beginning of the week
+    const currentDate = new Date(startDate);
+    const dayOfWeek = currentDate.getDay();
+    const daysToMonday = (dayOfWeek + 6) % 7;
+    currentDate.setDate(currentDate.getDate() - daysToMonday);
+    currentDate.setHours(0, 0, 0, 0);
+
+    let weekNumber = 1;
+
+    while (currentDate <= endDate) {
+      const weekEnd = new Date(currentDate);
+      weekEnd.setDate(currentDate.getDate() + 6);
+      weekEnd.setHours(23, 59, 59, 999);
+
+      const { data: transactions } = await supabase
+        .from('transactions')
+        .select('amount, type')
+        .eq('user_id', user.id)
+        .gte('date', currentDate.toISOString())
+        .lte('date', weekEnd.toISOString())
+        .order('date', { ascending: true });
+
+      if (transactions) {
+        const income = transactions
+          .filter((t) => t.type === 'income')
+          .reduce((sum, t) => sum + Number(t.amount), 0);
+        const expenses = transactions
+          .filter((t) => t.type === 'expense')
+          .reduce((sum, t) => sum + Number(t.amount), 0);
+
+        trendData.push({
+          week: `Week ${weekNumber}`,
+          income,
+          expenses,
+        });
+
+        weekNumber++;
+      }
+
+      currentDate.setDate(currentDate.getDate() + 7);
+    }
+
+    return { success: true, data: trendData };
+  } catch (error) {
+    return handleActionError(error, 'getWeeklyCashFlowTrend');
+  }
+}
+
+/**
+ * Get yearly cash flow trend data
+ */
+export async function getYearlyCashFlowTrend(years = 3) {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const transactionService = new TransactionService(supabase);
+    const trendData = [];
+
+    for (let i = years - 1; i >= 0; i--) {
+      const targetYear = new Date().getFullYear() - i;
+
+      // Get yearly summary by aggregating all months in the year
+      const monthlyData = [];
+      for (let month = 1; month <= 12; month++) {
+        const result = await transactionService.getMonthlySummary(user.id, targetYear, month);
+        if (result.success) {
+          monthlyData.push(result.data);
+        }
+      }
+
+      if (monthlyData.length > 0) {
+        const yearlyIncome = monthlyData.reduce((sum, month) => sum + month.totalIncome, 0);
+        const yearlyExpenses = monthlyData.reduce((sum, month) => sum + month.totalExpenses, 0);
+        const yearlyNet = yearlyIncome - yearlyExpenses;
+
+        trendData.push({
+          year: targetYear.toString(),
+          income: yearlyIncome,
+          expenses: yearlyExpenses,
+          net: yearlyNet,
+        });
+      }
+    }
+
+    return { success: true, data: trendData };
+  } catch (error) {
+    return handleActionError(error, 'getYearlyCashFlowTrend');
+  }
+}
+
+/**
+ * Get category spending breakdown
+ */
+export async function getCategorySpendingBreakdown() {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const transactionService = new TransactionService(supabase);
+    const result = await transactionService.getCategorySpending(user.id, 'expense');
+
+    if (!result.success) {
+      return { success: false, error: result.error };
+    }
+
+    const totalExpenses = result.data.reduce((sum, item) => sum + item.totalAmount, 0);
+
+    const breakdown = result.data
+      .map((item) => ({
+        category: item.category,
+        amount: item.totalAmount,
+        percentage: totalExpenses > 0 ? Math.round((item.totalAmount / totalExpenses) * 100) : 0,
+        transactionCount: item.transactionCount,
+      }))
+      .sort((a, b) => b.amount - a.amount);
+
+    return { success: true, data: breakdown };
+  } catch (error) {
+    return handleActionError(error, 'getCategorySpendingBreakdown');
+  }
+}
+
+/**
+ * Get category spending breakdown for a specific month
+ */
+export async function getCategorySpendingForMonth(year: number, month: number) {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    // Create date range for the specific month
+    const startDate = new Date(year, month - 1, 1); // month is 1-based, Date constructor is 0-based
+    const endDate = new Date(year, month, 0); // Last day of the month
+
+    // Get transactions for the specific month
+    const { data: transactions, error } = await supabase
+      .from('transactions')
+      .select('category, amount')
+      .eq('user_id', user.id)
+      .eq('type', 'expense')
+      .gte('date', startDate.toISOString().split('T')[0])
+      .lte('date', endDate.toISOString().split('T')[0]);
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    // Group by category and calculate totals
+    const categoryMap = new Map<string, { totalAmount: number; transactionCount: number }>();
+
+    transactions.forEach((transaction) => {
+      const amount = Number(transaction.amount);
+      const existing = categoryMap.get(transaction.category) || {
+        totalAmount: 0,
+        transactionCount: 0,
+      };
+      categoryMap.set(transaction.category, {
+        totalAmount: existing.totalAmount + amount,
+        transactionCount: existing.transactionCount + 1,
+      });
+    });
+
+    const totalExpenses = Array.from(categoryMap.values()).reduce(
+      (sum, cat) => sum + cat.totalAmount,
+      0,
+    );
+
+    const breakdown = Array.from(categoryMap.entries())
+      .map(([category, data]) => ({
+        category,
+        amount: data.totalAmount,
+        percentage: totalExpenses > 0 ? Math.round((data.totalAmount / totalExpenses) * 100) : 0,
+        transactionCount: data.transactionCount,
+        avgCategory: Math.round(data.totalAmount * 0.8), // Placeholder - 80% of current amount as "average"
+      }))
+      .sort((a, b) => b.amount - a.amount);
+
+    return { success: true, data: breakdown };
+  } catch (error) {
+    return handleActionError(error, 'getCategorySpendingForMonth');
+  }
+}
+
+/**
+ * Get top merchants/spending locations
+ */
+export async function getTopMerchants(limit = 5) {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    // Get recent transactions and group by description/merchant
+    const { data: transactions, error } = await supabase
+      .from('transactions')
+      .select('description, amount, category, date')
+      .eq('user_id', user.id)
+      .eq('type', 'expense')
+      .gte('date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]) // Last 30 days
+      .order('date', { ascending: false });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    // Group by merchant name (simplified - in real app you'd have merchant normalization)
+    const merchantMap = new Map();
+
+    transactions.forEach((transaction) => {
+      const merchant = transaction.description.split(' ')[0]; // Simple merchant extraction
+      if (merchantMap.has(merchant)) {
+        const existing = merchantMap.get(merchant);
+        existing.amount += transaction.amount;
+        existing.transactionCount += 1;
+      } else {
+        merchantMap.set(merchant, {
+          name: merchant,
+          amount: transaction.amount,
+          transactionCount: 1,
+          category: transaction.category,
+        });
+      }
+    });
+
+    const topMerchants = Array.from(merchantMap.values())
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, limit)
+      .map((merchant) => ({
+        ...merchant,
+        avgTransaction: Math.round(merchant.amount / merchant.transactionCount),
+      }));
+
+    return { success: true, data: topMerchants };
+  } catch (error) {
+    return handleActionError(error, 'getTopMerchants');
+  }
+}
+
+/**
+ * Calculate simple financial health score for dashboard
+ */
+export async function getSimpleFinancialHealthScore() {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const transactionService = new TransactionService(supabase);
+    const accountService = new AccountService(supabase);
+
+    const [monthlySummaryResult, totalBalanceResult] = await Promise.all([
+      transactionService.getMonthlySummary(user.id),
+      accountService.getTotalBalance(user.id),
+    ]);
+
+    if (!monthlySummaryResult.success) {
+      return { success: false, error: monthlySummaryResult.error };
+    }
+
+    const monthlySummary = monthlySummaryResult.data;
+    const totalBalance = totalBalanceResult.success ? totalBalanceResult.data : 0;
+
+    // Calculate different health metrics
+    const savingsRate =
+      monthlySummary.totalIncome > 0
+        ? Math.round((monthlySummary.netIncome / monthlySummary.totalIncome) * 100)
+        : 0;
+
+    // Simplified health score calculation
+    const savingsRateScore = Math.min(Math.max(savingsRate, 0), 100);
+    const emergencyFundScore =
+      totalBalance > monthlySummary.totalExpenses * 3
+        ? 100
+        : Math.round((totalBalance / (monthlySummary.totalExpenses * 3)) * 100);
+    const debtScore =
+      monthlySummary.totalExpenses > 0
+        ? Math.max(
+            0,
+            100 - Math.round((monthlySummary.totalExpenses / monthlySummary.totalIncome) * 100),
+          )
+        : 100;
+    const consistencyScore = monthlySummary.netIncome > 0 ? 80 : 40; // Simplified
+
+    const overallScore = Math.round(
+      savingsRateScore * 0.3 +
+        emergencyFundScore * 0.25 +
+        debtScore * 0.25 +
+        consistencyScore * 0.2,
+    );
+
+    const healthScore = {
+      overallScore,
+      breakdown: {
+        savingsRate: { score: savingsRateScore, weight: 30 },
+        emergencyFund: { score: emergencyFundScore, weight: 25 },
+        debtManagement: { score: debtScore, weight: 25 },
+        consistency: { score: consistencyScore, weight: 20 },
+      },
+    };
+
+    return { success: true, data: healthScore };
+  } catch (error) {
+    return handleActionError(error, 'getSimpleFinancialHealthScore');
+  }
+}
+
+/**
+ * Get AI-powered financial health score for assistant
+ */
+export async function getFinancialHealthScore() {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const aiService = new AIAssistantService(supabase);
+    return await aiService.getFinancialHealthScore(user.id);
+  } catch (error) {
+    return handleActionError(error, 'getFinancialHealthScore');
+  }
+}
+
 // =============================================================================
 // AI ASSISTANT ACTIONS
 // =============================================================================
@@ -600,27 +1193,6 @@ export async function getSpendingPatterns() {
     return await aiService.getSpendingPatterns(user.id);
   } catch (error) {
     return handleActionError(error, 'getSpendingPatterns');
-  }
-}
-
-/**
- * Get financial health score
- */
-export async function getFinancialHealthScore() {
-  try {
-    const supabase = await createClientForServer();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
-    }
-
-    const aiService = new AIAssistantService(supabase);
-    return await aiService.getFinancialHealthScore(user.id);
-  } catch (error) {
-    return handleActionError(error, 'getFinancialHealthScore');
   }
 }
 

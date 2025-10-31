@@ -129,6 +129,7 @@ export interface AccountBalance {
   accountType: AccountType;
   balance: number;
   currency: string;
+  color?: string;
 }
 
 // =============================================================================

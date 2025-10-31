@@ -46,5 +46,5 @@
     ✔ Create balance history charts for accounts @done(25-10-22 08:04)
     ✔ Use <LoadingSpinner> component for loading states @done(25-10-22 08:07)
     ✔ Implement dynamic header title generation @done(25-10-22 11:20)
-    ☐ Add memoization for expensive calculations in all pages
+    ✔ Add memoization for expensive calculations in all pages @done(25-10-22 11:47)
     ☐ Add account archiving functionality (soft delete)

@@ -27,12 +27,10 @@ interface DateRangeSelectorProps {
 }
 
 const PRESET_RANGES = [
-  { label: 'Last 7 days', days: 7 },
-  { label: 'Last 30 days', days: 30 },
-  { label: 'Last 90 days', days: 90 },
-  { label: 'This month', isThisMonth: true },
-  { label: 'Last month', isLastMonth: true },
-  { label: 'This year', isThisYear: true },
+  { label: 'Current month', isThisMonth: true },
+  { label: 'Last 3 months', months: 3 },
+  { label: 'Last 6 months', months: 6 },
+  { label: 'Last year', months: 12 },
 ] as const;
 
 export function DateRangeSelector({
@@ -47,20 +45,12 @@ export function DateRangeSelector({
     let from: Date | undefined;
     let to: Date | undefined;
 
-    if ('days' in preset) {
-      from = new Date();
-      from.setDate(now.getDate() - preset.days);
-      to = now;
+    if ('months' in preset) {
+      from = new Date(now.getFullYear(), now.getMonth() - preset.months + 1, 1);
+      to = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     } else if ('isThisMonth' in preset && preset.isThisMonth) {
       from = new Date(now.getFullYear(), now.getMonth(), 1);
-      to = now;
-    } else if ('isLastMonth' in preset && preset.isLastMonth) {
-      const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-      from = lastMonth;
-      to = new Date(now.getFullYear(), now.getMonth(), 0);
-    } else if ('isThisYear' in preset && preset.isThisYear) {
-      from = new Date(now.getFullYear(), 0, 1);
-      to = now;
+      to = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     }
 
     onDateRangeChange({ from, to });
@@ -77,7 +67,6 @@ export function DateRangeSelector({
       return 'Select date range';
     }
     if (dateRange.from && dateRange.to) {
-      // Use shorter format on mobile
       return `${format(dateRange.from, 'MMM dd')} - ${format(dateRange.to, 'MMM dd')}`;
     }
     if (dateRange.from) {
@@ -157,7 +146,6 @@ export function DateRangeSelector({
                       selected={dateRange.from}
                       onSelect={(date) => {
                         onDateRangeChange({ ...dateRange, from: date });
-                        // Auto-close if both dates are selected
                         if (dateRange.to) {
                           setIsOpen(false);
                         }
@@ -192,7 +180,6 @@ export function DateRangeSelector({
                       selected={dateRange.to}
                       onSelect={(date) => {
                         onDateRangeChange({ ...dateRange, to: date });
-                        // Auto-close if both dates are selected
                         if (dateRange.from) {
                           setIsOpen(false);
                         }

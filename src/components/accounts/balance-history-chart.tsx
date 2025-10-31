@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/chart';
 import { LineChart, Line } from 'recharts';
 import { CartesianGrid } from 'recharts';
-import { YAxis, XAxis } from 'recharts';
+import { XAxis } from 'recharts';
 import { LoadingSpinner } from '../ui/custom-spinner';
 
 interface BalanceHistoryChartProps {
@@ -118,29 +118,6 @@ export function BalanceHistoryChartComponent({ accounts }: BalanceHistoryChartPr
 
     return data;
   }, [balanceHistory, selectedAccounts]);
-
-  // Calculate Y-axis domain with constant step
-  const yAxisDomain = useMemo(() => {
-    if (chartData.length === 0) return [0, 1000];
-
-    const allValues = chartData.flatMap((data) =>
-      Array.from(selectedAccounts).map((accountId) => (data[accountId] as number) || 0),
-    );
-
-    const min = Math.min(...allValues);
-    const max = Math.max(...allValues);
-
-    // Add some padding and ensure nice round numbers
-    const padding = (max - min) * 0.1;
-    const minValue = Math.max(0, min - padding);
-    const maxValue = max + padding;
-
-    // Round to nearest 100 for cleaner ticks
-    const roundedMin = Math.floor(minValue / 100) * 100;
-    const roundedMax = Math.ceil(maxValue / 100) * 100;
-
-    return [roundedMin, roundedMax];
-  }, [chartData, selectedAccounts]);
 
   // Chart configuration for selected accounts only
   const chartConfig = useMemo(() => {
@@ -258,12 +235,15 @@ export function BalanceHistoryChartComponent({ accounts }: BalanceHistoryChartPr
             </div>
           ) : (
             <ChartContainer config={chartConfig} className="w-full h-full">
-              <LineChart accessibilityLayer data={chartData} className="w-full h-full">
+              <LineChart
+                accessibilityLayer
+                data={chartData}
+                className="w-full h-full"
+                margin={{ top: 16, bottom: 16, left: 32, right: 32 }}
+              >
                 <CartesianGrid vertical={false} />
-                <YAxis tickLine={false} axisLine={false} domain={yAxisDomain} tickCount={6} />
                 <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={10} />
                 <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
-
                 {Array.from(selectedAccounts).map((accountId) => {
                   const account = accounts.find((acc) => acc.id === accountId);
                   if (!account) return null;
