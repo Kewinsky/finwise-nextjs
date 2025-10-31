@@ -81,7 +81,8 @@ export function MetricCard({
           />
         </div>
         <p className={cn('text-xs', subtitleColor)}>
-          {renderSubtitle()} {previousValue && !customSubtitle && previousValueLabel}
+          {renderSubtitle()}
+          {previousValue != null && !customSubtitle && ` ${previousValueLabel}`}
         </p>
       </CardContent>
     </Card>
