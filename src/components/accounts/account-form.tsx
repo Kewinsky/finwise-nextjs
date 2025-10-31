@@ -27,6 +27,7 @@ import { cn } from '@/lib/utils';
 import { X, Save } from 'lucide-react';
 import { createAccount, updateAccount } from '@/lib/actions/finance-actions';
 import { notifySuccess, notifyError } from '@/lib/notifications';
+import { ACCOUNT_TYPES } from '@/lib/constants/accounts';
 import type { Account } from '@/types/finance.types';
 
 const accountSchema = z.object({
@@ -52,12 +53,12 @@ interface AccountFormProps {
   onSuccess?: (newAccount?: Account, updatedAccount?: Account) => void;
 }
 
-const accountTypes = [
-  { value: 'checking', label: 'Checking' },
-  { value: 'savings', label: 'Savings' },
-  { value: 'creditcard', label: 'Credit Card' },
-  { value: 'investment', label: 'Investment' },
-];
+const accountTypes = Object.entries(ACCOUNT_TYPES)
+  .filter(([key]) => key !== 'other')
+  .map(([value, config]) => ({
+    value: value as 'checking' | 'savings' | 'creditcard' | 'investment',
+    label: config.label,
+  }));
 
 const currencies = [
   { value: 'USD', label: 'USD - US Dollar' },
