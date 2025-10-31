@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/chart';
 import { LineChart, Line } from 'recharts';
 import { CartesianGrid } from 'recharts';
-import { YAxis, XAxis } from 'recharts';
+import { XAxis } from 'recharts';
 import { LoadingSpinner } from '../ui/custom-spinner';
 
 interface BalanceHistoryChartProps {
@@ -118,29 +118,6 @@ export function BalanceHistoryChartComponent({ accounts }: BalanceHistoryChartPr
 
     return data;
   }, [balanceHistory, selectedAccounts]);
-
-  // Calculate Y-axis domain with constant step
-  const yAxisDomain = useMemo(() => {
-    if (chartData.length === 0) return [0, 1000];
-
-    const allValues = chartData.flatMap((data) =>
-      Array.from(selectedAccounts).map((accountId) => (data[accountId] as number) || 0),
-    );
-
-    const min = Math.min(...allValues);
-    const max = Math.max(...allValues);
-
-    // Add some padding and ensure nice round numbers
-    const padding = (max - min) * 0.1;
-    const minValue = Math.max(0, min - padding);
-    const maxValue = max + padding;
-
-    // Round to nearest 100 for cleaner ticks
-    const roundedMin = Math.floor(minValue / 100) * 100;
-    const roundedMax = Math.ceil(maxValue / 100) * 100;
-
-    return [roundedMin, roundedMax];
-  }, [chartData, selectedAccounts]);
 
   // Chart configuration for selected accounts only
   const chartConfig = useMemo(() => {

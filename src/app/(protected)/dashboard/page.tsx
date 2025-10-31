@@ -49,25 +49,20 @@ export default function DashboardPage() {
 
   return (
     <div className="flex-1 space-y-6 p-4 sm:p-6">
-      {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">Advanced financial insights and analytics.</p>
       </div>
 
-      {/* Key Metrics Cards */}
       <MetricsGrid data={dashboardData} />
 
-      {/* Financial Trends Chart */}
       <FinancialTrendsChart dashboardData={dashboardData} />
 
-      {/* Charts Row */}
       <div className="grid gap-6 lg:grid-cols-2">
         <MonthDistributionChart dashboardData={dashboardData} />
         <TopCategoriesChart categorySpending={monthlyCategorySpending} />
       </div>
 
-      {/* AI Suggestions and Recent Activity */}
       <div className="grid gap-6 lg:grid-cols-2">
         <AISuggestionsCard
           financialHealthScore={financialHealthScore}
@@ -77,10 +72,8 @@ export default function DashboardPage() {
         <RecentActivityCard recentTransactions={dashboardData.recentTransactions} />
       </div>
 
-      {/* Quick Actions */}
       <QuickActionsCard onAddTransaction={handleAddTransaction} />
 
-      {/* Transaction Form */}
       {showTransactionForm && (
         <TransactionForm
           open={showTransactionForm}

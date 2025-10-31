@@ -70,6 +70,7 @@ function getDateRange(timeRange: TimeRange): { from: Date; to: Date } {
 
 /**
  * Format label based on time range and data type
+ * Parses YYYY-MM-DD dates as local dates to avoid timezone shifts
  */
 function formatLabel(
   item: ChartDataItem,
@@ -77,10 +78,16 @@ function formatLabel(
   index: number,
 ): { label: string; date: string } {
   if (timeRange === '1W' || timeRange === '1M') {
-    const dayDate = item.date ? new Date(item.date) : new Date();
-    const label = dayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const date = item.date?.split('T')[0] || '';
-    return { label, date };
+    const dateString = item.date?.split('T')[0] || '';
+    if (dateString) {
+      const [year, month, day] = dateString.split('-').map(Number);
+      const dayDate = new Date(year, month - 1, day);
+      const label = dayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      return { label, date: dateString };
+    }
+    const fallbackDate = new Date();
+    const label = fallbackDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return { label, date: dateString };
   }
 
   const label = item.month || `Month ${index + 1}`;
@@ -164,7 +171,6 @@ export function useAreaChart({
 
     const cacheKey = `${timeRange}-${series}`;
 
-    // Check cache first
     if (cacheRef.current.has(cacheKey)) {
       setData(cacheRef.current.get(cacheKey)!);
       return;

@@ -111,18 +111,12 @@ export function useDashboardData(): UseDashboardDataResult {
     }
   }, [financialHealthScore]);
 
-  const refetch = useCallback(async () => {
-    await Promise.all([loadDashboardData(), loadFinancialHealthScore()]);
-  }, [loadDashboardData, loadFinancialHealthScore]);
-
-  // Load initial data in parallel
   useEffect(() => {
     Promise.all([loadDashboardData(), loadFinancialHealthScore()]).catch((error) => {
       console.error('Error loading dashboard data:', error);
     });
   }, [loadDashboardData, loadFinancialHealthScore]);
 
-  // Load AI insights when financial health score is available
   useEffect(() => {
     if (financialHealthScore) {
       loadAIInsights();
@@ -134,6 +128,6 @@ export function useDashboardData(): UseDashboardDataResult {
     financialHealthScore,
     aiInsights,
     isLoadingInsights,
-    refetch: loadDashboardData, // Return loadDashboardData as refetch for backward compatibility
+    refetch: loadDashboardData,
   };
 }

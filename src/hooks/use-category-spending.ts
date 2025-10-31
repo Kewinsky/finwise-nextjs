@@ -36,7 +36,6 @@ export function useCategorySpending({
   const loadData = useCallback(async () => {
     const cacheKey = `${year}-${month}`;
 
-    // Check cache first
     if (cacheRef.current.has(cacheKey)) {
       setData(cacheRef.current.get(cacheKey)!);
       return;

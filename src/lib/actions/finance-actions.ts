@@ -727,7 +727,7 @@ export async function getDailyCashFlowTrend(dateRange: {
       const dayData = dailyMap.get(dateKey) || { income: 0, expenses: 0 };
 
       trendData.push({
-        date: currentDate.toISOString(),
+        date: dateKey,
         income: dayData.income,
         expenses: dayData.expenses,
       });

@@ -22,7 +22,7 @@ interface MetricCardProps {
   subtitleColor: string;
   delay?: number;
   decimalPlaces?: number;
-  reverseComparison?: boolean; // For expenses: lower is better
+  reverseComparison?: boolean;
 }
 
 export function MetricCard({
