@@ -1,64 +1,98 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PieChart, Pie, Cell } from 'recharts';
 import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
 import { SimpleChartTooltip } from '@/components/charts/simple-chart-tooltip';
-import { BarChart3 } from 'lucide-react';
+import { Wallet } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
-import type { DashboardMetrics } from '@/types/finance.types';
+import { getAccountDistribution } from '@/lib/actions/finance-actions';
 
-interface MonthDistributionChartProps {
-  dashboardData: DashboardMetrics;
+interface AccountDistributionItem {
+  name: string;
+  type: string;
+  value: number;
+  color: string;
 }
 
-const chartConfig = {
-  value: {
-    label: 'Value',
-    color: 'var(--primary)',
-  },
-};
+interface AccountDistributionChartProps {
+  className?: string;
+}
 
-const COLORS = {
-  income: 'var(--success)',
-  expenses: 'var(--destructive)',
-  savings: 'var(--purple)',
-};
+export function AccountDistributionChart({ className }: AccountDistributionChartProps) {
+  const [accountData, setAccountData] = useState<AccountDistributionItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-export function MonthDistributionChart({ dashboardData }: MonthDistributionChartProps) {
+  useEffect(() => {
+    const loadAccountData = async () => {
+      try {
+        setIsLoading(true);
+        const result = await getAccountDistribution();
+        if (result.success && 'data' in result && result.data) {
+          setAccountData(result.data);
+        }
+      } catch (error) {
+        console.error('Failed to load account distribution:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadAccountData();
+  }, []);
+
   const pieChartData = useMemo(() => {
-    const totalIncome = dashboardData.monthlySummary.totalIncome;
-    const totalExpenses = dashboardData.monthlySummary.totalExpenses;
-    const savings = dashboardData.monthlySummary.savings;
+    return accountData
+      .filter((item) => item.value > 0)
+      .map((account) => ({
+        name: account.name,
+        value: account.value,
+        fill: account.color,
+        type: account.type,
+      }));
+  }, [accountData]);
 
-    return [
-      {
-        name: 'Income',
-        value: totalIncome,
-        fill: COLORS.income,
-      },
-      {
-        name: 'Expenses',
-        value: totalExpenses,
-        fill: COLORS.expenses,
-      },
-      {
-        name: 'Savings',
-        value: savings,
-        fill: COLORS.savings,
-      },
-    ].filter((item) => item.value > 0);
-  }, [dashboardData]);
+  const chartConfig = {
+    value: {
+      label: 'Balance',
+      color: 'var(--primary)',
+    },
+  };
+
+  if (isLoading) {
+    return (
+      <Card className={className}>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Wallet className="h-4 w-4" />
+            Account Distribution
+          </CardTitle>
+          <CardDescription>How your total balance is distributed across accounts</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center h-[300px] text-center text-muted-foreground">
+            <p>Loading account data...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const totalBalance = pieChartData.reduce((sum, item) => sum + item.value, 0);
 
   return (
-    <Card>
+    <Card className={className}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <BarChart3 className="h-4 w-4" />
-          Current Month Distribution
+          <Wallet className="h-4 w-4" />
+          Account Distribution
         </CardTitle>
-        <CardDescription>How your income, expenses, and savings are distributed</CardDescription>
+        <CardDescription>
+          {totalBalance > 0
+            ? `Total balance: ${formatCurrency(totalBalance)} distributed across ${pieChartData.length} account${pieChartData.length !== 1 ? 's' : ''}`
+            : 'How your total balance is distributed across accounts'}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {pieChartData.length > 0 ? (
@@ -67,18 +101,24 @@ export function MonthDistributionChart({ dashboardData }: MonthDistributionChart
               <PieChart>
                 <Pie
                   data={pieChartData}
-                  innerRadius="80%"
+                  innerRadius="60%"
                   outerRadius="100%"
-                  cornerRadius="50%"
-                  paddingAngle={5}
+                  cornerRadius="5"
+                  paddingAngle={2}
                   dataKey="value"
                   isAnimationActive={true}
+                  label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                  labelLine={false}
                 >
                   {pieChartData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}
                 </Pie>
-                <ChartTooltip cursor={false} content={<SimpleChartTooltip labelKey="name" />} />
+                <ChartTooltip
+                  cursor={false}
+                  content={<SimpleChartTooltip labelKey="name" />}
+                  formatter={(value: number) => formatCurrency(value)}
+                />
               </PieChart>
             </ChartContainer>
 
@@ -88,7 +128,9 @@ export function MonthDistributionChart({ dashboardData }: MonthDistributionChart
                 <div key={index} className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.fill }} />
                   <span className="text-sm text-muted-foreground">
-                    {item.name}: {formatCurrency(item.value)}
+                    {item.name}: {formatCurrency(item.value)} (
+                    {totalBalance > 0 ? `${((item.value / totalBalance) * 100).toFixed(1)}%` : '0%'}
+                    )
                   </span>
                 </div>
               ))}
@@ -96,7 +138,7 @@ export function MonthDistributionChart({ dashboardData }: MonthDistributionChart
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-center text-muted-foreground">
-            <p>No data available</p>
+            <p>No accounts with balance available</p>
           </div>
         )}
       </CardContent>
