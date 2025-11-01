@@ -242,23 +242,20 @@ export class AccountService {
         return { success: false, error: 'Cannot delete mandatory account' };
       }
 
-      // Check if account has transactions (either as source or destination account)
-      const { data: transactions, error: transactionsError } = await this.supabase
+      // Delete all transactions associated with this account
+      // (either as source or destination account)
+      const { error: deleteTransactionsError } = await this.supabase
         .from('transactions')
-        .select('id')
-        .or(`from_account_id.eq.${accountId},to_account_id.eq.${accountId}`)
-        .limit(1);
+        .delete()
+        .eq('user_id', userId)
+        .or(`from_account_id.eq.${accountId},to_account_id.eq.${accountId}`);
 
-      if (transactionsError) {
+      if (deleteTransactionsError) {
         log.error(
-          { accountId, userId, error: transactionsError.message },
-          'Failed to check transactions',
+          { accountId, userId, error: deleteTransactionsError.message },
+          'Failed to delete associated transactions',
         );
-        return { success: false, error: transactionsError.message };
-      }
-
-      if (transactions && transactions.length > 0) {
-        return { success: false, error: 'Cannot delete account with existing transactions' };
+        return { success: false, error: deleteTransactionsError.message };
       }
 
       const { error } = await this.supabase
@@ -398,6 +395,85 @@ export class AccountService {
       return !error && !!data;
     } catch {
       return false;
+    }
+  }
+
+  /**
+   * Recalculate account balance from all transactions
+   * Useful for data integrity checks or fixing balance discrepancies
+   */
+  async recalculateAccountBalance(
+    accountId: string,
+    userId: string,
+  ): Promise<ServiceResult<number>> {
+    try {
+      log.info({ accountId, userId }, 'Recalculating account balance');
+
+      // Verify account exists and belongs to user
+      const accountResult = await this.getAccountById(accountId, userId);
+      if (!accountResult.success || !accountResult.data) {
+        return { success: false, error: ERROR_MESSAGES.DATA_NOT_FOUND };
+      }
+
+      // Calculate balance from all transactions
+      // Get all transactions where this account is involved
+      const { data: transactions, error: transactionsError } = await this.supabase
+        .from('transactions')
+        .select('type, amount, from_account_id, to_account_id')
+        .or(`from_account_id.eq.${accountId},to_account_id.eq.${accountId}`);
+
+      if (transactionsError) {
+        log.error(
+          { accountId, userId, error: transactionsError.message },
+          'Failed to fetch transactions for balance calculation',
+        );
+        return { success: false, error: transactionsError.message };
+      }
+
+      // Start from initial balance (0, or you could track initial balance separately)
+      let calculatedBalance = 0;
+
+      transactions?.forEach((transaction) => {
+        const amount = Number(transaction.amount);
+        if (transaction.type === 'income' && transaction.to_account_id === accountId) {
+          calculatedBalance += amount;
+        } else if (transaction.type === 'expense' && transaction.from_account_id === accountId) {
+          calculatedBalance -= amount;
+        } else if (transaction.type === 'transfer') {
+          if (transaction.from_account_id === accountId) {
+            calculatedBalance -= amount;
+          } else if (transaction.to_account_id === accountId) {
+            calculatedBalance += amount;
+          }
+        }
+      });
+
+      // Update the account balance
+      const { error: updateError } = await this.supabase
+        .from('accounts')
+        .update({ balance: calculatedBalance, updated_at: new Date().toISOString() })
+        .eq('id', accountId)
+        .eq('user_id', userId);
+
+      if (updateError) {
+        log.error(
+          { accountId, userId, error: updateError.message },
+          'Failed to update account balance',
+        );
+        return { success: false, error: updateError.message };
+      }
+
+      log.info(
+        { accountId, userId, calculatedBalance },
+        'Account balance recalculated successfully',
+      );
+      return { success: true, data: calculatedBalance };
+    } catch (error) {
+      log.error(error, 'Error recalculating account balance');
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : ERROR_MESSAGES.UNEXPECTED,
+      };
     }
   }
 

@@ -93,6 +93,9 @@ CREATE INDEX IF NOT EXISTS idx_transactions_date ON public.transactions USING bt
 CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON public.transactions USING btree (created_at);
 CREATE INDEX IF NOT EXISTS idx_transactions_user_date ON public.transactions USING btree (user_id, date DESC);
 
+-- Composite index for common transaction queries (user_id, type, date)
+CREATE INDEX IF NOT EXISTS idx_transactions_user_type_date ON public.transactions USING btree (user_id, type, date DESC);
+
 -- =============================================================================
 -- TRIGGERS
 -- =============================================================================

@@ -48,11 +48,38 @@ export function MetricCard({
       return <span>{customSubtitle}</span>;
     }
 
-    if (!previousValue) {
+    // Handle case when there are no transactions in current month and no previous data
+    if (value === 0 && (previousValue === undefined || previousValue === null)) {
+      return <span className="text-muted-foreground">No transactions this month</span>;
+    }
+
+    // Handle case when current value is 0 but previous value existed (show friendly message instead of -100%)
+    if (value === 0 && previousValue !== undefined && previousValue !== null && previousValue > 0) {
+      return <span className="text-muted-foreground">None this month {previousValueLabel}</span>;
+    }
+
+    // Handle case when both are 0
+    if (previousValue === 0 && value === 0) {
+      return <span className="text-muted-foreground">No change {previousValueLabel}</span>;
+    }
+
+    // Handle case when there's no previous data but current value exists
+    if ((previousValue === undefined || previousValue === null) && value !== 0) {
       return <span className="text-muted-foreground">No previous data</span>;
     }
 
-    const percentage = calculatePercentageChange(value, previousValue);
+    // Normal percentage comparison (when both values exist and at least one is non-zero)
+    const percentage = calculatePercentageChange(value, previousValue || 0);
+
+    // Special case: when previous was 0 and current is positive, show as "new" instead of percentage
+    if (previousValue === 0 && value > 0) {
+      return (
+        <span className="text-green-600 dark:text-green-400">
+          New this month {previousValueLabel}
+        </span>
+      );
+    }
+
     const { text, isPositive } = formatPercentageChange(percentage);
     const isGood = reverseComparison ? !isPositive : isPositive;
 
@@ -61,6 +88,7 @@ export function MetricCard({
         className={isGood ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}
       >
         {text}
+        {previousValue != null && ` ${previousValueLabel}`}
       </span>
     );
   };
@@ -80,10 +108,7 @@ export function MetricCard({
             className={valueColor}
           />
         </div>
-        <p className={cn('text-xs', subtitleColor)}>
-          {renderSubtitle()}
-          {previousValue != null && !customSubtitle && ` ${previousValueLabel}`}
-        </p>
+        <p className={cn('text-xs', subtitleColor)}>{renderSubtitle()}</p>
       </CardContent>
     </Card>
   );

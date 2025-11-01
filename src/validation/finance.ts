@@ -90,7 +90,18 @@ const baseTransactionSchema = z.object({
   date: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
-    .refine((date) => !isNaN(Date.parse(date)), 'Invalid date'),
+    .refine((date) => !isNaN(Date.parse(date)), 'Invalid date')
+    .refine(
+      (date) => {
+        const transactionDate = new Date(date);
+        const maxFutureDate = new Date();
+        maxFutureDate.setFullYear(maxFutureDate.getFullYear() + 1);
+        return transactionDate <= maxFutureDate;
+      },
+      {
+        message: 'Transaction date cannot be more than 1 year in the future',
+      },
+    ),
   notes: z
     .string()
     .max(500, 'Notes must be less than 500 characters')
@@ -201,22 +212,37 @@ export const transactionFormSchema = z
     { message: 'Please select the required accounts' },
   );
 
-export const transactionFiltersSchema = z.object({
-  accountId: z.string().uuid('Invalid account ID').optional(),
-  type: transactionTypeSchema.optional(),
-  category: z.string().max(50).optional(),
-  dateFrom: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
-    .optional(),
-  dateTo: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
-    .optional(),
-  minAmount: z.number().min(0).optional(),
-  maxAmount: z.number().min(0).optional(),
-  search: z.string().max(100).optional(),
-});
+export const transactionFiltersSchema = z
+  .object({
+    accountId: z.string().uuid('Invalid account ID').optional(),
+    type: transactionTypeSchema.optional(),
+    category: z.string().max(50).optional(),
+    dateFrom: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+      .optional(),
+    dateTo: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+      .optional(),
+    minAmount: z.number().min(0).optional(),
+    maxAmount: z.number().min(0).optional(),
+    search: z.string().max(100).optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.dateFrom && data.dateTo) {
+        const from = new Date(data.dateFrom);
+        const to = new Date(data.dateTo);
+        return from <= to;
+      }
+      return true;
+    },
+    {
+      message: 'dateFrom must be before or equal to dateTo',
+      path: ['dateTo'],
+    },
+  );
 
 // =============================================================================
 // PAGINATION SCHEMAS
@@ -250,13 +276,25 @@ export const aiQuestionSchema = z.object({
 // EXPORT SCHEMAS
 // =============================================================================
 
-export const exportFiltersSchema = z.object({
-  dateFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
-  dateTo: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
-  accountIds: z.array(z.string().uuid()).optional(),
-  types: z.array(transactionTypeSchema).optional(),
-  categories: z.array(z.string()).optional(),
-});
+export const exportFiltersSchema = z
+  .object({
+    dateFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
+    dateTo: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
+    accountIds: z.array(z.string().uuid()).optional(),
+    types: z.array(transactionTypeSchema).optional(),
+    categories: z.array(z.string()).optional(),
+  })
+  .refine(
+    (data) => {
+      const from = new Date(data.dateFrom);
+      const to = new Date(data.dateTo);
+      return from <= to;
+    },
+    {
+      message: 'dateFrom must be before or equal to dateTo',
+      path: ['dateTo'],
+    },
+  );
 
 // =============================================================================
 // BULK OPERATIONS SCHEMAS

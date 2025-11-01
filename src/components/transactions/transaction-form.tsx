@@ -214,7 +214,7 @@ export function TransactionForm({
 
         onOpenChange(false);
         resetForm({ type: defaultType || 'expense', ...defaultFormValues });
-        router.refresh();
+        // router.refresh() removed - revalidatePath in server actions + refetch() in parent is sufficient
       } else {
         notifyError('Failed to save transaction', { description: result?.error });
       }

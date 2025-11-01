@@ -236,7 +236,7 @@ export async function createTransaction(formData: FormData) {
     const result = await transactionService.createTransaction(user.id, validatedData);
 
     if (result.success) {
-      revalidatePath('/transactions');
+      // Only revalidate dashboard and accounts - transactions page uses client-side refetch
       revalidatePath('/dashboard');
       revalidatePath('/accounts');
     }
@@ -289,7 +289,7 @@ export async function updateTransaction(transactionId: string, formData: FormDat
     );
 
     if (result.success) {
-      revalidatePath('/transactions');
+      // Only revalidate dashboard and accounts - transactions page uses client-side refetch
       revalidatePath('/dashboard');
       revalidatePath('/accounts');
     }
@@ -300,6 +300,35 @@ export async function updateTransaction(transactionId: string, formData: FormDat
       return handleValidationError(error, 'updateTransaction');
     }
     return handleActionError(error, 'updateTransaction');
+  }
+}
+
+/**
+ * Duplicate a transaction
+ */
+export async function duplicateTransaction(transactionId: string, newDate?: string) {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const transactionService = new TransactionService(supabase);
+    const result = await transactionService.duplicateTransaction(transactionId, user.id, newDate);
+
+    if (result.success) {
+      // Only revalidate dashboard and accounts - transactions page uses client-side refetch
+      revalidatePath('/dashboard');
+      revalidatePath('/accounts');
+    }
+
+    return result;
+  } catch (error) {
+    return handleActionError(error, 'duplicateTransaction');
   }
 }
 
@@ -321,7 +350,7 @@ export async function deleteTransaction(transactionId: string) {
     const result = await transactionService.deleteTransaction(transactionId, user.id);
 
     if (result.success) {
-      revalidatePath('/transactions');
+      // Only revalidate dashboard and accounts - transactions page uses client-side refetch
       revalidatePath('/dashboard');
       revalidatePath('/accounts');
     }
@@ -355,7 +384,7 @@ export async function deleteManyTransactions(transactionIds: string[]) {
     );
 
     if (result.success) {
-      revalidatePath('/transactions');
+      // Only revalidate dashboard and accounts - transactions page uses client-side refetch
       revalidatePath('/dashboard');
       revalidatePath('/accounts');
     }
@@ -817,6 +846,7 @@ export async function getWeeklyCashFlowTrend(dateRange: {
 
 /**
  * Get yearly cash flow trend data
+ * Optimized: Single query instead of 12 queries per year
  */
 export async function getYearlyCashFlowTrend(years = 3) {
   try {
@@ -829,33 +859,59 @@ export async function getYearlyCashFlowTrend(years = 3) {
       return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
     }
 
-    const transactionService = new TransactionService(supabase);
+    const currentYear = new Date().getFullYear();
+    const startYear = currentYear - (years - 1);
+    const startDate = new Date(`${startYear}-01-01`);
+    const endDate = new Date(`${currentYear}-12-31`);
+
+    // Single optimized query for all years
+    const { data: transactions, error } = await supabase
+      .from('transactions')
+      .select('date, amount, type')
+      .eq('user_id', user.id)
+      .gte('date', startDate.toISOString().split('T')[0])
+      .lte('date', endDate.toISOString().split('T')[0])
+      .order('date', { ascending: true });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    if (!transactions) {
+      return { success: true, data: [] };
+    }
+
+    // Group transactions by year and aggregate
+    const yearlyMap = new Map<number, { income: number; expenses: number }>();
+
+    transactions.forEach((transaction) => {
+      const date = new Date(transaction.date);
+      const year = date.getFullYear();
+
+      if (!yearlyMap.has(year)) {
+        yearlyMap.set(year, { income: 0, expenses: 0 });
+      }
+
+      const yearData = yearlyMap.get(year)!;
+      const amount = Number(transaction.amount) || 0;
+
+      if (transaction.type === 'income') {
+        yearData.income += amount;
+      } else if (transaction.type === 'expense') {
+        yearData.expenses += amount;
+      }
+    });
+
+    // Convert map to array with all years (including years with no transactions)
     const trendData = [];
-
-    for (let i = years - 1; i >= 0; i--) {
-      const targetYear = new Date().getFullYear() - i;
-
-      // Get yearly summary by aggregating all months in the year
-      const monthlyData = [];
-      for (let month = 1; month <= 12; month++) {
-        const result = await transactionService.getMonthlySummary(user.id, targetYear, month);
-        if (result.success) {
-          monthlyData.push(result.data);
-        }
-      }
-
-      if (monthlyData.length > 0) {
-        const yearlyIncome = monthlyData.reduce((sum, month) => sum + month.totalIncome, 0);
-        const yearlyExpenses = monthlyData.reduce((sum, month) => sum + month.totalExpenses, 0);
-        const yearlyNet = yearlyIncome - yearlyExpenses;
-
-        trendData.push({
-          year: targetYear.toString(),
-          income: yearlyIncome,
-          expenses: yearlyExpenses,
-          net: yearlyNet,
-        });
-      }
+    for (let year = startYear; year <= currentYear; year++) {
+      const yearData = yearlyMap.get(year) || { income: 0, expenses: 0 };
+      trendData.push({
+        year: year.toString(),
+        income: yearData.income,
+        expenses: yearData.expenses,
+        net: yearData.income - yearData.expenses,
+      });
     }
 
     return { success: true, data: trendData };
@@ -904,6 +960,7 @@ export async function getCategorySpendingBreakdown() {
 
 /**
  * Get category spending breakdown for a specific month
+ * Now uses optimized getCategorySpending with date range
  */
 export async function getCategorySpendingForMonth(year: number, month: number) {
   try {
@@ -920,46 +977,25 @@ export async function getCategorySpendingForMonth(year: number, month: number) {
     const startDate = new Date(year, month - 1, 1); // month is 1-based, Date constructor is 0-based
     const endDate = new Date(year, month, 0); // Last day of the month
 
-    // Get transactions for the specific month
-    const { data: transactions, error } = await supabase
-      .from('transactions')
-      .select('category, amount')
-      .eq('user_id', user.id)
-      .eq('type', 'expense')
-      .gte('date', startDate.toISOString().split('T')[0])
-      .lte('date', endDate.toISOString().split('T')[0]);
-
-    if (error) {
-      return { success: false, error: error.message };
-    }
-
-    // Group by category and calculate totals
-    const categoryMap = new Map<string, { totalAmount: number; transactionCount: number }>();
-
-    transactions.forEach((transaction) => {
-      const amount = Number(transaction.amount);
-      const existing = categoryMap.get(transaction.category) || {
-        totalAmount: 0,
-        transactionCount: 0,
-      };
-      categoryMap.set(transaction.category, {
-        totalAmount: existing.totalAmount + amount,
-        transactionCount: existing.transactionCount + 1,
-      });
+    const transactionService = new TransactionService(supabase);
+    const result = await transactionService.getCategorySpending(user.id, 'expense', {
+      from: startDate.toISOString().split('T')[0],
+      to: endDate.toISOString().split('T')[0],
     });
 
-    const totalExpenses = Array.from(categoryMap.values()).reduce(
-      (sum, cat) => sum + cat.totalAmount,
-      0,
-    );
+    if (!result.success) {
+      return { success: false, error: result.error };
+    }
 
-    const breakdown = Array.from(categoryMap.entries())
-      .map(([category, data]) => ({
-        category,
-        amount: data.totalAmount,
-        percentage: totalExpenses > 0 ? Math.round((data.totalAmount / totalExpenses) * 100) : 0,
-        transactionCount: data.transactionCount,
-        avgCategory: Math.round(data.totalAmount * 0.8), // Placeholder - 80% of current amount as "average"
+    const totalExpenses = result.data.reduce((sum, item) => sum + item.totalAmount, 0);
+
+    const breakdown = result.data
+      .map((item) => ({
+        category: item.category,
+        amount: item.totalAmount,
+        percentage: totalExpenses > 0 ? Math.round((item.totalAmount / totalExpenses) * 100) : 0,
+        transactionCount: item.transactionCount,
+        avgCategory: Math.round(item.totalAmount * 0.8), // Placeholder - 80% of current amount as "average"
       }))
       .sort((a, b) => b.amount - a.amount);
 

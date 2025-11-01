@@ -345,6 +345,67 @@ export class TransactionService {
   }
 
   /**
+   * Duplicate a transaction
+   * Creates a new transaction with the same details but new ID and date
+   */
+  async duplicateTransaction(
+    transactionId: string,
+    userId: string,
+    newDate?: string,
+  ): Promise<ServiceResult<Transaction>> {
+    try {
+      log.info({ transactionId, userId, newDate }, 'Duplicating transaction');
+
+      // Get the original transaction
+      const originalResult = await this.getTransactionById(transactionId, userId);
+      if (!originalResult.success || !originalResult.data) {
+        return { success: false, error: ERROR_MESSAGES.DATA_NOT_FOUND };
+      }
+
+      const original = originalResult.data;
+
+      // Create new transaction with same data but new date (or current date if not provided)
+      const transactionData = {
+        user_id: userId,
+        from_account_id: original.from_account_id,
+        to_account_id: original.to_account_id,
+        type: original.type,
+        description: `${original.description} (Copy)`,
+        category: original.category,
+        amount: original.amount,
+        date: newDate || original.date,
+        notes: original.notes,
+      };
+
+      const { data, error } = await this.supabase
+        .from('transactions')
+        .insert(transactionData)
+        .select()
+        .single();
+
+      if (error) {
+        log.error(
+          { transactionId, userId, error: error.message },
+          'Failed to duplicate transaction',
+        );
+        return { success: false, error: error.message };
+      }
+
+      log.info(
+        { transactionId, userId, newTransactionId: data.id },
+        'Transaction duplicated successfully',
+      );
+      return { success: true, data };
+    } catch (error) {
+      log.error(error, 'Error duplicating transaction');
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : ERROR_MESSAGES.UNEXPECTED,
+      };
+    }
+  }
+
+  /**
    * Delete multiple transactions
    */
   async deleteManyTransactions(
@@ -639,19 +700,34 @@ export class TransactionService {
 
   /**
    * Get category spending breakdown
+   * @param userId - User ID
+   * @param type - Transaction type (expense or income)
+   * @param dateRange - Optional date range filter (from and/or to dates)
    */
   async getCategorySpending(
     userId: string,
     type: 'expense' | 'income' = 'expense',
+    dateRange?: { from?: string; to?: string },
   ): Promise<ServiceResult<CategorySpending[]>> {
     try {
-      log.info({ userId, type }, 'Fetching category spending');
+      log.info({ userId, type, dateRange }, 'Fetching category spending');
 
-      const { data, error } = await this.supabase
+      let query = this.supabase
         .from('transactions')
         .select('category, amount')
         .eq('user_id', userId)
         .eq('type', type);
+
+      // Apply date range filters if provided
+      if (dateRange?.from) {
+        query = query.gte('date', dateRange.from);
+      }
+
+      if (dateRange?.to) {
+        query = query.lte('date', dateRange.to);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         log.error({ userId, error: error.message }, 'Failed to fetch category spending');
@@ -748,7 +824,8 @@ export class TransactionService {
   }
 
   /**
-   * Search transactions by description or notes
+   * Search transactions by description, notes, or amount
+   * Supports both text search and amount search
    */
   async searchTransactions(
     userId: string,
@@ -757,21 +834,66 @@ export class TransactionService {
     try {
       log.info({ userId, searchTerm }, 'Searching transactions');
 
-      const { data, error } = await this.supabase
-        .from('transactions')
-        .select('*')
-        .eq('user_id', userId)
-        .or(`description.ilike.%${searchTerm}%,notes.ilike.%${searchTerm}%`)
-        .order('date', { ascending: false })
-        .limit(50);
+      let query = this.supabase.from('transactions').select('*').eq('user_id', userId);
+
+      // Check if searchTerm is a number (amount search)
+      const searchAmount = parseFloat(searchTerm);
+      const isAmountSearch = !isNaN(searchAmount) && isFinite(searchAmount);
+
+      if (isAmountSearch) {
+        // For amount search: fetch transactions that match either the amount or the text
+        // We'll use a range query for amount (with tolerance) and text search, then filter client-side
+        const tolerance = 0.01;
+        // First try to get transactions matching amount (with tolerance range)
+        query = query.or(
+          `amount.gte.${searchAmount - tolerance},amount.lte.${searchAmount + tolerance}`,
+        );
+      } else {
+        // Text search only
+        query = query.or(`description.ilike.%${searchTerm}%,notes.ilike.%${searchTerm}%`);
+      }
+
+      const { data, error } = await query.order('date', { ascending: false }).limit(200);
 
       if (error) {
         log.error({ userId, searchTerm, error: error.message }, 'Failed to search transactions');
         return { success: false, error: error.message };
       }
 
-      log.info({ userId, searchTerm, count: data.length }, 'Transaction search completed');
-      return { success: true, data };
+      // Filter results client-side for better precision
+      let filteredData: Transaction[] = [];
+
+      if (isAmountSearch && data) {
+        // For amount search, also check text matches and combine with amount matches
+        const amountMatches = data.filter((transaction) => {
+          const amount = Number(transaction.amount);
+          return Math.abs(amount - searchAmount) < 0.01;
+        });
+
+        // Also search for text matches if the search term appears in description/notes
+        const textMatches = data.filter(
+          (transaction) =>
+            transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (transaction.notes &&
+              transaction.notes.toLowerCase().includes(searchTerm.toLowerCase())),
+        );
+
+        // Combine and deduplicate
+        const allMatches = [...amountMatches, ...textMatches];
+        const uniqueMatches = Array.from(new Map(allMatches.map((t) => [t.id, t])).values());
+        filteredData = uniqueMatches;
+      } else if (data) {
+        // For text-only searches, data is already filtered by query
+        filteredData = data;
+      }
+
+      // Sort by date (most recent first) and limit to 50 results
+      filteredData = filteredData
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        .slice(0, 50);
+
+      log.info({ userId, searchTerm, count: filteredData.length }, 'Transaction search completed');
+      return { success: true, data: filteredData };
     } catch (error) {
       log.error(error, 'Error searching transactions');
       return {
