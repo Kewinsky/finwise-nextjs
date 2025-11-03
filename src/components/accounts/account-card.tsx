@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Edit, Trash2, MoreVertical, LucideIcon } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
+import { formatCurrency } from '@/lib/utils';
 import type { Account } from '@/types/finance.types';
 
 interface AccountCardProps {
@@ -90,8 +91,7 @@ export function AccountCard({
                   : 'text-red-600 dark:text-red-400'
               }`}
             >
-              {account.currency === 'USD' ? '$' : account.currency}{' '}
-              {Math.abs(account.balance || 0).toFixed(2)}
+              {formatCurrency(Math.abs(account.balance || 0), account.currency || 'USD')}
               {account.balance < 0 && (
                 <span className="text-red-500 dark:text-red-400 ml-1">(Overdrawn)</span>
               )}

@@ -2,7 +2,12 @@
 
 import { createClientForServer } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
-import { AccountService, TransactionService, AIAssistantService } from '@/services';
+import {
+  AccountService,
+  TransactionService,
+  AIAssistantService,
+  CurrencyService,
+} from '@/services';
 import {
   createAccountSchema,
   updateAccountSchema,
@@ -173,6 +178,27 @@ export async function getAccountById(accountId: string) {
     return await accountService.getAccountById(accountId, user.id);
   } catch (error) {
     return handleActionError(error, 'getAccountById');
+  }
+}
+
+/**
+ * Get total balance across all accounts (with currency conversion)
+ */
+export async function getTotalBalance() {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const accountService = new AccountService(supabase);
+    return await accountService.getTotalBalance(user.id);
+  } catch (error) {
+    return handleActionError(error, 'getTotalBalance');
   }
 }
 
@@ -561,6 +587,7 @@ export async function getFinancialSummary() {
 
 /**
  * Get account balance distribution for pie chart
+ * Converts all balances to user's base currency
  */
 export async function getAccountDistribution() {
   try {
@@ -574,7 +601,10 @@ export async function getAccountDistribution() {
     }
 
     const accountService = new AccountService(supabase);
-    const result = await accountService.getAccountBalances(user.id);
+    // Convert all balances to base currency for consistent display
+    const result = await accountService.getAccountBalances(user.id, {
+      convertToBaseCurrency: true,
+    });
 
     if (!result.success) {
       return { success: false, error: result.error };
@@ -584,6 +614,7 @@ export async function getAccountDistribution() {
       name: account.accountName,
       type: account.accountType,
       value: account.balance,
+      currency: account.currency, // Base currency after conversion
       color: account.color || '#3b82f6', // Use account color or default blue
     }));
 
@@ -1160,6 +1191,76 @@ export async function getFinancialHealthScore() {
 }
 
 // =============================================================================
+// CURRENCY ACTIONS
+// =============================================================================
+
+/**
+ * Convert amount from one currency to another
+ */
+export async function convertCurrency(amount: number, fromCurrency: string, toCurrency: string) {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const currencyService = new CurrencyService(supabase);
+    return await currencyService.convertAmount(amount, fromCurrency, toCurrency);
+  } catch (error) {
+    return handleActionError(error, 'convertCurrency');
+  }
+}
+
+/**
+ * Get exchange rate between two currencies
+ */
+export async function getExchangeRate(fromCurrency: string, toCurrency: string) {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const currencyService = new CurrencyService(supabase);
+    return await currencyService.getExchangeRate(fromCurrency, toCurrency);
+  } catch (error) {
+    return handleActionError(error, 'getExchangeRate');
+  }
+}
+
+/**
+ * Convert multiple amounts from different currencies to a target currency
+ */
+export async function convertMultipleAmounts(
+  amounts: Array<{ amount: number; currency: string }>,
+  targetCurrency: string,
+) {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const currencyService = new CurrencyService(supabase);
+    return await currencyService.convertMultipleAmounts(amounts, targetCurrency);
+  } catch (error) {
+    return handleActionError(error, 'convertMultipleAmounts');
+  }
+}
+
+// =============================================================================
 // AI ASSISTANT ACTIONS
 // =============================================================================
 
@@ -1283,7 +1384,10 @@ export async function exportTransactions(filters?: TransactionFilters) {
 /**
  * Export transactions to CSV format
  */
-export async function exportTransactionsToCSV(filters: TransactionFilters = {}) {
+export async function exportTransactionsToCSV(
+  filters: TransactionFilters = {},
+  options?: { convertToBaseCurrency?: boolean },
+) {
   try {
     const supabase = await createClientForServer();
     const {
@@ -1295,7 +1399,7 @@ export async function exportTransactionsToCSV(filters: TransactionFilters = {}) 
     }
 
     const transactionService = new TransactionService(supabase);
-    const result = await transactionService.exportTransactionsToCSV(user.id, filters);
+    const result = await transactionService.exportTransactionsToCSV(user.id, filters, options);
 
     if (!result.success) {
       return { success: false, error: result.error };
@@ -1304,5 +1408,35 @@ export async function exportTransactionsToCSV(filters: TransactionFilters = {}) 
     return { success: true, data: result.data };
   } catch (error) {
     return handleActionError(error, 'exportTransactionsToCSV');
+  }
+}
+
+/**
+ * Export transactions to JSON format
+ */
+export async function exportTransactionsToJSON(
+  filters: TransactionFilters = {},
+  options?: { convertToBaseCurrency?: boolean },
+) {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const transactionService = new TransactionService(supabase);
+    const result = await transactionService.exportTransactionsToJSON(user.id, filters, options);
+
+    if (!result.success) {
+      return { success: false, error: result.error };
+    }
+
+    return { success: true, data: result.data };
+  } catch (error) {
+    return handleActionError(error, 'exportTransactionsToJSON');
   }
 }

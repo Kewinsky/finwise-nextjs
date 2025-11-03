@@ -5,7 +5,7 @@ import { TransactionsTableRow } from './transactions-table-row';
 import { EmptyTransactionsState } from './empty-transactions-state';
 import { TransactionsPagination } from './transactions-pagination';
 import { TransactionsBulkActions } from './transactions-bulk-actions';
-import { CSVExportButton } from './csv-export-button';
+import { TransactionsExportButton } from './transactions-export-button';
 import type { Transaction, Account, TransactionFilters } from '@/types/finance.types';
 
 interface TransactionsTableProps {
@@ -73,7 +73,7 @@ export function TransactionsTable({
             isDeleting={isDeleting === 'bulk'}
             onBulkDelete={onBulkDelete}
           >
-            <CSVExportButton filters={filters} />
+            <TransactionsExportButton filters={filters} />
           </TransactionsBulkActions>
         </div>
       </CardHeader>

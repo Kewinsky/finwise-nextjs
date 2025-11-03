@@ -1,5 +1,6 @@
 import { useChart } from '@/components/ui/chart';
 import { formatCurrency } from '@/lib/utils';
+import { DEFAULT_CURRENCY } from '@/types/finance.types';
 
 interface SimpleChartTooltipProps {
   active?: boolean;
@@ -10,11 +11,13 @@ interface SimpleChartTooltipProps {
       label?: string;
       name?: string;
       fill?: string;
+      currency?: string;
       [key: string]: unknown;
     };
     [key: string]: unknown;
   }>;
   labelKey?: 'label' | 'name';
+  currency?: string; // Optional currency override
 }
 
 /**
@@ -25,6 +28,7 @@ export function SimpleChartTooltip({
   active,
   payload,
   labelKey = 'label',
+  currency,
 }: SimpleChartTooltipProps) {
   const { config } = useChart();
 
@@ -40,6 +44,9 @@ export function SimpleChartTooltip({
   if (!label) {
     return null;
   }
+
+  // Determine currency: use prop, payload currency, or default
+  const displayCurrency = currency || (data.payload?.currency as string) || DEFAULT_CURRENCY;
 
   // Get color from payload fill, item color, chart config, or fallback to a default
   const dataKey = (data.dataKey as string) || (data.name as string);
@@ -61,7 +68,7 @@ export function SimpleChartTooltip({
         />
         <span className="font-semibold text-foreground">{label}</span>
         <span className="font-mono font-medium tabular-nums text-foreground">
-          {formatCurrency(value)}
+          {formatCurrency(value, displayCurrency)}
         </span>
       </div>
     </div>

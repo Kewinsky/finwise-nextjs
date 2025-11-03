@@ -229,6 +229,41 @@ FOR EACH ROW EXECUTE FUNCTION public.prevent_mandatory_account_delete();
 GRANT ALL ON FUNCTION public.prevent_mandatory_account_delete() TO anon, authenticated, service_role;
 
 -- =============================================================================
+-- USER PREFERENCES - BASE CURRENCY
+-- =============================================================================
+
+-- Add base_currency column to user_preferences table (if table exists)
+DO $$
+BEGIN
+  IF EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'user_preferences') THEN
+    -- Add base_currency column if it doesn't exist
+    IF NOT EXISTS (
+      SELECT 1 FROM information_schema.columns 
+      WHERE table_schema = 'public' 
+      AND table_name = 'user_preferences' 
+      AND column_name = 'base_currency'
+    ) THEN
+      ALTER TABLE public.user_preferences
+      ADD COLUMN base_currency text DEFAULT 'USD' NOT NULL;
+
+      -- Add check constraint to ensure valid currency code format
+      ALTER TABLE public.user_preferences
+      ADD CONSTRAINT user_preferences_base_currency_check 
+      CHECK (base_currency ~ '^[A-Z]{3}$');
+
+      -- Update existing records to have USD as default if NULL
+      UPDATE public.user_preferences
+      SET base_currency = 'USD'
+      WHERE base_currency IS NULL OR base_currency = '';
+
+      -- Add index for base_currency queries
+      CREATE INDEX IF NOT EXISTS idx_user_preferences_base_currency 
+      ON public.user_preferences USING btree (base_currency);
+    END IF;
+  END IF;
+END $$;
+
+-- =============================================================================
 -- SETUP COMPLETE
 -- =============================================================================
 -- Your Finwise financial management tables are now ready! 
@@ -241,5 +276,6 @@ GRANT ALL ON FUNCTION public.prevent_mandatory_account_delete() TO anon, authent
 -- ✅ Auto-update triggers for timestamps and account balances
 -- ✅ Row Level Security policies for data protection
 -- ✅ Automatic balance calculation when transactions change
+-- ✅ base_currency field added to user_preferences (if table exists)
 -- 
 -- =============================================================================

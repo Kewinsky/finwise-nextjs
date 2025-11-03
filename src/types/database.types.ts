@@ -290,6 +290,7 @@ export type Database = {
       };
       user_preferences: {
         Row: {
+          base_currency: string;
           created_at: string | null;
           font_size: string;
           header_title_preference: string | null;
@@ -300,6 +301,7 @@ export type Database = {
           user_id: string;
         };
         Insert: {
+          base_currency?: string;
           created_at?: string | null;
           font_size?: string;
           header_title_preference?: string | null;
@@ -310,6 +312,7 @@ export type Database = {
           user_id: string;
         };
         Update: {
+          base_currency?: string;
           created_at?: string | null;
           font_size?: string;
           header_title_preference?: string | null;

@@ -1,3 +1,5 @@
+'use client';
+
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,6 +14,7 @@ import { TableCell, TableRow } from '@/components/ui/table';
 import { Edit, Trash2, MoreHorizontal } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { formatCurrency } from '@/lib/utils';
+import { useBaseCurrency } from '@/hooks/use-base-currency';
 import {
   getTypeBadgeClassName,
   getAmountClassName,
@@ -38,6 +41,22 @@ export function TransactionsTableRow({
   onEdit,
   onDelete,
 }: TransactionsTableRowProps) {
+  const baseCurrency = useBaseCurrency();
+
+  // Get currency from transaction's account
+  const getTransactionCurrency = (): string => {
+    const accountId = transaction.from_account_id || transaction.to_account_id;
+    if (accountId) {
+      const account = accounts.find((acc) => acc.id === accountId);
+      if (account?.currency) {
+        return account.currency;
+      }
+    }
+    return baseCurrency;
+  };
+
+  const transactionCurrency = getTransactionCurrency();
+
   return (
     <TableRow key={transaction.id}>
       <TableCell>
@@ -57,7 +76,7 @@ export function TransactionsTableRow({
       <TableCell>{format(new Date(transaction.date), 'MMM dd, yyyy')}</TableCell>
       <TableCell className={`text-right font-medium ${getAmountClassName(transaction.type)}`}>
         {transaction.type === 'income' ? '+' : transaction.type === 'expense' ? '-' : ''}
-        {formatCurrency(Math.abs(transaction.amount))}
+        {formatCurrency(Math.abs(transaction.amount), transactionCurrency)}
       </TableCell>
       <TableCell>
         <DropdownMenu>

@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { ArrowRightLeft, ArrowRight, TrendingUp, TrendingDown } from 'lucide-react';
 import { formatCurrency, formatDisplayDate } from '@/lib/utils';
+import { useBaseCurrency } from '@/hooks/use-base-currency';
 import type { DashboardMetrics } from '@/types/finance.types';
 
 interface RecentActivityCardProps {
@@ -13,6 +14,7 @@ interface RecentActivityCardProps {
 
 export function RecentActivityCard({ recentTransactions }: RecentActivityCardProps) {
   const router = useRouter();
+  const baseCurrency = useBaseCurrency();
 
   const getTransactionIcon = (type: string) => {
     switch (type) {
@@ -84,7 +86,7 @@ export function RecentActivityCard({ recentTransactions }: RecentActivityCardPro
                 </div>
                 <div className={`text-sm font-medium ${styles.text}`}>
                   {styles.prefix}
-                  {formatCurrency(transaction.amount)}
+                  {formatCurrency(transaction.amount, baseCurrency)}
                 </div>
               </div>
             );

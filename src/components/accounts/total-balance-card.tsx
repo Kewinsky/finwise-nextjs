@@ -1,12 +1,17 @@
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Wallet } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
+import { useBaseCurrency } from '@/hooks/use-base-currency';
 
 interface TotalBalanceCardProps {
   totalBalance: number;
 }
 
 export function TotalBalanceCard({ totalBalance }: TotalBalanceCardProps) {
+  const baseCurrency = useBaseCurrency();
+
   return (
     <Card>
       <CardHeader>
@@ -17,7 +22,7 @@ export function TotalBalanceCard({ totalBalance }: TotalBalanceCardProps) {
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground mt-1">Across all your accounts</p>
-        <div className="text-3xl font-bold">{formatCurrency(totalBalance)}</div>
+        <div className="text-3xl font-bold">{formatCurrency(totalBalance, baseCurrency)}</div>
       </CardContent>
     </Card>
   );

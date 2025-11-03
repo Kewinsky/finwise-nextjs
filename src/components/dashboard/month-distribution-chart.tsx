@@ -8,11 +8,13 @@ import { SimpleChartTooltip } from '@/components/charts/simple-chart-tooltip';
 import { Wallet } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { getAccountDistribution } from '@/lib/actions/finance-actions';
+import { useBaseCurrency } from '@/hooks/use-base-currency';
 
 interface AccountDistributionItem {
   name: string;
   type: string;
   value: number;
+  currency?: string;
   color: string;
 }
 
@@ -23,6 +25,7 @@ interface AccountDistributionChartProps {
 export function AccountDistributionChart({ className }: AccountDistributionChartProps) {
   const [accountData, setAccountData] = useState<AccountDistributionItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const baseCurrency = useBaseCurrency();
 
   useEffect(() => {
     const loadAccountData = async () => {
@@ -90,7 +93,7 @@ export function AccountDistributionChart({ className }: AccountDistributionChart
         </CardTitle>
         <CardDescription>
           {totalBalance > 0
-            ? `Total balance: ${formatCurrency(totalBalance)} distributed across ${pieChartData.length} account${pieChartData.length !== 1 ? 's' : ''}`
+            ? `Total balance: ${formatCurrency(totalBalance, baseCurrency)} distributed across ${pieChartData.length} account${pieChartData.length !== 1 ? 's' : ''}`
             : 'How your total balance is distributed across accounts'}
         </CardDescription>
       </CardHeader>
@@ -107,8 +110,6 @@ export function AccountDistributionChart({ className }: AccountDistributionChart
                   paddingAngle={2}
                   dataKey="value"
                   isAnimationActive={true}
-                  label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                  labelLine={false}
                 >
                   {pieChartData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.fill} />
@@ -116,8 +117,7 @@ export function AccountDistributionChart({ className }: AccountDistributionChart
                 </Pie>
                 <ChartTooltip
                   cursor={false}
-                  content={<SimpleChartTooltip labelKey="name" />}
-                  formatter={(value: number) => formatCurrency(value)}
+                  content={<SimpleChartTooltip labelKey="name" currency={baseCurrency} />}
                 />
               </PieChart>
             </ChartContainer>
@@ -128,7 +128,7 @@ export function AccountDistributionChart({ className }: AccountDistributionChart
                 <div key={index} className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.fill }} />
                   <span className="text-sm text-muted-foreground">
-                    {item.name}: {formatCurrency(item.value)} (
+                    {item.name}: {formatCurrency(item.value, baseCurrency)} (
                     {totalBalance > 0 ? `${((item.value / totalBalance) * 100).toFixed(1)}%` : '0%'}
                     )
                   </span>

@@ -166,8 +166,19 @@ export function TransactionForm({
 
   useEffect(() => {
     const currentCategory = form.getValues('category');
+
+    // For transfers, automatically set category to 'transfer'
+    if (selectedType === 'transfer') {
+      const transferCategory = categories.transfer[0];
+      if (transferCategory && currentCategory !== transferCategory.id) {
+        form.setValue('category', transferCategory.id);
+      }
+      return;
+    }
+
+    // For other types, validate category exists
     if (currentCategory) {
-      const categoryList = categories[selectedType] || [];
+      const categoryList = categories[selectedType as keyof typeof categories] || [];
       const categoryExists = categoryList.some((cat) => cat.id === currentCategory);
       if (!categoryExists) {
         form.setValue('category', '');
@@ -182,7 +193,23 @@ export function TransactionForm({
   const onSubmit = async (data: TransactionFormData) => {
     setIsLoading(true);
     try {
-      const categoryName = getCategoryName(data.category, data.type);
+      // Validate form data before submitting
+      if (data.type === 'transfer' && (!data.fromAccount || !data.toAccount)) {
+        notifyError('Please select both from and to accounts for transfer');
+        setIsLoading(false);
+        return;
+      }
+
+      if (data.type === 'transfer' && data.fromAccount === data.toAccount) {
+        notifyError('From and to accounts must be different');
+        setIsLoading(false);
+        return;
+      }
+
+      // For transfers, use 'transfer' as category if not set
+      const categoryId = data.category || (data.type === 'transfer' ? 'transfer' : '');
+      const categoryName = getCategoryName(categoryId, data.type);
+
       const payload = {
         type: data.type,
         description: data.description,
@@ -203,7 +230,13 @@ export function TransactionForm({
         ? await updateTransaction(transaction.id, fd)
         : await createTransaction(fd);
 
-      if (result?.success) {
+      if (!result) {
+        notifyError('Failed to save transaction', { description: 'No response from server' });
+        setIsLoading(false);
+        return;
+      }
+
+      if (result.success) {
         notifySuccess(`Transaction ${transaction?.id ? 'updated' : 'created'} successfully`);
 
         if (!transaction?.id && result.success && 'data' in result) {
@@ -242,41 +275,47 @@ export function TransactionForm({
     }
   };
 
-  const availableToAccounts = accounts.filter((account) => account.id !== fromAccount);
-
   const AccountSelect = ({
     value,
     onChange,
     placeholder,
     error,
+    excludeAccountId,
   }: {
     value: string;
     onChange: (value: string) => void;
     placeholder: string;
     error?: string | undefined;
-  }) => (
-    <div className="space-y-2">
-      <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="w-full">
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectContent>
-          {accounts.map((account) => (
-            <SelectItem key={account.id} value={account.id}>
-              <div className="flex items-center justify-between gap-3 w-full">
-                <span>{account.name}</span>
-                <span className="text-xs text-muted-foreground">
-                  {account.currency} {Number(account.balance).toLocaleString()}
-                </span>
-              </div>
-            </SelectItem>
-          ))}
-          <SelectItem value="__add__">+ Add new account</SelectItem>
-        </SelectContent>
-      </Select>
-      <FormError message={error} />
-    </div>
-  );
+    excludeAccountId?: string;
+  }) => {
+    const availableAccounts = excludeAccountId
+      ? accounts.filter((account) => account.id !== excludeAccountId)
+      : accounts;
+
+    return (
+      <div className="space-y-2">
+        <Select value={value} onValueChange={onChange}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder={placeholder} />
+          </SelectTrigger>
+          <SelectContent>
+            {availableAccounts.map((account) => (
+              <SelectItem key={account.id} value={account.id}>
+                <div className="flex items-center justify-between gap-3 w-full">
+                  <span>{account.name}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {account.currency} {Number(account.balance).toLocaleString()}
+                  </span>
+                </div>
+              </SelectItem>
+            ))}
+            <SelectItem value="__add__">+ Add new account</SelectItem>
+          </SelectContent>
+        </Select>
+        {error && <FormError message={error} />}
+      </div>
+    );
+  };
 
   const CategorySelect = ({
     value,
@@ -319,7 +358,26 @@ export function TransactionForm({
         {!isFormReady ? (
           <LoadingSpinner message="Loading..." size="default" variant="default" />
         ) : (
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(
+              (data) => {
+                // Ensure category is set for transfers before submission
+                if (data.type === 'transfer' && !data.category) {
+                  const transferCategory = categories.transfer[0];
+                  if (transferCategory) {
+                    data.category = transferCategory.id;
+                  }
+                }
+                onSubmit(data);
+              },
+              () => {
+                notifyError('Please fix form errors', {
+                  description: 'Check all required fields are filled correctly',
+                });
+              },
+            )}
+            className="space-y-4"
+          >
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="type">Transaction Type</Label>
@@ -413,7 +471,7 @@ export function TransactionForm({
                 <div className="space-y-2">
                   <Label htmlFor="category">Category</Label>
                   <CategorySelect
-                    value={form.watch('category')}
+                    value={form.watch('category') || ''}
                     onChange={(value) => form.setValue('category', value)}
                     error={form.formState.errors.category?.message}
                   />
@@ -435,7 +493,7 @@ export function TransactionForm({
                 <div className="space-y-2">
                   <Label htmlFor="category">Category</Label>
                   <CategorySelect
-                    value={form.watch('category')}
+                    value={form.watch('category') || ''}
                     onChange={(value) => form.setValue('category', value)}
                     error={form.formState.errors.category?.message}
                   />
@@ -456,28 +514,13 @@ export function TransactionForm({
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="toAccount">To Account</Label>
-                  <Select
-                    value={toAccount}
-                    onValueChange={(value) => handleAccountChange(value, 'toAccount')}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select to account" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableToAccounts.map((account) => (
-                        <SelectItem key={account.id} value={account.id}>
-                          <div className="flex items-center justify-between gap-3 w-full">
-                            <span>{account.name}</span>
-                            <span className="text-xs text-muted-foreground">
-                              {account.currency} {Number(account.balance).toLocaleString()}
-                            </span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                      <SelectItem value="__add__">+ Add new account</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormError message={form.formState.errors.toAccount?.message} />
+                  <AccountSelect
+                    value={toAccount || ''}
+                    onChange={(value) => handleAccountChange(value, 'toAccount')}
+                    placeholder="Select to account"
+                    error={form.formState.errors.toAccount?.message}
+                    excludeAccountId={fromAccount}
+                  />
                 </div>
               </div>
             )}
@@ -491,10 +534,6 @@ export function TransactionForm({
                 {...form.register('notes')}
               />
             </div>
-
-            {form.formState.errors.root && (
-              <div className="text-sm text-red-600">{form.formState.errors.root.message}</div>
-            )}
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={handleCancel}>

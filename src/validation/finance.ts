@@ -192,7 +192,7 @@ export const transactionFormSchema = z
         message: 'Amount must be a positive number',
       }),
     description: z.string().min(1, 'Description is required'),
-    category: z.string().min(1, 'Category is required'),
+    category: z.string().optional(),
     date: z.date(),
     notes: z.string().optional(),
     fromAccount: z.string().optional(),
@@ -200,16 +200,85 @@ export const transactionFormSchema = z
   })
   .refine(
     (data) => {
-      if (data.type === 'income' && !data.toAccount) return false;
-      if (data.type === 'expense' && !data.fromAccount) return false;
-      if (
-        data.type === 'transfer' &&
-        (!data.fromAccount || !data.toAccount || data.fromAccount === data.toAccount)
-      )
+      // For transfers, category is optional (will be auto-set to 'transfer')
+      if (data.type === 'transfer') {
+        return true; // Always allow transfers, category will be auto-set
+      }
+      // For other types, category is required
+      if (!data.category || data.category.length === 0) {
         return false;
+      }
       return true;
     },
-    { message: 'Please select the required accounts' },
+    {
+      message: 'Category is required',
+      path: ['category'],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.type === 'income' && !data.toAccount) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'To account is required for income',
+      path: ['toAccount'],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.type === 'expense' && !data.fromAccount) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'From account is required for expenses',
+      path: ['fromAccount'],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.type === 'transfer' && !data.fromAccount) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'From account is required for transfers',
+      path: ['fromAccount'],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.type === 'transfer' && !data.toAccount) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'To account is required for transfers',
+      path: ['toAccount'],
+    },
+  )
+  .refine(
+    (data) => {
+      if (
+        data.type === 'transfer' &&
+        data.fromAccount &&
+        data.toAccount &&
+        data.fromAccount === data.toAccount
+      ) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'From and to accounts must be different',
+      path: ['toAccount'],
+    },
   );
 
 export const transactionFiltersSchema = z

@@ -7,6 +7,7 @@ import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
 import { SimpleChartTooltip } from '@/components/charts/simple-chart-tooltip';
 import { BarChart3 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
+import { useBaseCurrency } from '@/hooks/use-base-currency';
 import type { CategorySpending } from '@/hooks/use-category-spending';
 
 interface TopCategoriesChartProps {
@@ -23,6 +24,8 @@ const chartConfig = {
 const CATEGORY_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
 export function TopCategoriesChart({ categorySpending }: TopCategoriesChartProps) {
+  const baseCurrency = useBaseCurrency();
+
   const topCategoriesData = useMemo(() => {
     if (categorySpending.length === 0) return [];
 
@@ -48,7 +51,10 @@ export function TopCategoriesChart({ categorySpending }: TopCategoriesChartProps
             <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
               <BarChart accessibilityLayer data={topCategoriesData}>
                 <CartesianGrid vertical={false} />
-                <ChartTooltip cursor={false} content={<SimpleChartTooltip labelKey="name" />} />
+                <ChartTooltip
+                  cursor={false}
+                  content={<SimpleChartTooltip labelKey="name" currency={baseCurrency} />}
+                />
                 <Bar dataKey="value" radius={8} />
               </BarChart>
             </ChartContainer>
@@ -62,7 +68,7 @@ export function TopCategoriesChart({ categorySpending }: TopCategoriesChartProps
                     style={{ backgroundColor: category.fill }}
                   />
                   <span className="text-sm text-muted-foreground">
-                    {category.name}: {formatCurrency(category.value)}
+                    {category.name}: {formatCurrency(category.value, baseCurrency)}
                   </span>
                 </div>
               ))}

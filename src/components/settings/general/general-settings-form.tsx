@@ -41,6 +41,7 @@ import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { Key } from 'lucide-react';
 import { LANGUAGE_OPTIONS, FONT_OPTIONS, FONT_SIZE_OPTIONS } from '@/config/app';
 import type { HeaderTitleType } from '@/types/header.types';
+import { SUPPORTED_CURRENCIES } from '@/types/finance.types';
 
 const HEADER_TITLE_OPTIONS = [
   { value: 'time-based', label: 'Time-Based Greetings', description: 'Good morning, John!' },
@@ -71,6 +72,7 @@ export interface GeneralSettingsFormData {
   fontSize?: string;
   fontFamily?: FontKey;
   headerTitlePreference?: HeaderTitleType;
+  baseCurrency?: string;
 }
 
 export function GeneralSettingsForm({
@@ -83,10 +85,12 @@ export function GeneralSettingsForm({
     language,
     fontSize,
     headerTitlePreference,
+    baseCurrency,
     setSystemFont,
     setLanguage,
     setFontSize,
     setHeaderTitlePreference,
+    setBaseCurrency,
     isLoading: settingsLoading,
     isSaving,
     savePreferences,
@@ -104,6 +108,7 @@ export function GeneralSettingsForm({
     animationsEnabled: true,
     fontFamily: 'system',
     headerTitlePreference,
+    baseCurrency,
   });
   const [showCookieDialog, setShowCookieDialog] = useState(false);
   const [tempCookiePreferences, setTempCookiePreferences] =
@@ -127,8 +132,9 @@ export function GeneralSettingsForm({
       language,
       fontSize,
       headerTitlePreference,
+      baseCurrency,
     }));
-  }, [systemFont, language, fontSize, headerTitlePreference]);
+  }, [systemFont, language, fontSize, headerTitlePreference, baseCurrency]);
 
   const handleInputChange = (field: keyof GeneralSettingsFormData, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -142,6 +148,8 @@ export function GeneralSettingsForm({
       setFontSize(value as string);
     } else if (field === 'headerTitlePreference') {
       setHeaderTitlePreference(value as HeaderTitleType);
+    } else if (field === 'baseCurrency') {
+      setBaseCurrency(value as string);
     }
   };
 
@@ -392,6 +400,36 @@ export function GeneralSettingsForm({
                         <span>{option.label}</span>
                         <span className="text-xs text-muted-foreground">{option.description}</span>
                       </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Separator />
+
+            {/* Base Currency */}
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1">
+                <Label htmlFor="base_currency" className="text-sm font-medium">
+                  Base Currency
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  All account balances will be converted to this currency for total balance
+                </p>
+              </div>
+              <Select
+                value={formData.baseCurrency}
+                onValueChange={(value) => handleInputChange('baseCurrency', value)}
+                disabled={settingsLoading}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select Currency" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SUPPORTED_CURRENCIES.map((currency) => (
+                    <SelectItem key={currency} value={currency}>
+                      {currency}
                     </SelectItem>
                   ))}
                 </SelectContent>

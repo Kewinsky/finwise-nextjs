@@ -20,6 +20,9 @@ import type {
 } from '@/types/finance.types';
 import { log } from '@/lib/logger';
 import { ERROR_MESSAGES } from '@/lib/constants/errors';
+import { CurrencyService } from './currency.service';
+import { UserPreferencesService } from './user-preferences.service';
+import { DEFAULT_CURRENCY } from '@/types/finance.types';
 
 /**
  * TransactionService handles all transaction-related business logic
@@ -179,6 +182,7 @@ export class TransactionService {
 
   /**
    * Create a new transaction
+   * For transfers between accounts with different currencies, handles currency conversion
    */
   async createTransaction(
     userId: string,
@@ -187,6 +191,165 @@ export class TransactionService {
     try {
       log.info({ userId, type: input.type, amount: input.amount }, 'Creating transaction');
 
+      // For transfers, check if currency conversion is needed
+      if (input.type === 'transfer' && input.fromAccountId && input.toAccountId) {
+        // Get account currencies
+        const { data: accounts, error: accountsError } = await this.supabase
+          .from('accounts')
+          .select('id, currency')
+          .in('id', [input.fromAccountId, input.toAccountId])
+          .eq('user_id', userId);
+
+        if (accountsError || !accounts || accounts.length !== 2) {
+          log.error(
+            { userId, error: accountsError?.message },
+            'Failed to fetch account currencies',
+          );
+          return {
+            success: false,
+            error: accountsError?.message || 'Failed to fetch account currencies',
+          };
+        }
+
+        const fromAccount = accounts.find((acc) => acc.id === input.fromAccountId);
+        const toAccount = accounts.find((acc) => acc.id === input.toAccountId);
+
+        if (!fromAccount || !toAccount) {
+          return { success: false, error: 'One or both accounts not found' };
+        }
+
+        const fromCurrency = fromAccount.currency || DEFAULT_CURRENCY;
+        const toCurrency = toAccount.currency || DEFAULT_CURRENCY;
+
+        // If currencies differ, convert amount for destination account
+        if (fromCurrency !== toCurrency) {
+          log.info(
+            { fromCurrency, toCurrency, amount: input.amount },
+            'Transfer between different currencies - converting amount',
+          );
+
+          const currencyService = new CurrencyService(this.supabase);
+          const conversionResult = await currencyService.convertAmount(
+            input.amount,
+            fromCurrency,
+            toCurrency,
+          );
+
+          if (!conversionResult.success || !conversionResult.data) {
+            log.error(
+              { fromCurrency, toCurrency, amount: input.amount, error: conversionResult.error },
+              'Currency conversion failed',
+            );
+            return {
+              success: false,
+              error: `Failed to convert ${fromCurrency} to ${toCurrency}: ${conversionResult.error}`,
+            };
+          }
+
+          const convertedAmount = conversionResult.data;
+
+          // Create transaction with original amount
+          const transactionData = {
+            user_id: userId,
+            from_account_id: input.fromAccountId,
+            to_account_id: input.toAccountId,
+            type: input.type,
+            description: input.description,
+            category: input.category,
+            amount: input.amount, // Original amount in source currency
+            date: input.date,
+            notes: input.notes || null,
+          };
+
+          const { data, error } = await this.supabase
+            .from('transactions')
+            .insert(transactionData)
+            .select()
+            .single();
+
+          if (error) {
+            log.error({ userId, error: error.message }, 'Failed to create transaction');
+            return { success: false, error: error.message };
+          }
+
+          // Trigger already updated balances incorrectly (added original amount to destination)
+          // We need to revert the trigger's changes and apply correct conversion
+
+          // Get current balances after trigger
+          const { data: currentAccounts, error: fetchError } = await this.supabase
+            .from('accounts')
+            .select('id, balance')
+            .in('id', [input.fromAccountId, input.toAccountId])
+            .eq('user_id', userId);
+
+          if (fetchError || !currentAccounts || currentAccounts.length !== 2) {
+            log.error({ fetchError: fetchError?.message }, 'Failed to fetch current balances');
+            log.warn(
+              { transactionId: data.id },
+              'Transaction created but balance correction failed',
+            );
+            return {
+              success: true,
+              data,
+            };
+          }
+
+          const currentToAccount = currentAccounts.find((acc) => acc.id === input.toAccountId);
+          if (!currentToAccount) {
+            log.warn(
+              { transactionId: data.id, toAccountId: input.toAccountId },
+              'Transaction created but balance correction failed - toAccount not found',
+            );
+            return {
+              success: true,
+              data,
+            };
+          }
+
+          // Calculate correct balance: revert trigger's addition and add converted amount
+          const currentBalance = Number(currentToAccount.balance);
+          const correctedBalance = currentBalance - input.amount + convertedAmount;
+
+          // Update destination account with corrected balance
+          const { error: toBalanceError } = await this.supabase
+            .from('accounts')
+            .update({ balance: correctedBalance, updated_at: new Date().toISOString() })
+            .eq('id', input.toAccountId)
+            .eq('user_id', userId);
+
+          if (toBalanceError) {
+            log.error(
+              { toBalanceError: toBalanceError.message },
+              'Failed to update account balances after currency conversion',
+            );
+            // Transaction was created but balance update failed - return warning
+            log.warn(
+              { transactionId: data.id },
+              'Transaction created but balance update may be incorrect',
+            );
+            return {
+              success: true,
+              data,
+            };
+          }
+
+          log.info(
+            {
+              userId,
+              transactionId: data.id,
+              fromCurrency,
+              toCurrency,
+              originalAmount: input.amount,
+              convertedAmount,
+            },
+            'Transfer with currency conversion completed',
+          );
+
+          return { success: true, data };
+        }
+      }
+
+      // For same currency transfers or non-transfer transactions, use normal flow
       const transactionData = {
         user_id: userId,
         from_account_id: input.fromAccountId || null,
@@ -703,6 +866,7 @@ export class TransactionService {
    * @param userId - User ID
    * @param type - Transaction type (expense or income)
    * @param dateRange - Optional date range filter (from and/or to dates)
+   * Converts all amounts to user's base currency for consistent display
    */
   async getCategorySpending(
     userId: string,
@@ -712,9 +876,27 @@ export class TransactionService {
     try {
       log.info({ userId, type, dateRange }, 'Fetching category spending');
 
+      // Get user's base currency
+      const preferencesService = new UserPreferencesService(this.supabase);
+      const preferencesResult = await preferencesService.getPreferences(userId);
+      const baseCurrency =
+        preferencesResult.success && preferencesResult.data.baseCurrency
+          ? preferencesResult.data.baseCurrency
+          : DEFAULT_CURRENCY;
+
+      // Get account currencies for conversion
+      const { data: accounts } = await this.supabase
+        .from('accounts')
+        .select('id, currency')
+        .eq('user_id', userId);
+      const accountCurrencyMap = new Map(
+        accounts?.map((acc) => [acc.id, acc.currency || DEFAULT_CURRENCY]) || [],
+      );
+
+      // Fetch transactions with account IDs
       let query = this.supabase
         .from('transactions')
-        .select('category, amount')
+        .select('category, amount, from_account_id, to_account_id')
         .eq('user_id', userId)
         .eq('type', type);
 
@@ -734,20 +916,53 @@ export class TransactionService {
         return { success: false, error: error.message };
       }
 
-      // Group by category and calculate totals
+      // Convert all transactions to base currency
+      const currencyService = new CurrencyService(this.supabase);
       const categoryMap = new Map<string, { totalAmount: number; transactionCount: number }>();
 
-      data.forEach((transaction) => {
-        const amount = Number(transaction.amount);
-        const existing = categoryMap.get(transaction.category) || {
-          totalAmount: 0,
-          transactionCount: 0,
-        };
-        categoryMap.set(transaction.category, {
-          totalAmount: existing.totalAmount + amount,
-          transactionCount: existing.transactionCount + 1,
-        });
-      });
+      await Promise.all(
+        data.map(async (transaction) => {
+          // Determine account currency
+          const accountId = transaction.from_account_id || transaction.to_account_id;
+          const transactionCurrency = accountId
+            ? accountCurrencyMap.get(accountId) || DEFAULT_CURRENCY
+            : DEFAULT_CURRENCY;
+
+          let amount = Number(transaction.amount);
+
+          // Convert to base currency if needed
+          if (transactionCurrency !== baseCurrency) {
+            const conversionResult = await currencyService.convertAmount(
+              amount,
+              transactionCurrency,
+              baseCurrency,
+            );
+            if (conversionResult.success && conversionResult.data !== undefined) {
+              amount = conversionResult.data;
+            } else {
+              log.warn(
+                {
+                  amount,
+                  transactionCurrency,
+                  baseCurrency,
+                  error: conversionResult.error,
+                },
+                'Failed to convert transaction amount, using original',
+              );
+            }
+          }
+
+          // Group by category
+          const existing = categoryMap.get(transaction.category) || {
+            totalAmount: 0,
+            transactionCount: 0,
+          };
+          categoryMap.set(transaction.category, {
+            totalAmount: existing.totalAmount + amount,
+            transactionCount: existing.transactionCount + 1,
+          });
+        }),
+      );
 
       const totalSpending = Array.from(categoryMap.values()).reduce(
         (sum, cat) => sum + cat.totalAmount,
@@ -766,7 +981,10 @@ export class TransactionService {
       // Sort by total amount descending
       categorySpending.sort((a, b) => b.totalAmount - a.totalAmount);
 
-      log.info({ userId, count: categorySpending.length }, 'Category spending retrieved');
+      log.info(
+        { userId, count: categorySpending.length, baseCurrency },
+        'Category spending retrieved with currency conversion',
+      );
       return { success: true, data: categorySpending };
     } catch (error) {
       log.error(error, 'Error fetching category spending');
@@ -930,10 +1148,18 @@ export class TransactionService {
         return { success: true, data: [] };
       }
 
-      // Get current account balances
+      // Get user's base currency for conversion
+      const preferencesService = new UserPreferencesService(this.supabase);
+      const preferencesResult = await preferencesService.getPreferences(userId);
+      const baseCurrency =
+        preferencesResult.success && preferencesResult.data.baseCurrency
+          ? preferencesResult.data.baseCurrency
+          : DEFAULT_CURRENCY;
+
+      // Get current account balances with currencies
       const { data: accounts } = await this.supabase
         .from('accounts')
-        .select('id, balance')
+        .select('id, balance, currency')
         .eq('user_id', userId)
         .in('id', filters.accountIds);
 
@@ -941,7 +1167,13 @@ export class TransactionService {
         return { success: true, data: [] };
       }
 
-      const accountMap = new Map(accounts.map((acc) => [acc.id, acc.balance]));
+      const accountMap = new Map(
+        accounts.map((acc) => [
+          acc.id,
+          { balance: acc.balance, currency: acc.currency || DEFAULT_CURRENCY },
+        ]),
+      );
+      const currencyService = new CurrencyService(this.supabase);
 
       // Group transactions by account and period
       const groupedTransactions = this.groupTransactionsByPeriod(transactions, filters.period);
@@ -950,8 +1182,29 @@ export class TransactionService {
       const balanceHistory: BalanceHistoryChart[] = [];
 
       for (const accountId of filters.accountIds) {
-        const currentBalance = accountMap.get(accountId) || 0;
+        const accountData = accountMap.get(accountId);
+        if (!accountData) continue;
+
+        const accountCurrency = accountData.currency;
+        let currentBalance = Number(accountData.balance);
         const accountTransactions = groupedTransactions[accountId] || [];
+
+        // Convert current balance to base currency if needed
+        if (accountCurrency !== baseCurrency) {
+          const conversionResult = await currencyService.convertAmount(
+            currentBalance,
+            accountCurrency,
+            baseCurrency,
+          );
+          if (conversionResult.success && conversionResult.data !== undefined) {
+            currentBalance = conversionResult.data;
+          } else {
+            log.warn(
+              { accountId, accountCurrency, baseCurrency, error: conversionResult.error },
+              'Failed to convert current balance, using original',
+            );
+          }
+        }
 
         // Calculate balance for each period by working backwards from current balance
         const balanceData: BalanceHistoryPoint[] = [];
@@ -964,15 +1217,33 @@ export class TransactionService {
           const period = periods[i];
           const periodTransactions = accountTransactions[period] || [];
 
-          // Calculate net change for this period
-          const netChange = periodTransactions.reduce((sum, transaction) => {
-            if (transaction.from_account_id === accountId) {
-              return sum - transaction.amount; // Money going out
-            } else if (transaction.to_account_id === accountId) {
-              return sum + transaction.amount; // Money coming in
-            }
-            return sum;
-          }, 0);
+          // Calculate net change for this period (convert amounts to base currency)
+          let netChange = 0;
+          await Promise.all(
+            periodTransactions.map(async (transaction) => {
+              let amount = Number(transaction.amount);
+              // Determine transaction currency based on account involved
+              const transactionCurrency = accountCurrency;
+
+              // Convert to base currency if needed
+              if (transactionCurrency !== baseCurrency) {
+                const conversionResult = await currencyService.convertAmount(
+                  amount,
+                  transactionCurrency,
+                  baseCurrency,
+                );
+                if (conversionResult.success && conversionResult.data !== undefined) {
+                  amount = conversionResult.data;
+                }
+              }
+
+              if (transaction.from_account_id === accountId) {
+                netChange -= amount; // Money going out
+              } else if (transaction.to_account_id === accountId) {
+                netChange += amount; // Money coming in
+              }
+            }),
+          );
 
           // Calculate balance at the end of this period
           const periodEndBalance = runningBalance - netChange;
@@ -1051,13 +1322,39 @@ export class TransactionService {
 
   /**
    * Export transactions to CSV format
+   * Optionally converts all amounts to user's base currency
    */
   async exportTransactionsToCSV(
     userId: string,
     filters: TransactionFilters = {},
+    options?: { convertToBaseCurrency?: boolean },
   ): Promise<ServiceResult<string>> {
     try {
-      log.info({ userId, filters }, 'Starting CSV export');
+      log.info({ userId, filters, options }, 'Starting CSV export');
+
+      // Get user's base currency if conversion is requested
+      let baseCurrency: string | undefined;
+      let currencyService: CurrencyService | undefined;
+      let accountCurrencyMap: Map<string, string> | undefined;
+
+      if (options?.convertToBaseCurrency) {
+        const preferencesService = new UserPreferencesService(this.supabase);
+        const preferencesResult = await preferencesService.getPreferences(userId);
+        baseCurrency =
+          preferencesResult.success && preferencesResult.data.baseCurrency
+            ? preferencesResult.data.baseCurrency
+            : DEFAULT_CURRENCY;
+        currencyService = new CurrencyService(this.supabase);
+
+        // Get account currencies for conversion
+        const { data: accounts } = await this.supabase
+          .from('accounts')
+          .select('id, currency')
+          .eq('user_id', userId);
+        accountCurrencyMap = new Map(
+          accounts?.map((acc) => [acc.id, acc.currency || DEFAULT_CURRENCY]) || [],
+        );
+      }
 
       // Get transactions with filters
       const transactionsResult = await this.getTransactions(userId, filters);
@@ -1068,26 +1365,29 @@ export class TransactionService {
       const transactions = transactionsResult.data?.data || [];
 
       if (transactions.length === 0) {
-        return { success: true, data: 'Date,Description,Amount,Type,Category,Account,Notes\n' };
+        const headers = baseCurrency
+          ? `Date,Description,Amount (${baseCurrency}),Original Amount,Original Currency,Type,Category,Account,From Account,To Account,Notes\n`
+          : 'Date,Description,Amount,Type,Category,Account,From Account,To Account,Notes\n';
+        return { success: true, data: headers };
       }
 
       // Get account names for better CSV data
       const { data: accounts } = await this.supabase
         .from('accounts')
-        .select('id, name')
+        .select('id, name, currency')
         .eq('user_id', userId);
 
       const accountMap = new Map(accounts?.map((acc) => [acc.id, acc.name]) || []);
 
-      // Generate CSV content
-      const csvHeaders =
-        'Date,Description,Amount,Type,Category,Account,From Account,To Account,Notes\n';
+      // Generate CSV content with optional currency conversion
+      const csvHeaders = baseCurrency
+        ? `Date,Description,Amount (${baseCurrency}),Original Amount,Original Currency,Type,Category,Account,From Account,To Account,Notes\n`
+        : 'Date,Description,Amount,Type,Category,Account,From Account,To Account,Notes\n';
 
-      const csvRows = transactions
-        .map((transaction) => {
+      const csvRows = await Promise.all(
+        transactions.map(async (transaction) => {
           const date = new Date(transaction.date).toLocaleDateString();
           const description = `"${transaction.description.replace(/"/g, '""')}"`;
-          const amount = transaction.amount.toFixed(2);
           const type = transaction.type;
           const category = `"${transaction.category || ''}"`;
           const account = `"${accountMap.get(transaction.from_account_id || transaction.to_account_id || '') || 'Unknown'}"`;
@@ -1099,16 +1399,161 @@ export class TransactionService {
             : '';
           const notes = `"${(transaction.notes || '').replace(/"/g, '""')}"`;
 
-          return `${date},${description},${amount},${type},${category},${account},${fromAccount},${toAccount},${notes}`;
-        })
-        .join('\n');
+          if (baseCurrency && currencyService && accountCurrencyMap) {
+            // Get transaction currency
+            const accountId = transaction.from_account_id || transaction.to_account_id;
+            const transactionCurrency = accountId
+              ? accountCurrencyMap.get(accountId) || DEFAULT_CURRENCY
+              : DEFAULT_CURRENCY;
 
-      const csvContent = csvHeaders + csvRows;
+            // Convert to base currency
+            const conversionResult = await currencyService.convertAmount(
+              transaction.amount,
+              transactionCurrency,
+              baseCurrency,
+            );
 
-      log.info({ userId, transactionCount: transactions.length }, 'CSV export completed');
+            const convertedAmount = conversionResult.success
+              ? conversionResult.data || transaction.amount
+              : transaction.amount;
+            const originalAmount = transaction.amount.toFixed(2);
+
+            return `${date},${description},${convertedAmount.toFixed(2)},${originalAmount},${transactionCurrency},${type},${category},${account},${fromAccount},${toAccount},${notes}`;
+          } else {
+            const amount = transaction.amount.toFixed(2);
+            return `${date},${description},${amount},${type},${category},${account},${fromAccount},${toAccount},${notes}`;
+          }
+        }),
+      );
+
+      const csvContent = csvHeaders + csvRows.join('\n');
+
+      log.info(
+        { userId, transactionCount: transactions.length, baseCurrency },
+        'CSV export completed',
+      );
       return { success: true, data: csvContent };
     } catch (error) {
       log.error(error, 'Error exporting transactions to CSV');
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : ERROR_MESSAGES.UNEXPECTED,
+      };
+    }
+  }
+
+  /**
+   * Export transactions to JSON format
+   * Optionally converts all amounts to user's base currency
+   */
+  async exportTransactionsToJSON(
+    userId: string,
+    filters: TransactionFilters = {},
+    options?: { convertToBaseCurrency?: boolean },
+  ): Promise<ServiceResult<string>> {
+    try {
+      log.info({ userId, filters, options }, 'Starting JSON export');
+
+      // Get user's base currency if conversion is requested
+      let baseCurrency: string | undefined;
+      let currencyService: CurrencyService | undefined;
+
+      if (options?.convertToBaseCurrency) {
+        const preferencesService = new UserPreferencesService(this.supabase);
+        const preferencesResult = await preferencesService.getPreferences(userId);
+        baseCurrency =
+          preferencesResult.success && preferencesResult.data.baseCurrency
+            ? preferencesResult.data.baseCurrency
+            : DEFAULT_CURRENCY;
+        currencyService = new CurrencyService(this.supabase);
+      }
+
+      // Get transactions with filters
+      const transactionsResult = await this.getTransactions(userId, filters);
+      if (!transactionsResult.success) {
+        return { success: false, error: transactionsResult.error };
+      }
+
+      const transactions = transactionsResult.data?.data || [];
+
+      // Get account names
+      const { data: accounts } = await this.supabase
+        .from('accounts')
+        .select('id, name, currency')
+        .eq('user_id', userId);
+
+      const accountMap = new Map(accounts?.map((acc) => [acc.id, acc.name]) || []);
+      const accountCurrencyDataMap = new Map(
+        accounts?.map((acc) => [acc.id, acc.currency || DEFAULT_CURRENCY]) || [],
+      );
+
+      // Convert transactions with optional currency conversion
+      const exportData = {
+        exportDate: new Date().toISOString(),
+        dateRange: {
+          from: filters.dateFrom || null,
+          to: filters.dateTo || null,
+        },
+        baseCurrency: baseCurrency || null,
+        transactionCount: transactions.length,
+        transactions: await Promise.all(
+          transactions.map(async (transaction) => {
+            const accountId = transaction.from_account_id || transaction.to_account_id;
+            const transactionCurrency = accountId
+              ? accountCurrencyDataMap.get(accountId) || DEFAULT_CURRENCY
+              : DEFAULT_CURRENCY;
+
+            let convertedAmount: number | null = null;
+            if (baseCurrency && currencyService && transactionCurrency !== baseCurrency) {
+              const conversionResult = await currencyService.convertAmount(
+                transaction.amount,
+                transactionCurrency,
+                baseCurrency,
+              );
+              convertedAmount = conversionResult.success ? conversionResult.data || null : null;
+            }
+
+            return {
+              id: transaction.id,
+              date: transaction.date,
+              description: transaction.description,
+              type: transaction.type,
+              category: transaction.category,
+              amount: transaction.amount,
+              currency: transactionCurrency,
+              ...(convertedAmount !== null && {
+                convertedAmount: convertedAmount,
+                convertedCurrency: baseCurrency,
+              }),
+              fromAccount: transaction.from_account_id
+                ? {
+                    id: transaction.from_account_id,
+                    name: accountMap.get(transaction.from_account_id) || 'Unknown',
+                  }
+                : null,
+              toAccount: transaction.to_account_id
+                ? {
+                    id: transaction.to_account_id,
+                    name: accountMap.get(transaction.to_account_id) || 'Unknown',
+                  }
+                : null,
+              notes: transaction.notes,
+              createdAt: transaction.created_at,
+              updatedAt: transaction.updated_at,
+            };
+          }),
+        ),
+      };
+
+      const jsonContent = JSON.stringify(exportData, null, 2);
+
+      log.info(
+        { userId, transactionCount: transactions.length, baseCurrency },
+        'JSON export completed',
+      );
+      return { success: true, data: jsonContent };
+    } catch (error) {
+      log.error(error, 'Error exporting transactions to JSON');
       return {
         success: false,
         error: error instanceof Error ? error.message : ERROR_MESSAGES.UNEXPECTED,

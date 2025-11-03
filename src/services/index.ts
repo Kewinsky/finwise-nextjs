@@ -94,6 +94,7 @@ export {
 export { AccountService } from './account.service';
 export { TransactionService } from './transaction.service';
 export { AIAssistantService } from './ai.service';
+export { CurrencyService } from './currency.service';
 export type {
   Account,
   AccountInsert,
