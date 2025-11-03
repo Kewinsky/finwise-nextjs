@@ -25,7 +25,7 @@ export interface NotificationOptions {
  * Default notification configuration
  */
 const DEFAULT_CONFIG = {
-  duration: 4000,
+  duration: 5000,
   dismissible: true,
 } as const;
 

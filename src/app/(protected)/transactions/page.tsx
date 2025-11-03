@@ -10,6 +10,7 @@ import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { notifySuccess, notifyError } from '@/lib/notifications';
 import { deleteManyTransactions, deleteTransaction } from '@/lib/actions/finance-actions';
 import { useTransactions } from '@/hooks/use-transactions';
+import { DeleteConfirmationDialog } from '@/components/common/delete-confirmation-dialog';
 import type { Transaction } from '@/types/finance.types';
 
 export default function TransactionsPage() {
@@ -56,6 +57,9 @@ export default function TransactionsPage() {
     notes?: string;
   } | null>(null);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+  const [transactionToDelete, setTransactionToDelete] = useState<string | null>(null);
 
   // Check for openForm query parameter and open form if present
   useEffect(() => {
@@ -80,6 +84,15 @@ export default function TransactionsPage() {
     setSortConfig({ key, direction });
   };
 
+  const handleDeleteClick = (id: string) => {
+    setTransactionToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleBulkDeleteClick = () => {
+    setBulkDeleteDialogOpen(true);
+  };
+
   const handleBulkDelete = async () => {
     try {
       setIsDeleting('bulk');
@@ -98,13 +111,16 @@ export default function TransactionsPage() {
       notifyError('Failed to delete transactions');
     } finally {
       setIsDeleting(null);
+      setBulkDeleteDialogOpen(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async () => {
+    if (!transactionToDelete) return;
+
     try {
-      setIsDeleting(id);
-      const result = await deleteTransaction(id);
+      setIsDeleting(transactionToDelete);
+      const result = await deleteTransaction(transactionToDelete);
       if (result.success) {
         notifySuccess('Transaction deleted successfully');
         await refetch();
@@ -117,6 +133,8 @@ export default function TransactionsPage() {
       notifyError('Failed to delete transaction');
     } finally {
       setIsDeleting(null);
+      setTransactionToDelete(null);
+      setDeleteDialogOpen(false);
     }
   };
 
@@ -184,8 +202,8 @@ export default function TransactionsPage() {
         onSelectRow={handleSelectRow}
         onSort={handleSort}
         onEdit={handleEditTransaction}
-        onDelete={handleDelete}
-        onBulkDelete={handleBulkDelete}
+        onDelete={handleDeleteClick}
+        onBulkDelete={handleBulkDeleteClick}
         onPageChange={setCurrentPage}
         onItemsPerPageChange={setItemsPerPage}
         onAddTransaction={() => setShowForm(true)}
@@ -200,6 +218,24 @@ export default function TransactionsPage() {
           defaultType={defaultTransactionType}
         />
       )}
+
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDelete}
+        title="Delete Transaction"
+        description="Are you sure you want to delete this transaction? This action cannot be undone."
+        isLoading={isDeleting === transactionToDelete}
+      />
+
+      <DeleteConfirmationDialog
+        open={bulkDeleteDialogOpen}
+        onOpenChange={setBulkDeleteDialogOpen}
+        onConfirm={handleBulkDelete}
+        title="Delete Multiple Transactions"
+        description={`Are you sure you want to delete ${selectedRows.length} selected transaction${selectedRows.length !== 1 ? 's' : ''}? This action cannot be undone.`}
+        isLoading={isDeleting === 'bulk'}
+      />
     </div>
   );
 }

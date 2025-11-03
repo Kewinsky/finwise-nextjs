@@ -11,6 +11,7 @@ import { AccountsGrid } from '@/components/accounts/accounts-grid';
 import { EmptyAccountsState } from '@/components/accounts/empty-accounts-state';
 import { ACCOUNT_COLORS } from '@/lib/constants/accounts';
 import { getTotalBalance } from '@/lib/actions/finance-actions';
+import { DeleteConfirmationDialog } from '@/components/common/delete-confirmation-dialog';
 import type { Account } from '@/types/finance.types';
 
 export default function AccountsPage() {
@@ -18,6 +19,8 @@ export default function AccountsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [totalBalance, setTotalBalance] = useState<number>(0);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [accountToDelete, setAccountToDelete] = useState<Account | null>(null);
 
   // Fetch total balance with currency conversion
   useEffect(() => {
@@ -46,6 +49,26 @@ export default function AccountsPage() {
   const handleCloseForm = () => {
     setShowForm(false);
     setEditingAccount(null);
+  };
+
+  const handleDeleteClick = (account: Account) => {
+    if (account.is_mandatory) {
+      return;
+    }
+    setAccountToDelete(account);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!accountToDelete) return;
+    await handleDeleteAccount(accountToDelete);
+    setDeleteDialogOpen(false);
+    setAccountToDelete(null);
+    // Refresh total balance after account deletion
+    const result = await getTotalBalance();
+    if (result.success && 'data' in result && result.data !== undefined) {
+      setTotalBalance(result.data);
+    }
   };
 
   const handleAccountSuccess = async () => {
@@ -82,7 +105,7 @@ export default function AccountsPage() {
         <AccountsGrid
           accounts={accounts}
           onEdit={handleEditAccount}
-          onDelete={handleDeleteAccount}
+          onDelete={handleDeleteClick}
           isDeleting={isDeleting}
         />
       )}
@@ -98,6 +121,19 @@ export default function AccountsPage() {
           onSuccess={handleAccountSuccess}
         />
       )}
+
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Account"
+        description={
+          accountToDelete
+            ? `Are you sure you want to delete "${accountToDelete.name}"? This will also delete all associated transactions. This action cannot be undone.`
+            : 'Are you sure you want to delete this account? This will also delete all associated transactions. This action cannot be undone.'
+        }
+        isLoading={accountToDelete ? isDeleting === accountToDelete.id : false}
+      />
     </div>
   );
 }

@@ -44,6 +44,8 @@ export function useAccounts(): UseAccountsResult {
         return;
       }
 
+      // This function now just performs the deletion
+      // The confirmation should be handled in the component that uses this hook
       try {
         setIsDeleting(account.id);
         const previous = accounts;
