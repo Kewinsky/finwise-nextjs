@@ -217,7 +217,10 @@ export class AIAssistantService {
     const lowerMessage = message.toLowerCase();
 
     // Get recent data for context
-    const recentTransactionsResult = await this.transactionService.getRecentTransactions(userId, 5);
+    const recentTransactionsResult = await this.transactionService.getRecentTransactions(
+      userId,
+      10,
+    );
     const monthlySummaryResult = await this.transactionService.getMonthlySummary(userId);
 
     let answer = '';

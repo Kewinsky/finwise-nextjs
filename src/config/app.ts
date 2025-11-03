@@ -318,19 +318,6 @@ export const APP_SETTINGS = {
 } as const;
 
 /**
- * Feature flags
- */
-export const FEATURE_FLAGS = {
-  enableAnalytics: isProduction,
-  enableNotifications: true,
-  enableTeams: true,
-  enableApiAccess: true,
-  enableAdvancedReporting: false, // Coming soon
-  enableCustomBranding: false, // Coming soon
-  maintenanceMode: false,
-} as const;
-
-/**
  * Plan limits configuration
  */
 export type PlanLimits = {
@@ -649,9 +636,6 @@ export const appConfig = {
   // Application settings
   settings: APP_SETTINGS,
 
-  // Feature flags
-  features: FEATURE_FLAGS,
-
   // Subscription configuration (raw plans + helpers)
   subscription: SUBSCRIPTION_CONFIG,
 
@@ -747,5 +731,4 @@ export type AppMetadata = typeof APP_METADATA;
 export type AppUrls = typeof APP_URLS;
 export type ContactInfo = typeof CONTACT_INFO;
 export type AppSettings = typeof APP_SETTINGS;
-export type FeatureFlags = typeof FEATURE_FLAGS;
 export type AuthConfig = typeof AUTH_CONFIG;

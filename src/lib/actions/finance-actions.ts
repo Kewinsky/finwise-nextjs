@@ -496,7 +496,7 @@ export async function getDashboardData(dateRange?: { from?: Date; to?: Date }) {
       accountCountResult,
     ] = await Promise.all([
       transactionService.getMonthlySummary(user.id),
-      transactionService.getRecentTransactions(user.id, 5),
+      transactionService.getRecentTransactions(user.id, 10),
       transactionService.getSpendingTrends(user.id, 7, dateRange),
       accountService.getTotalBalance(user.id),
       accountService.getAccountCount(user.id),

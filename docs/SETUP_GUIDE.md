@@ -363,14 +363,8 @@ The application uses a centralized configuration system located in `src/config/a
 - **Feature Lists**: What's included in each plan
 - **Usage Limits**: Project limits, storage limits, API call limits
 
-#### Feature Flags
-
-- **Development Features**: Beta features, debugging options
-- **Production Features**: Analytics, API access, etc.
-
 #### Helper Functions
 
-- **Feature Checking**: `hasFeature(plan, feature)`
 - **Limit Checking**: `hasReachedLimit(current, max)`
 - **Usage Calculation**: `getUsagePercentage(current, max)`
 - **URL Generation**: `getAbsoluteUrl(path)`
@@ -379,9 +373,6 @@ The application uses a centralized configuration system located in `src/config/a
 
 ```typescript
 import { appConfig } from '@/config/app';
-
-// Check if user has access to a feature
-const hasAnalytics = appConfig.helpers.hasFeature('pro', 'analytics');
 
 // Check usage limits
 const usagePercentage = appConfig.helpers.getUsagePercentage(8, 10);
@@ -415,17 +406,7 @@ export const PLAN_LIMITS: Record<PlanType, PlanLimits> = {
 };
 ```
 
-2. **Add New Features**:
-
-```typescript
-export const FEATURE_FLAGS = {
-  enableAnalytics: true,
-  enableApiAccess: true,
-  enableNewFeature: false, // Add your feature
-} as const;
-```
-
-3. **Update Plan Features**:
+2. **Update Plan Features**:
 
 ```typescript
 export const PLAN_FEATURES = {
