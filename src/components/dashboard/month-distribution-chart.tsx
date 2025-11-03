@@ -100,7 +100,7 @@ export function AccountDistributionChart({ className }: AccountDistributionChart
       <CardContent>
         {pieChartData.length > 0 ? (
           <>
-            <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
+            <ChartContainer config={chartConfig} className="h-[250px] sm:h-[300px] w-full">
               <PieChart>
                 <Pie
                   data={pieChartData}
@@ -123,12 +123,19 @@ export function AccountDistributionChart({ className }: AccountDistributionChart
             </ChartContainer>
 
             {/* Legend */}
-            <div className="mt-4 flex flex-wrap gap-4 justify-center">
+            <div className="mt-4 flex flex-wrap gap-2 sm:gap-4 justify-center">
               {pieChartData.map((item, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.fill }} />
-                  <span className="text-sm text-muted-foreground">
-                    {item.name}: {formatCurrency(item.value, baseCurrency)} (
+                <div key={index} className="flex items-center gap-1.5 sm:gap-2">
+                  <div
+                    className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full flex-shrink-0"
+                    style={{ backgroundColor: item.fill }}
+                  />
+                  <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
+                    <span className="hidden sm:inline">{item.name}: </span>
+                    <span className="sm:hidden">
+                      {item.name.length > 10 ? `${item.name.substring(0, 10)}...` : item.name}:{' '}
+                    </span>
+                    {formatCurrency(item.value, baseCurrency)} (
                     {totalBalance > 0 ? `${((item.value / totalBalance) * 100).toFixed(1)}%` : '0%'}
                     )
                   </span>
@@ -137,8 +144,8 @@ export function AccountDistributionChart({ className }: AccountDistributionChart
             </div>
           </>
         ) : (
-          <div className="flex items-center justify-center h-[300px] text-center text-muted-foreground">
-            <p>No accounts with balance available</p>
+          <div className="flex items-center justify-center h-[250px] sm:h-[300px] text-center text-muted-foreground">
+            <p className="text-sm sm:text-base">No accounts with balance available</p>
           </div>
         )}
       </CardContent>

@@ -54,12 +54,12 @@ export function QuickActionsCard({ onAddTransaction }: QuickActionsCardProps) {
         <CardDescription>Common tasks at your fingertips</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
           {actions.map((action) => (
             <Button
               key={action.label}
               variant="outline"
-              className="h-20 sm:h-24 flex flex-col items-center gap-1 sm:gap-2 transition-all duration-200 group"
+              className="h-auto min-h-[100px] sm:min-h-[120px] py-3 sm:py-4 flex flex-col items-center justify-center gap-2 transition-all duration-200 group"
               onClick={() => {
                 if (action.onClick) {
                   action.onClick();
@@ -73,9 +73,11 @@ export function QuickActionsCard({ onAddTransaction }: QuickActionsCardProps) {
               >
                 <action.icon className="w-4 h-4 text-white" />
               </div>
-              <div className="text-center">
-                <p className="font-medium text-sm">{action.label}</p>
-                <p className="text-xs text-muted-foreground">{action.description}</p>
+              <div className="text-center space-y-0.5">
+                <p className="font-medium text-xs sm:text-sm leading-tight">{action.label}</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight hidden sm:block">
+                  {action.description}
+                </p>
               </div>
             </Button>
           ))}

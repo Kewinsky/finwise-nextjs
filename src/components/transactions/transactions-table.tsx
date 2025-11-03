@@ -36,7 +36,6 @@ export function TransactionsTable({
   transactions,
   allTransactions,
   filteredTransactions,
-  sortedTransactionsLength,
   accounts,
   filters,
   selectedRows,
@@ -54,7 +53,6 @@ export function TransactionsTable({
   onItemsPerPageChange,
   onAddTransaction,
 }: TransactionsTableProps) {
-  const startIndex = (currentPage - 1) * itemsPerPage;
   const allSelected = selectedRows.length === transactions.length && transactions.length > 0;
 
   return (
@@ -113,8 +111,6 @@ export function TransactionsTable({
           currentPage={currentPage}
           totalPages={totalPages}
           itemsPerPage={itemsPerPage}
-          startIndex={startIndex}
-          totalItems={sortedTransactionsLength}
           onPageChange={onPageChange}
           onItemsPerPageChange={onItemsPerPageChange}
         />

@@ -94,12 +94,19 @@ export function MetricCard({
   };
 
   return (
-    <Card className={cn('bg-gradient-to-br shadow-lg', gradientFrom, gradientTo, borderColor)}>
+    <Card
+      className={cn(
+        'bg-gradient-to-br shadow-lg flex flex-col',
+        gradientFrom,
+        gradientTo,
+        borderColor,
+      )}
+    >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className={cn('text-sm font-medium', textColor)}>{title}</CardTitle>
         <Icon className={cn('h-4 w-4', iconColor)} />
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-col justify-end flex-1 mt-auto">
         <div className={cn('text-2xl font-bold', valueColor)}>
           <NumberTicker
             value={value}

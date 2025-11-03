@@ -48,35 +48,42 @@ export function TopCategoriesChart({ categorySpending }: TopCategoriesChartProps
       <CardContent>
         {topCategoriesData.length > 0 ? (
           <>
-            <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
+            <ChartContainer config={chartConfig} className="h-[250px] sm:h-[300px] w-full">
               <BarChart accessibilityLayer data={topCategoriesData}>
                 <CartesianGrid vertical={false} />
                 <ChartTooltip
                   cursor={false}
                   content={<SimpleChartTooltip labelKey="name" currency={baseCurrency} />}
                 />
-                <Bar dataKey="value" radius={8} />
+                <Bar dataKey="value" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ChartContainer>
 
             {/* Category List */}
-            <div className="mt-4 flex flex-wrap gap-4 justify-center">
+            <div className="mt-4 flex flex-wrap gap-2 sm:gap-4 justify-center">
               {topCategoriesData.map((category, index) => (
-                <div key={index} className="flex items-center gap-2">
+                <div key={index} className="flex items-center gap-1.5 sm:gap-2">
                   <div
-                    className="w-3 h-3 rounded-full"
+                    className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full flex-shrink-0"
                     style={{ backgroundColor: category.fill }}
                   />
-                  <span className="text-sm text-muted-foreground">
-                    {category.name}: {formatCurrency(category.value, baseCurrency)}
+                  <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
+                    <span className="hidden sm:inline">{category.name}: </span>
+                    <span className="sm:hidden">
+                      {category.name.length > 10
+                        ? `${category.name.substring(0, 10)}...`
+                        : category.name}
+                      :{' '}
+                    </span>
+                    {formatCurrency(category.value, baseCurrency)}
                   </span>
                 </div>
               ))}
             </div>
           </>
         ) : (
-          <div className="flex items-center justify-center h-[300px] text-muted-foreground">
-            <p>No category data available</p>
+          <div className="flex items-center justify-center h-[250px] sm:h-[300px] text-muted-foreground">
+            <p className="text-sm sm:text-base">No category data available</p>
           </div>
         )}
       </CardContent>

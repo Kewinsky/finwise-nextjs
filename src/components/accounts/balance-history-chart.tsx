@@ -31,22 +31,26 @@ export function BalanceHistoryChartComponent({ accounts }: BalanceHistoryChartPr
   return (
     <Card className="w-full">
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
           <div className="flex flex-col gap-2">
-            <CardTitle className="flex items-center gap-2">
-              <AreaChart className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+              <AreaChart className="h-4 w-4 sm:h-5 sm:w-5" />
               Balance History
             </CardTitle>
-            <CardDescription>Track your balance history over time</CardDescription>
+            <CardDescription className="text-xs sm:text-sm">
+              Track your balance history over time
+            </CardDescription>
           </div>
-          <BalanceHistoryFilters
-            accounts={accounts}
-            selectedYear={selectedYear}
-            selectedAccounts={selectedAccounts}
-            years={years}
-            onYearChange={setSelectedYear}
-            onAccountsChange={setSelectedAccounts}
-          />
+          <div className="flex-shrink-0">
+            <BalanceHistoryFilters
+              accounts={accounts}
+              selectedYear={selectedYear}
+              selectedAccounts={selectedAccounts}
+              years={years}
+              onYearChange={setSelectedYear}
+              onAccountsChange={setSelectedAccounts}
+            />
+          </div>
         </div>
       </CardHeader>
       <CardContent>
