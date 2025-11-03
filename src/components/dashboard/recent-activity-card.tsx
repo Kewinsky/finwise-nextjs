@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { ArrowRightLeft, ArrowRight, TrendingUp, TrendingDown } from 'lucide-react';
 import { formatCurrency, formatDisplayDate } from '@/lib/utils';
+import { useBaseCurrency } from '@/hooks/use-base-currency';
 import type { DashboardMetrics } from '@/types/finance.types';
 
 interface RecentActivityCardProps {
@@ -13,6 +14,7 @@ interface RecentActivityCardProps {
 
 export function RecentActivityCard({ recentTransactions }: RecentActivityCardProps) {
   const router = useRouter();
+  const baseCurrency = useBaseCurrency();
 
   const getTransactionIcon = (type: string) => {
     switch (type) {
@@ -64,31 +66,35 @@ export function RecentActivityCard({ recentTransactions }: RecentActivityCardPro
         </Button>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {recentTransactions.map((transaction) => {
-            const Icon = getTransactionIcon(transaction.type);
-            const styles = getTransactionStyles(transaction.type);
+        <div className="space-y-4 max-h-[600px] overflow-y-auto">
+          {recentTransactions.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">No recent transactions</p>
+          ) : (
+            recentTransactions.map((transaction) => {
+              const Icon = getTransactionIcon(transaction.type);
+              const styles = getTransactionStyles(transaction.type);
 
-            return (
-              <div key={transaction.id} className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className={`rounded-full p-2 ${styles.bg}`}>
-                    <Icon className="h-4 w-4" />
+              return (
+                <div key={transaction.id} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className={`rounded-full p-2 ${styles.bg}`}>
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{transaction.description}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {transaction.category} • {formatDisplayDate(transaction.date)}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium">{transaction.description}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {transaction.category} • {formatDisplayDate(transaction.date)}
-                    </p>
+                  <div className={`text-sm font-medium ${styles.text}`}>
+                    {styles.prefix}
+                    {formatCurrency(transaction.amount, baseCurrency)}
                   </div>
                 </div>
-                <div className={`text-sm font-medium ${styles.text}`}>
-                  {styles.prefix}
-                  {formatCurrency(transaction.amount)}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </CardContent>
     </Card>

@@ -8,6 +8,7 @@ import {
   type FontValue,
   type FontSizeValue,
 } from '@/config/app';
+import { DEFAULT_CURRENCY, SUPPORTED_CURRENCIES } from '@/types/finance.types';
 
 /**
  * User preferences interface - MVP version
@@ -23,6 +24,9 @@ export interface UserPreferences {
 
   // UI preferences
   headerTitlePreference: HeaderTitleType;
+
+  // Financial preferences
+  baseCurrency: string; // ISO 4217 currency code (e.g., 'USD', 'EUR')
 }
 
 /**
@@ -33,6 +37,7 @@ export const defaultUserPreferences: UserPreferences = {
   systemFont: DEFAULT_FONT,
   fontSize: DEFAULT_FONT_SIZE,
   headerTitlePreference: 'time-based',
+  baseCurrency: DEFAULT_CURRENCY,
 };
 
 /**
@@ -139,6 +144,15 @@ export const preferencesHelpers = {
       }
     }
 
+    // Validate base currency
+    if (preferences.baseCurrency !== undefined) {
+      if (SUPPORTED_CURRENCIES.includes(preferences.baseCurrency)) {
+        sanitized.baseCurrency = preferences.baseCurrency;
+      } else {
+        errors.push('Invalid base currency code');
+      }
+    }
+
     return {
       isValid: errors.length === 0,
       errors,
@@ -189,6 +203,7 @@ export type UserPreferencesInsert = {
   system_font?: string;
   font_size?: string;
   header_title_preference?: string;
+  base_currency?: string;
 };
 
 /**
@@ -199,6 +214,7 @@ export type UserPreferencesUpdate = {
   system_font?: string;
   font_size?: string;
   header_title_preference?: string;
+  base_currency?: string;
 };
 
 /**
@@ -210,6 +226,7 @@ export function dbToAppPreferences(db: UserPreferencesDB): UserPreferences {
     systemFont: db.system_font as FontValue,
     fontSize: db.font_size as FontSizeValue,
     headerTitlePreference: (db.header_title_preference as HeaderTitleType) || 'time-based',
+    baseCurrency: (db.base_currency as string) || DEFAULT_CURRENCY,
   };
 }
 
@@ -223,6 +240,7 @@ export function appToDbPreferences(app: UserPreferences, userId: string): UserPr
     system_font: app.systemFont,
     font_size: app.fontSize,
     header_title_preference: app.headerTitlePreference,
+    base_currency: app.baseCurrency,
   };
 }
 
@@ -237,6 +255,7 @@ export function appToDbUpdate(app: PartialUserPreferences): UserPreferencesUpdat
   if (app.fontSize !== undefined) update.font_size = app.fontSize;
   if (app.headerTitlePreference !== undefined)
     update.header_title_preference = app.headerTitlePreference;
+  if (app.baseCurrency !== undefined) update.base_currency = app.baseCurrency;
 
   return update;
 }

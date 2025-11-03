@@ -7,7 +7,7 @@ import { useDashboardData } from '@/hooks/use-dashboard-data';
 import { useCategorySpending } from '@/hooks/use-category-spending';
 import { MetricsGrid } from '@/components/dashboard/metrics-grid';
 import { FinancialTrendsChart } from '@/components/dashboard/financial-trends-chart';
-import { MonthDistributionChart } from '@/components/dashboard/month-distribution-chart';
+import { AccountDistributionChart } from '@/components/dashboard/month-distribution-chart';
 import { TopCategoriesChart } from '@/components/dashboard/top-categories-chart';
 import { AISuggestionsCard } from '@/components/dashboard/ai-suggestions-card';
 import { RecentActivityCard } from '@/components/dashboard/recent-activity-card';
@@ -59,7 +59,7 @@ export default function DashboardPage() {
       <FinancialTrendsChart dashboardData={dashboardData} />
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <MonthDistributionChart dashboardData={dashboardData} />
+        <AccountDistributionChart />
         <TopCategoriesChart categorySpending={monthlyCategorySpending} />
       </div>
 

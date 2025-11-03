@@ -90,7 +90,18 @@ const baseTransactionSchema = z.object({
   date: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
-    .refine((date) => !isNaN(Date.parse(date)), 'Invalid date'),
+    .refine((date) => !isNaN(Date.parse(date)), 'Invalid date')
+    .refine(
+      (date) => {
+        const transactionDate = new Date(date);
+        const maxFutureDate = new Date();
+        maxFutureDate.setFullYear(maxFutureDate.getFullYear() + 1);
+        return transactionDate <= maxFutureDate;
+      },
+      {
+        message: 'Transaction date cannot be more than 1 year in the future',
+      },
+    ),
   notes: z
     .string()
     .max(500, 'Notes must be less than 500 characters')
@@ -181,7 +192,7 @@ export const transactionFormSchema = z
         message: 'Amount must be a positive number',
       }),
     description: z.string().min(1, 'Description is required'),
-    category: z.string().min(1, 'Category is required'),
+    category: z.string().optional(),
     date: z.date(),
     notes: z.string().optional(),
     fromAccount: z.string().optional(),
@@ -189,34 +200,118 @@ export const transactionFormSchema = z
   })
   .refine(
     (data) => {
-      if (data.type === 'income' && !data.toAccount) return false;
-      if (data.type === 'expense' && !data.fromAccount) return false;
-      if (
-        data.type === 'transfer' &&
-        (!data.fromAccount || !data.toAccount || data.fromAccount === data.toAccount)
-      )
+      // For transfers, category is optional (will be auto-set to 'transfer')
+      if (data.type === 'transfer') {
+        return true; // Always allow transfers, category will be auto-set
+      }
+      // For other types, category is required
+      if (!data.category || data.category.length === 0) {
         return false;
+      }
       return true;
     },
-    { message: 'Please select the required accounts' },
+    {
+      message: 'Category is required',
+      path: ['category'],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.type === 'income' && !data.toAccount) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'To account is required for income',
+      path: ['toAccount'],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.type === 'expense' && !data.fromAccount) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'From account is required for expenses',
+      path: ['fromAccount'],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.type === 'transfer' && !data.fromAccount) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'From account is required for transfers',
+      path: ['fromAccount'],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.type === 'transfer' && !data.toAccount) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'To account is required for transfers',
+      path: ['toAccount'],
+    },
+  )
+  .refine(
+    (data) => {
+      if (
+        data.type === 'transfer' &&
+        data.fromAccount &&
+        data.toAccount &&
+        data.fromAccount === data.toAccount
+      ) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'From and to accounts must be different',
+      path: ['toAccount'],
+    },
   );
 
-export const transactionFiltersSchema = z.object({
-  accountId: z.string().uuid('Invalid account ID').optional(),
-  type: transactionTypeSchema.optional(),
-  category: z.string().max(50).optional(),
-  dateFrom: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
-    .optional(),
-  dateTo: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
-    .optional(),
-  minAmount: z.number().min(0).optional(),
-  maxAmount: z.number().min(0).optional(),
-  search: z.string().max(100).optional(),
-});
+export const transactionFiltersSchema = z
+  .object({
+    accountId: z.string().uuid('Invalid account ID').optional(),
+    type: transactionTypeSchema.optional(),
+    category: z.string().max(50).optional(),
+    dateFrom: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+      .optional(),
+    dateTo: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+      .optional(),
+    minAmount: z.number().min(0).optional(),
+    maxAmount: z.number().min(0).optional(),
+    search: z.string().max(100).optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.dateFrom && data.dateTo) {
+        const from = new Date(data.dateFrom);
+        const to = new Date(data.dateTo);
+        return from <= to;
+      }
+      return true;
+    },
+    {
+      message: 'dateFrom must be before or equal to dateTo',
+      path: ['dateTo'],
+    },
+  );
 
 // =============================================================================
 // PAGINATION SCHEMAS
@@ -250,13 +345,25 @@ export const aiQuestionSchema = z.object({
 // EXPORT SCHEMAS
 // =============================================================================
 
-export const exportFiltersSchema = z.object({
-  dateFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
-  dateTo: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
-  accountIds: z.array(z.string().uuid()).optional(),
-  types: z.array(transactionTypeSchema).optional(),
-  categories: z.array(z.string()).optional(),
-});
+export const exportFiltersSchema = z
+  .object({
+    dateFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
+    dateTo: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
+    accountIds: z.array(z.string().uuid()).optional(),
+    types: z.array(transactionTypeSchema).optional(),
+    categories: z.array(z.string()).optional(),
+  })
+  .refine(
+    (data) => {
+      const from = new Date(data.dateFrom);
+      const to = new Date(data.dateTo);
+      return from <= to;
+    },
+    {
+      message: 'dateFrom must be before or equal to dateTo',
+      path: ['dateTo'],
+    },
+  );
 
 // =============================================================================
 // BULK OPERATIONS SCHEMAS

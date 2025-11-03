@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { TransactionForm } from '@/components/transactions/transaction-form';
 import { TransactionFiltersComponent } from '@/components/transactions/transaction-filters';
 import { TransactionsHeader } from '@/components/transactions/transactions-header';
@@ -36,7 +37,12 @@ export default function TransactionsPage() {
     refetch,
   } = useTransactions();
 
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [showForm, setShowForm] = useState(false);
+  const [defaultTransactionType, setDefaultTransactionType] = useState<
+    'expense' | 'income' | 'transfer' | undefined
+  >();
   const [editingTransaction, setEditingTransaction] = useState<{
     id: string;
     type: string;
@@ -50,6 +56,19 @@ export default function TransactionsPage() {
     notes?: string;
   } | null>(null);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+
+  // Check for openForm query parameter and open form if present
+  useEffect(() => {
+    const openForm = searchParams.get('openForm');
+    if (openForm && ['expense', 'income', 'transfer'].includes(openForm)) {
+      setDefaultTransactionType(openForm as 'expense' | 'income' | 'transfer');
+      setShowForm(true);
+      // Clean up URL by removing query param
+      const url = new URL(window.location.href);
+      url.searchParams.delete('openForm');
+      router.replace(url.pathname + url.search);
+    }
+  }, [searchParams, router]);
 
   const handleSort = (key: string) => {
     if (key !== 'date' && key !== 'amount') return;
@@ -127,6 +146,7 @@ export default function TransactionsPage() {
   const handleCloseForm = () => {
     setShowForm(false);
     setEditingTransaction(null);
+    setDefaultTransactionType(undefined);
   };
 
   if (isLoading) {
@@ -177,6 +197,7 @@ export default function TransactionsPage() {
           onOpenChange={handleCloseForm}
           onSuccess={handleTransactionSuccess}
           transaction={editingTransaction ?? undefined}
+          defaultType={defaultTransactionType}
         />
       )}
     </div>

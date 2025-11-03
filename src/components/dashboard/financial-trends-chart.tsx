@@ -10,6 +10,7 @@ import { SimpleChartTooltip } from '@/components/charts/simple-chart-tooltip';
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { TrendingUp } from 'lucide-react';
 import { useAreaChart, type TimeRange, type SeriesType } from '@/hooks/use-area-chart';
+import { useBaseCurrency } from '@/hooks/use-base-currency';
 import type { DashboardMetrics } from '@/types/finance.types';
 
 interface FinancialTrendsChartProps {
@@ -42,6 +43,7 @@ const chartConfig = {
 export function FinancialTrendsChart({ dashboardData }: FinancialTrendsChartProps) {
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('1M');
   const [selectedSeries, setSelectedSeries] = useState<SeriesType>('balance');
+  const baseCurrency = useBaseCurrency();
 
   const { data: areaChartData, isLoading: isLoadingAreaChart } = useAreaChart({
     timeRange: selectedTimeRange,
@@ -111,7 +113,10 @@ export function FinancialTrendsChart({ dashboardData }: FinancialTrendsChartProp
                 minTickGap={selectedTimeRange === '1M' ? 100 : 50}
                 interval={selectedTimeRange === '1M' ? Math.floor(areaChartData.length / 15) : 0}
               />
-              <ChartTooltip cursor={false} content={<SimpleChartTooltip labelKey="label" />} />
+              <ChartTooltip
+                cursor={false}
+                content={<SimpleChartTooltip labelKey="label" currency={baseCurrency} />}
+              />
               <Area
                 dataKey="value"
                 stroke={`var(--color-${selectedSeries})`}

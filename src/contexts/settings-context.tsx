@@ -11,6 +11,7 @@ import type { UserPreferences, PartialUserPreferences } from '@/types/user-prefe
 import { defaultUserPreferences, preferencesHelpers } from '@/types/user-preferences.types';
 import type { LanguageCode } from '@/config/app';
 import type { HeaderTitleType } from '@/types/header.types';
+import { SUPPORTED_CURRENCIES } from '@/types/finance.types';
 import { migrateLocalStoragePreferencesToDatabase } from '@/lib/user/preferences-migration';
 
 interface SettingsContextType {
@@ -21,6 +22,7 @@ interface SettingsContextType {
   fontSize: string;
   darkMode: boolean;
   headerTitlePreference: HeaderTitleType;
+  baseCurrency: string;
 
   // Preference setters (direct updates)
   setSystemFont: (font: FontKey) => void;
@@ -28,6 +30,7 @@ interface SettingsContextType {
   setFontSize: (fontSize: string) => void;
   setDarkMode: (enabled: boolean) => void;
   setHeaderTitlePreference: (preference: HeaderTitleType) => void;
+  setBaseCurrency: (currency: string) => void;
   setPreferences: (preferences: PartialUserPreferences) => void;
 
   // State
@@ -210,6 +213,14 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     setPreferences((prev) => ({ ...prev, headerTitlePreference: preference }));
   }, []);
 
+  const setBaseCurrency = useCallback((currency: string) => {
+    if (SUPPORTED_CURRENCIES.includes(currency)) {
+      setPreferences((prev) => ({ ...prev, baseCurrency: currency }));
+    } else {
+      log.warn({ currency }, 'Attempted to set unsupported base currency');
+    }
+  }, []);
+
   const setPreferencesCallback = useCallback((newPreferences: PartialUserPreferences) => {
     setPreferences((prev) => ({ ...prev, ...newPreferences }));
   }, []);
@@ -253,6 +264,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     fontSize: preferences.fontSize,
     darkMode: false, // Theme is now managed by next-themes directly
     headerTitlePreference: preferences.headerTitlePreference,
+    baseCurrency: preferences.baseCurrency,
 
     // Preference setters (direct updates)
     setSystemFont,
@@ -260,6 +272,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     setFontSize,
     setDarkMode,
     setHeaderTitlePreference,
+    setBaseCurrency,
     setPreferences: setPreferencesCallback,
 
     // State

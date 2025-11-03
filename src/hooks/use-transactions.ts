@@ -44,9 +44,11 @@ export function useTransactions(): UseTransactionsResult {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
 
-  const loadData = useCallback(async () => {
+  const loadData = useCallback(async (silent = false) => {
     try {
-      setIsLoading(true);
+      if (!silent) {
+        setIsLoading(true);
+      }
 
       const [transactionsResult, accountsResult] = await Promise.all([
         getTransactions(),
@@ -56,22 +58,30 @@ export function useTransactions(): UseTransactionsResult {
       if (transactionsResult.success && 'data' in transactionsResult) {
         setAllTransactions(transactionsResult.data.data);
       } else {
-        notifyError('Failed to load transactions', {
-          description: transactionsResult.error,
-        });
+        if (!silent) {
+          notifyError('Failed to load transactions', {
+            description: transactionsResult.error,
+          });
+        }
       }
 
       if (accountsResult.success && 'data' in accountsResult) {
         setAccounts(accountsResult.data);
       } else {
-        notifyError('Failed to load accounts', {
-          description: accountsResult.error,
-        });
+        if (!silent) {
+          notifyError('Failed to load accounts', {
+            description: accountsResult.error,
+          });
+        }
       }
     } catch {
-      notifyError('Failed to load data');
+      if (!silent) {
+        notifyError('Failed to load data');
+      }
     } finally {
-      setIsLoading(false);
+      if (!silent) {
+        setIsLoading(false);
+      }
     }
   }, []);
 
@@ -217,6 +227,6 @@ export function useTransactions(): UseTransactionsResult {
     setSortConfig,
     handleSelectAll,
     handleSelectRow,
-    refetch: loadData,
+    refetch: () => loadData(true), // Silent refetch - doesn't show loading spinner
   };
 }

@@ -1,3 +1,5 @@
+'use client';
+
 import { AreaChart } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import {
@@ -8,6 +10,8 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import { LineChart, Line, CartesianGrid, XAxis } from 'recharts';
+import { formatCurrency } from '@/lib/utils';
+import { useBaseCurrency } from '@/hooks/use-base-currency';
 import type { Account } from '@/types/finance.types';
 
 interface BalanceHistoryChartContentProps {
@@ -27,6 +31,8 @@ export function BalanceHistoryChartContent({
   selectedAccounts,
   hasData,
 }: BalanceHistoryChartContentProps) {
+  const baseCurrency = useBaseCurrency();
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -59,7 +65,11 @@ export function BalanceHistoryChartContent({
       >
         <CartesianGrid vertical={false} />
         <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={10} />
-        <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
+        <ChartTooltip
+          cursor={false}
+          content={<ChartTooltipContent indicator="line" />}
+          formatter={(value: number) => formatCurrency(value as number, baseCurrency)}
+        />
         {Array.from(selectedAccounts).map((accountId) => {
           const account = accounts.find((acc) => acc.id === accountId);
           if (!account) return null;

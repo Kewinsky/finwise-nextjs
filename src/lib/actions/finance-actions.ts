@@ -2,7 +2,12 @@
 
 import { createClientForServer } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
-import { AccountService, TransactionService, AIAssistantService } from '@/services';
+import {
+  AccountService,
+  TransactionService,
+  AIAssistantService,
+  CurrencyService,
+} from '@/services';
 import {
   createAccountSchema,
   updateAccountSchema,
@@ -177,6 +182,27 @@ export async function getAccountById(accountId: string) {
 }
 
 /**
+ * Get total balance across all accounts (with currency conversion)
+ */
+export async function getTotalBalance() {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const accountService = new AccountService(supabase);
+    return await accountService.getTotalBalance(user.id);
+  } catch (error) {
+    return handleActionError(error, 'getTotalBalance');
+  }
+}
+
+/**
  * Get balance history for accounts
  */
 export async function getBalanceHistory(filters: BalanceHistoryFilters) {
@@ -236,7 +262,7 @@ export async function createTransaction(formData: FormData) {
     const result = await transactionService.createTransaction(user.id, validatedData);
 
     if (result.success) {
-      revalidatePath('/transactions');
+      // Only revalidate dashboard and accounts - transactions page uses client-side refetch
       revalidatePath('/dashboard');
       revalidatePath('/accounts');
     }
@@ -289,7 +315,7 @@ export async function updateTransaction(transactionId: string, formData: FormDat
     );
 
     if (result.success) {
-      revalidatePath('/transactions');
+      // Only revalidate dashboard and accounts - transactions page uses client-side refetch
       revalidatePath('/dashboard');
       revalidatePath('/accounts');
     }
@@ -300,6 +326,35 @@ export async function updateTransaction(transactionId: string, formData: FormDat
       return handleValidationError(error, 'updateTransaction');
     }
     return handleActionError(error, 'updateTransaction');
+  }
+}
+
+/**
+ * Duplicate a transaction
+ */
+export async function duplicateTransaction(transactionId: string, newDate?: string) {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const transactionService = new TransactionService(supabase);
+    const result = await transactionService.duplicateTransaction(transactionId, user.id, newDate);
+
+    if (result.success) {
+      // Only revalidate dashboard and accounts - transactions page uses client-side refetch
+      revalidatePath('/dashboard');
+      revalidatePath('/accounts');
+    }
+
+    return result;
+  } catch (error) {
+    return handleActionError(error, 'duplicateTransaction');
   }
 }
 
@@ -321,7 +376,7 @@ export async function deleteTransaction(transactionId: string) {
     const result = await transactionService.deleteTransaction(transactionId, user.id);
 
     if (result.success) {
-      revalidatePath('/transactions');
+      // Only revalidate dashboard and accounts - transactions page uses client-side refetch
       revalidatePath('/dashboard');
       revalidatePath('/accounts');
     }
@@ -355,7 +410,7 @@ export async function deleteManyTransactions(transactionIds: string[]) {
     );
 
     if (result.success) {
-      revalidatePath('/transactions');
+      // Only revalidate dashboard and accounts - transactions page uses client-side refetch
       revalidatePath('/dashboard');
       revalidatePath('/accounts');
     }
@@ -441,7 +496,7 @@ export async function getDashboardData(dateRange?: { from?: Date; to?: Date }) {
       accountCountResult,
     ] = await Promise.all([
       transactionService.getMonthlySummary(user.id),
-      transactionService.getRecentTransactions(user.id, 5),
+      transactionService.getRecentTransactions(user.id, 10),
       transactionService.getSpendingTrends(user.id, 7, dateRange),
       accountService.getTotalBalance(user.id),
       accountService.getAccountCount(user.id),
@@ -532,6 +587,7 @@ export async function getFinancialSummary() {
 
 /**
  * Get account balance distribution for pie chart
+ * Converts all balances to user's base currency
  */
 export async function getAccountDistribution() {
   try {
@@ -545,7 +601,10 @@ export async function getAccountDistribution() {
     }
 
     const accountService = new AccountService(supabase);
-    const result = await accountService.getAccountBalances(user.id);
+    // Convert all balances to base currency for consistent display
+    const result = await accountService.getAccountBalances(user.id, {
+      convertToBaseCurrency: true,
+    });
 
     if (!result.success) {
       return { success: false, error: result.error };
@@ -555,6 +614,7 @@ export async function getAccountDistribution() {
       name: account.accountName,
       type: account.accountType,
       value: account.balance,
+      currency: account.currency, // Base currency after conversion
       color: account.color || '#3b82f6', // Use account color or default blue
     }));
 
@@ -817,6 +877,7 @@ export async function getWeeklyCashFlowTrend(dateRange: {
 
 /**
  * Get yearly cash flow trend data
+ * Optimized: Single query instead of 12 queries per year
  */
 export async function getYearlyCashFlowTrend(years = 3) {
   try {
@@ -829,33 +890,59 @@ export async function getYearlyCashFlowTrend(years = 3) {
       return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
     }
 
-    const transactionService = new TransactionService(supabase);
+    const currentYear = new Date().getFullYear();
+    const startYear = currentYear - (years - 1);
+    const startDate = new Date(`${startYear}-01-01`);
+    const endDate = new Date(`${currentYear}-12-31`);
+
+    // Single optimized query for all years
+    const { data: transactions, error } = await supabase
+      .from('transactions')
+      .select('date, amount, type')
+      .eq('user_id', user.id)
+      .gte('date', startDate.toISOString().split('T')[0])
+      .lte('date', endDate.toISOString().split('T')[0])
+      .order('date', { ascending: true });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    if (!transactions) {
+      return { success: true, data: [] };
+    }
+
+    // Group transactions by year and aggregate
+    const yearlyMap = new Map<number, { income: number; expenses: number }>();
+
+    transactions.forEach((transaction) => {
+      const date = new Date(transaction.date);
+      const year = date.getFullYear();
+
+      if (!yearlyMap.has(year)) {
+        yearlyMap.set(year, { income: 0, expenses: 0 });
+      }
+
+      const yearData = yearlyMap.get(year)!;
+      const amount = Number(transaction.amount) || 0;
+
+      if (transaction.type === 'income') {
+        yearData.income += amount;
+      } else if (transaction.type === 'expense') {
+        yearData.expenses += amount;
+      }
+    });
+
+    // Convert map to array with all years (including years with no transactions)
     const trendData = [];
-
-    for (let i = years - 1; i >= 0; i--) {
-      const targetYear = new Date().getFullYear() - i;
-
-      // Get yearly summary by aggregating all months in the year
-      const monthlyData = [];
-      for (let month = 1; month <= 12; month++) {
-        const result = await transactionService.getMonthlySummary(user.id, targetYear, month);
-        if (result.success) {
-          monthlyData.push(result.data);
-        }
-      }
-
-      if (monthlyData.length > 0) {
-        const yearlyIncome = monthlyData.reduce((sum, month) => sum + month.totalIncome, 0);
-        const yearlyExpenses = monthlyData.reduce((sum, month) => sum + month.totalExpenses, 0);
-        const yearlyNet = yearlyIncome - yearlyExpenses;
-
-        trendData.push({
-          year: targetYear.toString(),
-          income: yearlyIncome,
-          expenses: yearlyExpenses,
-          net: yearlyNet,
-        });
-      }
+    for (let year = startYear; year <= currentYear; year++) {
+      const yearData = yearlyMap.get(year) || { income: 0, expenses: 0 };
+      trendData.push({
+        year: year.toString(),
+        income: yearData.income,
+        expenses: yearData.expenses,
+        net: yearData.income - yearData.expenses,
+      });
     }
 
     return { success: true, data: trendData };
@@ -904,6 +991,7 @@ export async function getCategorySpendingBreakdown() {
 
 /**
  * Get category spending breakdown for a specific month
+ * Now uses optimized getCategorySpending with date range
  */
 export async function getCategorySpendingForMonth(year: number, month: number) {
   try {
@@ -920,46 +1008,25 @@ export async function getCategorySpendingForMonth(year: number, month: number) {
     const startDate = new Date(year, month - 1, 1); // month is 1-based, Date constructor is 0-based
     const endDate = new Date(year, month, 0); // Last day of the month
 
-    // Get transactions for the specific month
-    const { data: transactions, error } = await supabase
-      .from('transactions')
-      .select('category, amount')
-      .eq('user_id', user.id)
-      .eq('type', 'expense')
-      .gte('date', startDate.toISOString().split('T')[0])
-      .lte('date', endDate.toISOString().split('T')[0]);
-
-    if (error) {
-      return { success: false, error: error.message };
-    }
-
-    // Group by category and calculate totals
-    const categoryMap = new Map<string, { totalAmount: number; transactionCount: number }>();
-
-    transactions.forEach((transaction) => {
-      const amount = Number(transaction.amount);
-      const existing = categoryMap.get(transaction.category) || {
-        totalAmount: 0,
-        transactionCount: 0,
-      };
-      categoryMap.set(transaction.category, {
-        totalAmount: existing.totalAmount + amount,
-        transactionCount: existing.transactionCount + 1,
-      });
+    const transactionService = new TransactionService(supabase);
+    const result = await transactionService.getCategorySpending(user.id, 'expense', {
+      from: startDate.toISOString().split('T')[0],
+      to: endDate.toISOString().split('T')[0],
     });
 
-    const totalExpenses = Array.from(categoryMap.values()).reduce(
-      (sum, cat) => sum + cat.totalAmount,
-      0,
-    );
+    if (!result.success) {
+      return { success: false, error: result.error };
+    }
 
-    const breakdown = Array.from(categoryMap.entries())
-      .map(([category, data]) => ({
-        category,
-        amount: data.totalAmount,
-        percentage: totalExpenses > 0 ? Math.round((data.totalAmount / totalExpenses) * 100) : 0,
-        transactionCount: data.transactionCount,
-        avgCategory: Math.round(data.totalAmount * 0.8), // Placeholder - 80% of current amount as "average"
+    const totalExpenses = result.data.reduce((sum, item) => sum + item.totalAmount, 0);
+
+    const breakdown = result.data
+      .map((item) => ({
+        category: item.category,
+        amount: item.totalAmount,
+        percentage: totalExpenses > 0 ? Math.round((item.totalAmount / totalExpenses) * 100) : 0,
+        transactionCount: item.transactionCount,
+        avgCategory: Math.round(item.totalAmount * 0.8), // Placeholder - 80% of current amount as "average"
       }))
       .sort((a, b) => b.amount - a.amount);
 
@@ -1124,6 +1191,76 @@ export async function getFinancialHealthScore() {
 }
 
 // =============================================================================
+// CURRENCY ACTIONS
+// =============================================================================
+
+/**
+ * Convert amount from one currency to another
+ */
+export async function convertCurrency(amount: number, fromCurrency: string, toCurrency: string) {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const currencyService = new CurrencyService(supabase);
+    return await currencyService.convertAmount(amount, fromCurrency, toCurrency);
+  } catch (error) {
+    return handleActionError(error, 'convertCurrency');
+  }
+}
+
+/**
+ * Get exchange rate between two currencies
+ */
+export async function getExchangeRate(fromCurrency: string, toCurrency: string) {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const currencyService = new CurrencyService(supabase);
+    return await currencyService.getExchangeRate(fromCurrency, toCurrency);
+  } catch (error) {
+    return handleActionError(error, 'getExchangeRate');
+  }
+}
+
+/**
+ * Convert multiple amounts from different currencies to a target currency
+ */
+export async function convertMultipleAmounts(
+  amounts: Array<{ amount: number; currency: string }>,
+  targetCurrency: string,
+) {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const currencyService = new CurrencyService(supabase);
+    return await currencyService.convertMultipleAmounts(amounts, targetCurrency);
+  } catch (error) {
+    return handleActionError(error, 'convertMultipleAmounts');
+  }
+}
+
+// =============================================================================
 // AI ASSISTANT ACTIONS
 // =============================================================================
 
@@ -1247,7 +1384,10 @@ export async function exportTransactions(filters?: TransactionFilters) {
 /**
  * Export transactions to CSV format
  */
-export async function exportTransactionsToCSV(filters: TransactionFilters = {}) {
+export async function exportTransactionsToCSV(
+  filters: TransactionFilters = {},
+  options?: { convertToBaseCurrency?: boolean },
+) {
   try {
     const supabase = await createClientForServer();
     const {
@@ -1259,7 +1399,7 @@ export async function exportTransactionsToCSV(filters: TransactionFilters = {}) 
     }
 
     const transactionService = new TransactionService(supabase);
-    const result = await transactionService.exportTransactionsToCSV(user.id, filters);
+    const result = await transactionService.exportTransactionsToCSV(user.id, filters, options);
 
     if (!result.success) {
       return { success: false, error: result.error };
@@ -1268,5 +1408,35 @@ export async function exportTransactionsToCSV(filters: TransactionFilters = {}) 
     return { success: true, data: result.data };
   } catch (error) {
     return handleActionError(error, 'exportTransactionsToCSV');
+  }
+}
+
+/**
+ * Export transactions to JSON format
+ */
+export async function exportTransactionsToJSON(
+  filters: TransactionFilters = {},
+  options?: { convertToBaseCurrency?: boolean },
+) {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const transactionService = new TransactionService(supabase);
+    const result = await transactionService.exportTransactionsToJSON(user.id, filters, options);
+
+    if (!result.success) {
+      return { success: false, error: result.error };
+    }
+
+    return { success: true, data: result.data };
+  } catch (error) {
+    return handleActionError(error, 'exportTransactionsToJSON');
   }
 }
