@@ -38,15 +38,13 @@ CREATE TABLE public.accounts (
     name text NOT NULL,
     type account_type NOT NULL,
     balance numeric(12,2) DEFAULT 0 NOT NULL,
-    currency text DEFAULT 'USD' NOT NULL,
     color text,
     is_mandatory boolean DEFAULT false NOT NULL,
     created_at timestamptz DEFAULT now(),
     updated_at timestamptz DEFAULT now(),
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES public.profiles(id) ON DELETE CASCADE,
-    CHECK (balance >= 0), -- All accounts must have a non-negative balance
-    CHECK (currency ~ '^[A-Z]{3}$')
+    CHECK (balance >= 0) -- All accounts must have a non-negative balance
 );
 
 -- Transactions table - stores all user transactions
@@ -270,12 +268,17 @@ END $$;
 -- 
 -- What was created:
 -- ✅ accounts table with financial account information
--- ✅ transactions table with transaction records
+-- ✅ transactions table with transaction records (including currency field)
 -- ✅ account_type and transaction_type enums
 -- ✅ Performance indexes for optimal query performance
 -- ✅ Auto-update triggers for timestamps and account balances
 -- ✅ Row Level Security policies for data protection
 -- ✅ Automatic balance calculation when transactions change
 -- ✅ base_currency field added to user_preferences (if table exists)
+-- 
+-- Next steps:
+-- Run add-currency-and-mandatory-account-migration.sql to add:
+-- - Mandatory account creation and synchronization
+-- - Currency backfill for existing transactions
 -- 
 -- =============================================================================

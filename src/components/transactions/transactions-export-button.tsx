@@ -32,9 +32,7 @@ export function TransactionsExportButton({
     setIsExporting(true);
 
     try {
-      const result = await exportTransactionsToCSV(filters, {
-        convertToBaseCurrency: true,
-      });
+      const result = await exportTransactionsToCSV(filters);
 
       if (result.success && 'data' in result && result.data) {
         const filename = generateCSVFilename(filters);
@@ -60,9 +58,7 @@ export function TransactionsExportButton({
     setIsExporting(true);
 
     try {
-      const result = await exportTransactionsToJSON(filters, {
-        convertToBaseCurrency: true,
-      });
+      const result = await exportTransactionsToJSON(filters);
 
       if (result.success && 'data' in result && result.data) {
         const filename = generateJSONFilename(filters);

@@ -31,7 +31,6 @@ export interface CreateAccountInput {
   name: string;
   type: AccountType;
   balance?: number;
-  currency?: string;
   color?: string;
 }
 
@@ -39,7 +38,6 @@ export interface UpdateAccountInput {
   name?: string;
   type?: AccountType;
   balance?: number;
-  currency?: string;
   color?: string;
 }
 
@@ -71,7 +69,6 @@ export interface UpdateTransactionInput {
 
 export interface AccountFilters {
   type?: AccountType;
-  currency?: string;
   minBalance?: number;
   maxBalance?: number;
 }
@@ -128,7 +125,6 @@ export interface AccountBalance {
   accountName: string;
   accountType: AccountType;
   balance: number;
-  currency: string;
   color?: string;
 }
 
@@ -193,27 +189,15 @@ export interface TransactionExport {
 // CONSTANTS
 // =============================================================================
 
-export const ACCOUNT_TYPES: AccountType[] = ['checking', 'savings', 'investment', 'creditcard'];
-export const TRANSACTION_TYPES: TransactionType[] = ['income', 'expense', 'transfer'];
-
-export const DEFAULT_CURRENCY = 'USD';
-export const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'GBP', 'CAD', 'AUD'];
-
-export const COMMON_CATEGORIES = {
-  income: ['Salary', 'Freelance', 'Investment', 'Business', 'Other'],
-  expense: [
-    'Food & Dining',
-    'Transportation',
-    'Shopping',
-    'Entertainment',
-    'Bills & Utilities',
-    'Healthcare',
-    'Education',
-    'Travel',
-    'Other',
-  ],
-  transfer: ['Transfer', 'Payment', 'Refund', 'Other'],
-};
+// Re-export from config for backward compatibility
+export {
+  ACCOUNT_TYPES,
+  TRANSACTION_TYPES,
+  DEFAULT_CURRENCY,
+  SUPPORTED_CURRENCIES,
+  COMMON_CATEGORIES,
+  TRANSACTION_CATEGORIES,
+} from '@/config/app';
 
 // =============================================================================
 // FORM PROPS TYPES

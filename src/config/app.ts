@@ -317,6 +317,106 @@ export const APP_SETTINGS = {
   currencySymbol: '$',
 } as const;
 
+// =============================================================================
+// FINANCIAL CONFIGURATION
+// =============================================================================
+
+/**
+ * Supported currencies for the application
+ */
+export const SUPPORTED_CURRENCIES = [
+  'USD',
+  'EUR',
+  'GBP',
+  'JPY',
+  'CAD',
+  'AUD',
+  'CHF',
+  'CNY',
+  'PLN',
+] as const;
+
+export const DEFAULT_CURRENCY = 'USD' as const;
+
+/**
+ * Currency options with labels for display
+ */
+export const CURRENCY_OPTIONS = [
+  { value: 'USD', label: 'USD - US Dollar' },
+  { value: 'EUR', label: 'EUR - Euro' },
+  { value: 'GBP', label: 'GBP - British Pound' },
+  { value: 'JPY', label: 'JPY - Japanese Yen' },
+  { value: 'CAD', label: 'CAD - Canadian Dollar' },
+  { value: 'AUD', label: 'AUD - Australian Dollar' },
+  { value: 'CHF', label: 'CHF - Swiss Franc' },
+  { value: 'CNY', label: 'CNY - Chinese Yuan' },
+  { value: 'PLN', label: 'PLN - Polish Złoty' },
+] as const;
+
+/**
+ * Transaction types
+ */
+export const TRANSACTION_TYPES = ['income', 'expense', 'transfer'] as const;
+export type TransactionType = (typeof TRANSACTION_TYPES)[number];
+
+/**
+ * Account types
+ */
+export const ACCOUNT_TYPES = ['checking', 'savings', 'investment', 'creditcard'] as const;
+export type AccountType = (typeof ACCOUNT_TYPES)[number];
+
+/**
+ * Transaction categories with id and name
+ * This is the source of truth for all transaction categories
+ */
+export const TRANSACTION_CATEGORIES = {
+  income: [
+    { id: 'salary', name: 'Salary' },
+    { id: 'freelance', name: 'Freelance' },
+    { id: 'investment', name: 'Investment' },
+    { id: 'gift', name: 'Gift' },
+    { id: 'business', name: 'Business' },
+    { id: 'other', name: 'Other' },
+  ],
+  expense: [
+    { id: 'food', name: 'Food & Dining' },
+    { id: 'transport', name: 'Transportation' },
+    { id: 'shopping', name: 'Shopping' },
+    { id: 'utilities', name: 'Bills & Utilities' },
+    { id: 'entertainment', name: 'Entertainment' },
+    { id: 'healthcare', name: 'Healthcare' },
+    { id: 'education', name: 'Education' },
+    { id: 'travel', name: 'Travel' },
+    { id: 'other', name: 'Other' },
+  ],
+  transfer: [{ id: 'transfer', name: 'Transfer' }],
+} as const;
+
+/**
+ * Common categories as simple string arrays (for backward compatibility)
+ */
+export const COMMON_CATEGORIES = {
+  income: TRANSACTION_CATEGORIES.income.map((cat) => cat.name),
+  expense: TRANSACTION_CATEGORIES.expense.map((cat) => cat.name),
+  transfer: TRANSACTION_CATEGORIES.transfer.map((cat) => cat.name),
+} as const;
+
+/**
+ * Account colors for visual distinction
+ */
+export const ACCOUNT_COLORS = [
+  '#3B82F6', // Blue
+  '#10B981', // Green
+  '#F59E0B', // Yellow
+  '#EF4444', // Red
+  '#8B5CF6', // Purple
+  '#06B6D4', // Cyan
+  '#84CC16', // Lime
+  '#F97316', // Orange
+  '#EC4899', // Pink
+  '#6366F1', // Indigo
+] as const;
+
 /**
  * Plan limits configuration
  */
@@ -635,6 +735,17 @@ export const appConfig = {
 
   // Application settings
   settings: APP_SETTINGS,
+
+  // Financial configuration
+  finance: {
+    currencyOptions: CURRENCY_OPTIONS,
+    defaultCurrency: DEFAULT_CURRENCY,
+    transactionTypes: TRANSACTION_TYPES,
+    accountTypes: ACCOUNT_TYPES,
+    categories: TRANSACTION_CATEGORIES,
+    commonCategories: COMMON_CATEGORIES,
+    accountColors: ACCOUNT_COLORS,
+  },
 
   // Subscription configuration (raw plans + helpers)
   subscription: SUBSCRIPTION_CONFIG,

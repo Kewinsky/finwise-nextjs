@@ -9,7 +9,7 @@ import { AccountsHeader } from '@/components/accounts/accounts-header';
 import { TotalBalanceCard } from '@/components/accounts/total-balance-card';
 import { AccountsGrid } from '@/components/accounts/accounts-grid';
 import { EmptyAccountsState } from '@/components/accounts/empty-accounts-state';
-import { ACCOUNT_COLORS } from '@/lib/constants/accounts';
+import { ACCOUNT_COLORS } from '@/config/app';
 import { getTotalBalance } from '@/lib/actions/finance-actions';
 import { DeleteConfirmationDialog } from '@/components/common/delete-confirmation-dialog';
 import type { Account } from '@/types/finance.types';
@@ -117,7 +117,7 @@ export default function AccountsPage() {
           open={showForm}
           onOpenChange={handleCloseForm}
           account={editingAccount || undefined}
-          colors={ACCOUNT_COLORS}
+          colors={[...ACCOUNT_COLORS]}
           onSuccess={handleAccountSuccess}
         />
       )}

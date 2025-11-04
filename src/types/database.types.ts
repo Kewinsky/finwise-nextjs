@@ -15,7 +15,6 @@ export type Database = {
           name: string;
           type: 'checking' | 'savings' | 'investment' | 'creditcard';
           balance: number;
-          currency: string;
           color: string | null;
           is_mandatory: boolean;
           created_at: string | null;
@@ -27,7 +26,6 @@ export type Database = {
           name: string;
           type: 'checking' | 'savings' | 'investment' | 'creditcard';
           balance?: number;
-          currency?: string;
           color?: string | null;
           is_mandatory?: boolean;
           created_at?: string | null;
@@ -39,7 +37,6 @@ export type Database = {
           name?: string;
           type?: 'checking' | 'savings' | 'investment' | 'creditcard';
           balance?: number;
-          currency?: string;
           color?: string | null;
           is_mandatory?: boolean;
           created_at?: string | null;

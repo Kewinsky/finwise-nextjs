@@ -39,7 +39,6 @@ const accountSchema = z.object({
     .refine((val) => !isNaN(Number(val)), {
       message: 'Balance must be a valid number',
     }),
-  currency: z.string().min(1, 'Currency is required'),
   color: z.string().min(1, 'Color is required'),
 });
 
@@ -60,14 +59,6 @@ const accountTypes = Object.entries(ACCOUNT_TYPES)
     label: config.label,
   }));
 
-const currencies = [
-  { value: 'USD', label: 'USD - US Dollar' },
-  { value: 'EUR', label: 'EUR - Euro' },
-  { value: 'GBP', label: 'GBP - British Pound' },
-  { value: 'JPY', label: 'JPY - Japanese Yen' },
-  { value: 'CAD', label: 'CAD - Canadian Dollar' },
-];
-
 export function AccountForm({ open, onOpenChange, account, colors, onSuccess }: AccountFormProps) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -77,7 +68,6 @@ export function AccountForm({ open, onOpenChange, account, colors, onSuccess }: 
       name: '',
       type: 'checking',
       balance: '',
-      currency: 'USD',
       color: colors[0],
     },
   });
@@ -89,7 +79,6 @@ export function AccountForm({ open, onOpenChange, account, colors, onSuccess }: 
         name: account.name,
         type: account.type as 'checking' | 'savings' | 'creditcard' | 'investment',
         balance: account.balance.toString(),
-        currency: account.currency,
         color: account.color || colors[0],
       });
     } else {
@@ -97,7 +86,6 @@ export function AccountForm({ open, onOpenChange, account, colors, onSuccess }: 
         name: '',
         type: 'checking',
         balance: '',
-        currency: 'USD',
         color: colors[0],
       });
     }
@@ -110,7 +98,6 @@ export function AccountForm({ open, onOpenChange, account, colors, onSuccess }: 
       formData.append('name', data.name);
       formData.append('type', data.type);
       formData.append('balance', data.balance);
-      formData.append('currency', data.currency);
       formData.append('color', data.color);
 
       let result;
@@ -210,26 +197,6 @@ export function AccountForm({ open, onOpenChange, account, colors, onSuccess }: 
               </div>
               <FormError message={form.formState.errors.balance?.message} />
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="currency">Currency</Label>
-            <Select
-              value={form.watch('currency')}
-              onValueChange={(value) => form.setValue('currency', value)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select currency" />
-              </SelectTrigger>
-              <SelectContent>
-                {currencies.map((currency) => (
-                  <SelectItem key={currency.value} value={currency.value}>
-                    {currency.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormError message={form.formState.errors.currency?.message} />
           </div>
 
           <div className="space-y-3">

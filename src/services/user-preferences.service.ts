@@ -87,6 +87,7 @@ export class UserPreferencesService {
   /**
    * Update user preferences
    * Performs optimistic updates with conflict resolution
+   * Also handles mandatory account creation and currency synchronization
    */
   async updatePreferences(
     userId: string,

@@ -11,9 +11,6 @@ import type {
 } from '@/types/finance.types';
 import { log } from '@/lib/logger';
 import { ERROR_MESSAGES } from '@/lib/constants/errors';
-import { CurrencyService } from './currency.service';
-import { UserPreferencesService } from './user-preferences.service';
-import { DEFAULT_CURRENCY } from '@/types/finance.types';
 
 /**
  * AccountService handles all account-related business logic
@@ -53,10 +50,6 @@ export class AccountService {
 
       if (filters?.type) {
         query = query.eq('type', filters.type);
-      }
-
-      if (filters?.currency) {
-        query = query.eq('currency', filters.currency);
       }
 
       if (filters?.minBalance !== undefined) {
@@ -131,7 +124,6 @@ export class AccountService {
         name: input.name,
         type: input.type,
         balance: input.balance || 0,
-        currency: input.currency || 'USD',
         color: input.color || null,
       };
 
@@ -168,6 +160,12 @@ export class AccountService {
     try {
       log.info({ accountId, userId }, 'Updating account');
 
+      // First check if account exists and belongs to user
+      const accountResult = await this.getAccountById(accountId, userId);
+      if (!accountResult.success) {
+        return accountResult;
+      }
+
       // Build update object dynamically to avoid overwriting with undefined
       const updateData: Partial<Account> = {};
 
@@ -181,10 +179,6 @@ export class AccountService {
 
       if (input.balance !== undefined) {
         updateData.balance = input.balance;
-      }
-
-      if (input.currency !== undefined) {
-        updateData.currency = input.currency;
       }
 
       if (input.color !== undefined) {
@@ -285,23 +279,14 @@ export class AccountService {
 
   /**
    * Get total balance across all accounts for a user
-   * Converts all balances to the user's base currency
    */
   async getTotalBalance(userId: string): Promise<ServiceResult<number>> {
     try {
       log.info({ userId }, 'Calculating total balance');
 
-      // Get user's base currency from preferences
-      const preferencesService = new UserPreferencesService(this.supabase);
-      const preferencesResult = await preferencesService.getPreferences(userId);
-      const baseCurrency =
-        preferencesResult.success && preferencesResult.data.baseCurrency
-          ? preferencesResult.data.baseCurrency
-          : DEFAULT_CURRENCY;
-
       const { data, error } = await this.supabase
         .from('accounts')
-        .select('balance, currency')
+        .select('balance')
         .eq('user_id', userId);
 
       if (error) {
@@ -314,60 +299,9 @@ export class AccountService {
         return { success: true, data: 0 };
       }
 
-      // Convert all balances to base currency
-      const currencyService = new CurrencyService(this.supabase);
-      const amountsToConvert = data.map((account) => ({
-        amount: Number(account.balance),
-        currency: account.currency || DEFAULT_CURRENCY,
-      }));
+      const totalBalance = data.reduce((sum, account) => sum + Number(account.balance), 0);
 
-      log.info(
-        {
-          userId,
-          accounts: amountsToConvert.map((a) => `${a.amount} ${a.currency}`),
-          baseCurrency,
-        },
-        'Converting account balances to base currency',
-      );
-
-      const conversionResult = await currencyService.convertMultipleAmounts(
-        amountsToConvert,
-        baseCurrency,
-      );
-
-      if (!conversionResult.success) {
-        log.error(
-          {
-            userId,
-            error: conversionResult.error,
-            accounts: data.map((a) => `${a.balance} ${a.currency}`),
-          },
-          'Currency conversion failed, falling back to simple sum (THIS IS INCORRECT - amounts will be in different currencies!)',
-        );
-        // Fallback to simple sum if conversion fails (THIS IS A BUG - don't do this in production!)
-        const totalBalance = data.reduce((sum, account) => sum + Number(account.balance), 0);
-        log.error(
-          {
-            userId,
-            totalBalance,
-            warning: 'Returning incorrect sum - currencies were not converted!',
-          },
-          'CRITICAL: Currency conversion failed',
-        );
-        return { success: true, data: totalBalance };
-      }
-
-      const totalBalance = conversionResult.data || 0;
-
-      log.info(
-        {
-          userId,
-          totalBalance,
-          baseCurrency,
-          originalAmounts: amountsToConvert.map((a) => `${a.amount} ${a.currency}`),
-        },
-        'Total balance calculated with currency conversion',
-      );
+      log.info({ userId, totalBalance }, 'Total balance calculated');
       return { success: true, data: totalBalance };
     } catch (error) {
       log.error(error, 'Error calculating total balance');
@@ -380,32 +314,14 @@ export class AccountService {
 
   /**
    * Get account balances grouped by account
-   * Optionally converts all balances to user's base currency
    */
-  async getAccountBalances(
-    userId: string,
-    options?: { convertToBaseCurrency?: boolean },
-  ): Promise<ServiceResult<AccountBalance[]>> {
+  async getAccountBalances(userId: string): Promise<ServiceResult<AccountBalance[]>> {
     try {
-      log.info({ userId, options }, 'Fetching account balances');
-
-      // Get user's base currency if conversion is requested
-      let baseCurrency: string | undefined;
-      let currencyService: CurrencyService | undefined;
-
-      if (options?.convertToBaseCurrency) {
-        const preferencesService = new UserPreferencesService(this.supabase);
-        const preferencesResult = await preferencesService.getPreferences(userId);
-        baseCurrency =
-          preferencesResult.success && preferencesResult.data.baseCurrency
-            ? preferencesResult.data.baseCurrency
-            : DEFAULT_CURRENCY;
-        currencyService = new CurrencyService(this.supabase);
-      }
+      log.info({ userId }, 'Fetching account balances');
 
       const { data, error } = await this.supabase
         .from('accounts')
-        .select('id, name, type, balance, currency, color')
+        .select('id, name, type, balance, color')
         .eq('user_id', userId)
         .order('name');
 
@@ -414,55 +330,15 @@ export class AccountService {
         return { success: false, error: error.message };
       }
 
-      // Convert balances if requested
-      const balances: AccountBalance[] = await Promise.all(
-        data.map(async (account) => {
-          let balance = Number(account.balance);
-          let displayCurrency = account.currency || DEFAULT_CURRENCY;
+      const balances: AccountBalance[] = data.map((account) => ({
+        accountId: account.id,
+        accountName: account.name,
+        accountType: account.type as AccountType,
+        balance: Number(account.balance),
+        color: account.color || undefined,
+      }));
 
-          if (options?.convertToBaseCurrency && currencyService && baseCurrency) {
-            if (displayCurrency !== baseCurrency) {
-              const conversionResult = await currencyService.convertAmount(
-                balance,
-                displayCurrency,
-                baseCurrency,
-              );
-              if (conversionResult.success && conversionResult.data !== undefined) {
-                balance = conversionResult.data;
-                displayCurrency = baseCurrency;
-              } else {
-                log.warn(
-                  {
-                    account: account.name,
-                    currency: displayCurrency,
-                    baseCurrency,
-                    error: conversionResult.error,
-                  },
-                  'Failed to convert account balance, using original',
-                );
-              }
-            }
-          }
-
-          return {
-            accountId: account.id,
-            accountName: account.name,
-            accountType: account.type as AccountType,
-            balance,
-            currency: displayCurrency,
-            color: account.color || undefined,
-          };
-        }),
-      );
-
-      log.info(
-        {
-          userId,
-          count: balances.length,
-          baseCurrency: options?.convertToBaseCurrency ? baseCurrency : undefined,
-        },
-        'Account balances retrieved',
-      );
+      log.info({ userId, count: balances.length }, 'Account balances retrieved');
       return { success: true, data: balances };
     } catch (error) {
       log.error(error, 'Error fetching account balances');

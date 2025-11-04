@@ -36,25 +36,9 @@ import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { transactionFormSchema, TransactionFormData } from '@/validation/finance';
 import type { Account, TransactionFormProps } from '@/types';
 
-const categories = {
-  income: [
-    { id: 'salary', name: 'Salary' },
-    { id: 'freelance', name: 'Freelance' },
-    { id: 'investment', name: 'Investment' },
-    { id: 'gift', name: 'Gift' },
-    { id: 'other', name: 'Other' },
-  ],
-  expense: [
-    { id: 'food', name: 'Food & Dining' },
-    { id: 'transport', name: 'Transportation' },
-    { id: 'shopping', name: 'Shopping' },
-    { id: 'utilities', name: 'Utilities' },
-    { id: 'entertainment', name: 'Entertainment' },
-    { id: 'healthcare', name: 'Healthcare' },
-    { id: 'other', name: 'Other' },
-  ],
-  transfer: [{ id: 'transfer', name: 'Transfer' }],
-};
+import { TRANSACTION_CATEGORIES } from '@/config/app';
+
+const categories = TRANSACTION_CATEGORIES;
 
 const defaultFormValues = {
   amount: '',
@@ -111,7 +95,7 @@ export function TransactionForm({
     const supabase = createClientForBrowser();
     const { data, error } = await supabase
       .from('accounts')
-      .select('id, name, type, balance, currency, color, is_mandatory')
+      .select('id, name, type, balance, color, is_mandatory')
       .order('name');
 
     if (error) {
@@ -304,7 +288,7 @@ export function TransactionForm({
                 <div className="flex items-center justify-between gap-3 w-full">
                   <span>{account.name}</span>
                   <span className="text-xs text-muted-foreground">
-                    {account.currency} {Number(account.balance).toLocaleString()}
+                    {Number(account.balance).toLocaleString()}
                   </span>
                 </div>
               </SelectItem>

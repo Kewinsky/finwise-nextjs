@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSettings } from '@/contexts/settings-context';
-import { DEFAULT_CURRENCY } from '@/types/finance.types';
+import { DEFAULT_CURRENCY } from '@/config/app';
 
 /**
  * Hook to get user's base currency from preferences

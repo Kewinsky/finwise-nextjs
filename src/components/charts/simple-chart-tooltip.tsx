@@ -1,6 +1,6 @@
 import { useChart } from '@/components/ui/chart';
 import { formatCurrency } from '@/lib/utils';
-import { DEFAULT_CURRENCY } from '@/types/finance.types';
+import { DEFAULT_CURRENCY } from '@/config/app';
 
 interface SimpleChartTooltipProps {
   active?: boolean;

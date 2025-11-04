@@ -11,7 +11,7 @@ import type { UserPreferences, PartialUserPreferences } from '@/types/user-prefe
 import { defaultUserPreferences, preferencesHelpers } from '@/types/user-preferences.types';
 import type { LanguageCode } from '@/config/app';
 import type { HeaderTitleType } from '@/types/header.types';
-import { SUPPORTED_CURRENCIES } from '@/types/finance.types';
+import { CURRENCY_OPTIONS } from '@/config/app';
 import { migrateLocalStoragePreferencesToDatabase } from '@/lib/user/preferences-migration';
 
 interface SettingsContextType {
@@ -214,7 +214,8 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
   }, []);
 
   const setBaseCurrency = useCallback((currency: string) => {
-    if (SUPPORTED_CURRENCIES.includes(currency)) {
+    const isValidCurrency = CURRENCY_OPTIONS.some((option) => option.value === currency);
+    if (isValidCurrency) {
       setPreferences((prev) => ({ ...prev, baseCurrency: currency }));
     } else {
       log.warn({ currency }, 'Attempted to set unsupported base currency');

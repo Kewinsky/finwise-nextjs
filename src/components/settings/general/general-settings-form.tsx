@@ -41,7 +41,7 @@ import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { Key } from 'lucide-react';
 import { LANGUAGE_OPTIONS, FONT_OPTIONS, FONT_SIZE_OPTIONS } from '@/config/app';
 import type { HeaderTitleType } from '@/types/header.types';
-import { SUPPORTED_CURRENCIES } from '@/types/finance.types';
+import { CURRENCY_OPTIONS } from '@/config/app';
 
 const HEADER_TITLE_OPTIONS = [
   { value: 'time-based', label: 'Time-Based Greetings', description: 'Good morning, John!' },
@@ -427,9 +427,9 @@ export function GeneralSettingsForm({
                   <SelectValue placeholder="Select Currency" />
                 </SelectTrigger>
                 <SelectContent>
-                  {SUPPORTED_CURRENCIES.map((currency) => (
-                    <SelectItem key={currency} value={currency}>
-                      {currency}
+                  {CURRENCY_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

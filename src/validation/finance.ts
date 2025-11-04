@@ -28,12 +28,6 @@ export const createAccountSchema = z.object({
     .max(999999999.99, 'Balance is too large')
     .optional()
     .default(0),
-  currency: z
-    .string()
-    .length(3, 'Currency must be a 3-letter code')
-    .regex(/^[A-Z]{3}$/, 'Currency must be uppercase letters')
-    .optional()
-    .default('USD'),
   color: z
     .string()
     .regex(/^#[0-9A-F]{6}$/i, 'Color must be a valid hex color')
@@ -53,11 +47,6 @@ export const updateAccountSchema = z.object({
     .min(0, 'Balance cannot be negative')
     .max(999999999.99, 'Balance is too large')
     .optional(),
-  currency: z
-    .string()
-    .length(3, 'Currency must be a 3-letter code')
-    .regex(/^[A-Z]{3}$/, 'Currency must be uppercase letters')
-    .optional(),
   color: z
     .string()
     .regex(/^#[0-9A-F]{6}$/i, 'Color must be a valid hex color')
@@ -66,7 +55,6 @@ export const updateAccountSchema = z.object({
 
 export const accountFiltersSchema = z.object({
   type: accountTypeSchema.optional(),
-  currency: z.string().length(3).optional(),
   minBalance: z.number().min(0).optional(),
   maxBalance: z.number().min(0).optional(),
 });

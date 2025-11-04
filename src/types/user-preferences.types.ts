@@ -4,11 +4,12 @@ import {
   DEFAULT_LANGUAGE,
   DEFAULT_FONT,
   DEFAULT_FONT_SIZE,
+  DEFAULT_CURRENCY,
+  CURRENCY_OPTIONS,
   type LanguageCode,
   type FontValue,
   type FontSizeValue,
 } from '@/config/app';
-import { DEFAULT_CURRENCY, SUPPORTED_CURRENCIES } from '@/types/finance.types';
 
 /**
  * User preferences interface - MVP version
@@ -146,7 +147,10 @@ export const preferencesHelpers = {
 
     // Validate base currency
     if (preferences.baseCurrency !== undefined) {
-      if (SUPPORTED_CURRENCIES.includes(preferences.baseCurrency)) {
+      const isValidCurrency = CURRENCY_OPTIONS.some(
+        (option) => option.value === preferences.baseCurrency,
+      );
+      if (isValidCurrency) {
         sanitized.baseCurrency = preferences.baseCurrency;
       } else {
         errors.push('Invalid base currency code');

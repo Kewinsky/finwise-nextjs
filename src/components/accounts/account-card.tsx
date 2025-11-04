@@ -10,6 +10,7 @@ import {
 import { Edit, Trash2, MoreVertical, LucideIcon } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { formatCurrency } from '@/lib/utils';
+import { useBaseCurrency } from '@/hooks/use-base-currency';
 import type { Account } from '@/types/finance.types';
 
 interface AccountCardProps {
@@ -29,6 +30,8 @@ export function AccountCard({
   onDelete,
   isDeleting,
 }: AccountCardProps) {
+  const baseCurrency = useBaseCurrency();
+
   return (
     <Card key={account.id} className="overflow-hidden p-0">
       <CardHeader
@@ -91,7 +94,7 @@ export function AccountCard({
                   : 'text-red-600 dark:text-red-400'
               }`}
             >
-              {formatCurrency(Math.abs(account.balance || 0), account.currency || 'USD')}
+              {formatCurrency(Math.abs(account.balance || 0), baseCurrency)}
               {account.balance < 0 && (
                 <span className="text-red-500 dark:text-red-400 ml-1">(Overdrawn)</span>
               )}

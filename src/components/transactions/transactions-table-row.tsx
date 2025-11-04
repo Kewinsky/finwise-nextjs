@@ -43,20 +43,6 @@ export function TransactionsTableRow({
 }: TransactionsTableRowProps) {
   const baseCurrency = useBaseCurrency();
 
-  // Get currency from transaction's account
-  const getTransactionCurrency = (): string => {
-    const accountId = transaction.from_account_id || transaction.to_account_id;
-    if (accountId) {
-      const account = accounts.find((acc) => acc.id === accountId);
-      if (account?.currency) {
-        return account.currency;
-      }
-    }
-    return baseCurrency;
-  };
-
-  const transactionCurrency = getTransactionCurrency();
-
   return (
     <TableRow key={transaction.id}>
       <TableCell>
@@ -76,7 +62,7 @@ export function TransactionsTableRow({
       <TableCell>{format(new Date(transaction.date), 'MMM dd, yyyy')}</TableCell>
       <TableCell className={`text-right font-medium ${getAmountClassName(transaction.type)}`}>
         {transaction.type === 'income' ? '+' : transaction.type === 'expense' ? '-' : ''}
-        {formatCurrency(Math.abs(transaction.amount), transactionCurrency)}
+        {formatCurrency(Math.abs(transaction.amount), baseCurrency)}
       </TableCell>
       <TableCell>
         <DropdownMenu>

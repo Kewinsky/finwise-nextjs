@@ -113,10 +113,8 @@ export function useBalanceHistory({ accounts }: UseBalanceHistoryParams): UseBal
     Array.from(selectedAccounts).forEach((accountId) => {
       const account = accounts.find((acc) => acc.id === accountId);
       if (account) {
-        // Include original currency in label for context
-        const currencyLabel = account.currency ? ` (${account.currency})` : '';
         config[accountId] = {
-          label: `${account.name}${currencyLabel}`,
+          label: account.name,
           color: account.color || '#3B82F6',
         };
       }
