@@ -7,7 +7,6 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/themes/theme-toggle';
 import { RefreshCw } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { generateHeaderTitle } from '@/lib/header-utils';
 import type { HeaderTitleType, FinancialSummary } from '@/types/header.types';
 import { useSettings } from '@/contexts/settings-context';
@@ -30,7 +29,6 @@ export function SiteHeader({
 }: SiteHeaderProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [displayTitle, setDisplayTitle] = useState(title || 'Dashboard');
-  const router = useRouter();
   const pathname = usePathname();
   const { headerTitlePreference } = useSettings();
 
@@ -51,18 +49,11 @@ export function SiteHeader({
     }
   }, [title, headerTitlePreference, userFullName, pathname, financialSummary]);
 
-  const handleRefresh = async () => {
+  const handleRefresh = () => {
     setIsRefreshing(true);
-    try {
-      // Refresh the current page
-      router.refresh();
-      // Add a small delay to show the loading state
-      await new Promise((resolve) => setTimeout(resolve, 500));
-    } catch (error) {
-      console.error('Failed to refresh page:', error);
-    } finally {
-      setIsRefreshing(false);
-    }
+    // Use window.location.reload() to refresh all data including client components
+    // This ensures all hooks and client-side state are refreshed
+    window.location.reload();
   };
 
   return (

@@ -5,8 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AreaChart, Area, XAxis, CartesianGrid } from 'recharts';
-import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
-import { SimpleChartTooltip } from '@/components/charts/simple-chart-tooltip';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { TrendingUp } from 'lucide-react';
 import { useAreaChart, type TimeRange, type SeriesType } from '@/hooks/use-area-chart';
@@ -17,28 +16,35 @@ interface FinancialTrendsChartProps {
   dashboardData: DashboardMetrics | null;
 }
 
-const chartConfig = {
-  income: {
-    label: 'Income',
-    color: 'var(--success)',
-  },
-  expenses: {
-    label: 'Expenses',
-    color: 'var(--destructive)',
-  },
-  balance: {
-    label: 'Balance',
-    color: 'var(--blue)',
-  },
-  savings: {
-    label: 'Savings',
-    color: 'var(--purple)',
-  },
-  value: {
-    label: 'Value',
-    color: 'var(--primary)',
-  },
-};
+/**
+ * Prepares chart config for AreaChart
+ */
+function prepareAreaChartConfig(
+  series: SeriesType,
+): Record<string, { label: string; color: string }> {
+  const configs: Record<SeriesType, { label: string; color: string }> = {
+    income: {
+      label: 'Income',
+      color: 'var(--success)',
+    },
+    expenses: {
+      label: 'Expenses',
+      color: 'var(--destructive)',
+    },
+    balance: {
+      label: 'Balance',
+      color: 'var(--blue)',
+    },
+    savings: {
+      label: 'Savings',
+      color: 'var(--purple)',
+    },
+  };
+
+  return {
+    value: configs[series],
+  };
+}
 
 export function FinancialTrendsChart({ dashboardData }: FinancialTrendsChartProps) {
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('1M');
@@ -50,6 +56,9 @@ export function FinancialTrendsChart({ dashboardData }: FinancialTrendsChartProp
     series: selectedSeries,
     dashboardData,
   });
+
+  const chartConfig = prepareAreaChartConfig(selectedSeries);
+  const chartColor = chartConfig.value.color;
 
   return (
     <Card>
@@ -113,16 +122,8 @@ export function FinancialTrendsChart({ dashboardData }: FinancialTrendsChartProp
                 minTickGap={selectedTimeRange === '1M' ? 100 : 50}
                 interval={selectedTimeRange === '1M' ? Math.floor(areaChartData.length / 15) : 0}
               />
-              <ChartTooltip
-                cursor={false}
-                content={<SimpleChartTooltip labelKey="label" currency={baseCurrency} />}
-              />
-              <Area
-                dataKey="value"
-                stroke={`var(--color-${selectedSeries})`}
-                fill={`var(--color-${selectedSeries})`}
-                fillOpacity={0.3}
-              />
+              <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+              <Area dataKey="value" stroke={chartColor} fill={chartColor} fillOpacity={0.3} />
             </AreaChart>
           </ChartContainer>
         )}

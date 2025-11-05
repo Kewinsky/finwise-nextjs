@@ -38,28 +38,34 @@ export function AccountCard({
         className="py-3 text-white relative"
         style={{ backgroundColor: account.color || '#3B82F6' }}
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-white/20">
+        <div className="flex items-center justify-between gap-2 min-w-0">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="p-2 rounded-lg bg-white/20 flex-shrink-0">
               <IconComponent className="h-5 w-5 text-white" />
             </div>
-            <div>
-              <h3 className="font-bold text-lg flex items-center gap-2">
-                {account.name}
+            <div className="min-w-0 flex-1">
+              <h3 className="font-bold text-lg flex items-center gap-2 min-w-0">
+                <span className="truncate">{account.name}</span>
                 {account.is_mandatory && (
-                  <span className="inline-flex items-center rounded px-2 py-0.5 text-xs font-medium bg-white/20 text-white border border-white/30">
+                  <Badge
+                    variant="destructive"
+                    className="bg-white/20 text-white border-white/30 flex-shrink-0"
+                  >
                     Mandatory
-                  </span>
+                  </Badge>
                 )}
               </h3>
-              <Badge variant="outline" className="bg-white/20 text-white border-white/30">
+              <Badge variant="outline" className="bg-white/20 text-white border-white/30 mt-1">
                 {typeLabel}
               </Badge>
             </div>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0 text-white hover:bg-white/20">
+              <Button
+                variant="ghost"
+                className="h-8 w-8 p-0 text-white hover:bg-white/20 flex-shrink-0"
+              >
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>

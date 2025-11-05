@@ -10,7 +10,6 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import { LineChart, Line, CartesianGrid, XAxis } from 'recharts';
-import { formatCurrency } from '@/lib/utils';
 import { useBaseCurrency } from '@/hooks/use-base-currency';
 import type { Account } from '@/types/finance.types';
 
@@ -65,11 +64,7 @@ export function BalanceHistoryChartContent({
       >
         <CartesianGrid vertical={false} />
         <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={10} />
-        <ChartTooltip
-          cursor={false}
-          content={<ChartTooltipContent indicator="line" />}
-          formatter={(value: number) => formatCurrency(value as number, baseCurrency)}
-        />
+        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
         {Array.from(selectedAccounts).map((accountId) => {
           const account = accounts.find((acc) => acc.id === accountId);
           if (!account) return null;
@@ -79,16 +74,16 @@ export function BalanceHistoryChartContent({
               key={accountId}
               dataKey={accountId}
               type="linear"
-              stroke={account.color || '#3B82F6'}
+              stroke={`var(--color-${accountId})`}
               strokeWidth={2}
               dot={{
-                fill: account.color || '#3B82F6',
+                fill: `var(--color-${accountId})`,
                 strokeWidth: 2,
                 r: 4,
               }}
               activeDot={{
                 r: 6,
-                stroke: account.color || '#3B82F6',
+                stroke: `var(--color-${accountId})`,
                 strokeWidth: 2,
               }}
             />

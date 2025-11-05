@@ -72,20 +72,24 @@ export function BalanceHistoryFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Accounts</SelectItem>
-            {accounts.map((account) => (
-              <SelectItem key={account.id} value={account.id}>
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: account.color || '#3B82F6' }}
-                  />
-                  {account.name}
-                  {selectedAccounts.has(account.id) && (
-                    <span className="text-xs text-green-600">✓</span>
-                  )}
-                </div>
-              </SelectItem>
-            ))}
+            {accounts.map((account) => {
+              const isSelected = selectedAccounts.has(account.id);
+              return (
+                <SelectItem key={account.id} value={account.id}>
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`w-3 h-3 rounded-full border ${
+                        isSelected ? '' : 'bg-transparent border-foreground dark:border-white'
+                      }`}
+                      style={
+                        isSelected ? { backgroundColor: account.color || '#3B82F6' } : undefined
+                      }
+                    />
+                    {account.name}
+                  </div>
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
       </div>

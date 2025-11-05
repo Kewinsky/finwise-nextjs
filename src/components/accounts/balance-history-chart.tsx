@@ -37,9 +37,7 @@ export function BalanceHistoryChartComponent({ accounts }: BalanceHistoryChartPr
               <AreaChart className="h-4 w-4 sm:h-5 sm:w-5" />
               Balance History
             </CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
-              Track your balance history over time
-            </CardDescription>
+            <CardDescription>Track your balance history over time</CardDescription>
           </div>
           <div className="flex-shrink-0">
             <BalanceHistoryFilters
