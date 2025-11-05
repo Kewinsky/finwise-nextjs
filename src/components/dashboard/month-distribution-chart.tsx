@@ -29,7 +29,6 @@ interface AccountDistributionChartProps {
 export function AccountDistributionChart({ className }: AccountDistributionChartProps) {
   const [accountData, setAccountData] = useState<AccountDistributionItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const baseCurrency = useBaseCurrency();
 
   useEffect(() => {
     const loadAccountData = async () => {

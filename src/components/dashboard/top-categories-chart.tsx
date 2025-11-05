@@ -62,8 +62,6 @@ function prepareBarChartData(
 }
 
 export function TopCategoriesChart({ categorySpending }: TopCategoriesChartProps) {
-  const baseCurrency = useBaseCurrency();
-
   const { chartData, chartConfig } = useMemo(
     () => prepareBarChartData(categorySpending, CATEGORY_COLORS),
     [categorySpending],

@@ -49,7 +49,6 @@ function prepareAreaChartConfig(
 export function FinancialTrendsChart({ dashboardData }: FinancialTrendsChartProps) {
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('1M');
   const [selectedSeries, setSelectedSeries] = useState<SeriesType>('balance');
-  const baseCurrency = useBaseCurrency();
 
   const { data: areaChartData, isLoading: isLoadingAreaChart } = useAreaChart({
     timeRange: selectedTimeRange,
