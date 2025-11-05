@@ -14,6 +14,8 @@ import { log } from '@/lib/logger';
 import { ERROR_MESSAGES } from '@/lib/constants/errors';
 import { TransactionService } from './transaction.service';
 import { AccountService } from './account.service';
+import { callOpenAI } from '@/lib/openai/client';
+import { isOpenAIConfigured } from '@/lib/openai/config';
 
 /**
  * AIAssistantService handles AI-powered financial insights and analysis
@@ -74,13 +76,50 @@ export class AIAssistantService {
       const spendingTrends = spendingTrendsResult.success ? spendingTrendsResult.data : [];
       const accountBalances = accountBalancesResult.success ? accountBalancesResult.data : [];
 
-      // Generate insights
-      const insights = this.analyzeFinancialData({
-        monthlySummary,
-        categorySpending,
-        spendingTrends,
-        accountBalances,
-      });
+      // Try to use AI for insights if configured, otherwise use rule-based analysis
+      let insights: FinancialInsights;
+
+      if (isOpenAIConfigured()) {
+        try {
+          log.info({ userId }, 'Using OpenAI API for insights generation');
+          const aiInsights = await this.generateAIInsights({
+            monthlySummary,
+            categorySpending,
+            spendingTrends,
+            accountBalances,
+          });
+
+          if (aiInsights) {
+            insights = aiInsights;
+          } else {
+            // Fallback to rule-based if AI fails
+            log.warn({ userId }, 'AI insights generation failed, using rule-based fallback');
+            insights = this.analyzeFinancialData({
+              monthlySummary,
+              categorySpending,
+              spendingTrends,
+              accountBalances,
+            });
+          }
+        } catch (error) {
+          log.error(error, 'Error generating AI insights, using rule-based fallback');
+          insights = this.analyzeFinancialData({
+            monthlySummary,
+            categorySpending,
+            spendingTrends,
+            accountBalances,
+          });
+        }
+      } else {
+        // Use rule-based analysis
+        log.info({ userId }, 'OpenAI not configured, using rule-based insights');
+        insights = this.analyzeFinancialData({
+          monthlySummary,
+          categorySpending,
+          spendingTrends,
+          accountBalances,
+        });
+      }
 
       log.info({ userId }, 'Financial insights generated successfully');
       return { success: true, data: insights };
@@ -100,18 +139,229 @@ export class AIAssistantService {
     try {
       log.info({ userId, messageLength: message.length }, 'Processing AI question');
 
-      // For now, we'll provide mock responses based on common questions
-      // In a real implementation, you'd integrate with OpenAI or another AI service
-      const response = await this.generateMockResponse(userId, message);
+      // Gather financial context
+      const [
+        monthlySummaryResult,
+        categorySpendingResult,
+        recentTransactionsResult,
+        accountBalancesResult,
+      ] = await Promise.all([
+        this.transactionService.getMonthlySummary(userId),
+        this.transactionService.getCategorySpending(userId, 'expense'),
+        this.transactionService.getRecentTransactions(userId, 10),
+        this.accountService.getAccountBalances(userId),
+      ]);
+
+      // Build context for AI
+      const context = {
+        monthlySummary: monthlySummaryResult.success
+          ? {
+              totalIncome: monthlySummaryResult.data.totalIncome,
+              totalExpenses: monthlySummaryResult.data.totalExpenses,
+              savings: monthlySummaryResult.data.savings,
+              transactionCount: monthlySummaryResult.data.transactionCount,
+            }
+          : undefined,
+        categorySpending: categorySpendingResult.success
+          ? categorySpendingResult.data.slice(0, 5).map((c) => ({
+              category: c.category,
+              amount: c.totalAmount || 0,
+              percentage: c.percentage || 0,
+            }))
+          : undefined,
+        recentTransactions: recentTransactionsResult.success
+          ? recentTransactionsResult.data.map((t) => ({
+              description: t.description,
+              amount: t.amount,
+              category: t.category,
+              date: t.date,
+              type: t.type,
+            }))
+          : undefined,
+        accountBalances: accountBalancesResult.success
+          ? accountBalancesResult.data.map((acc) => ({
+              accountName: acc.accountName,
+              balance: acc.balance,
+              accountType: acc.accountType,
+            }))
+          : undefined,
+      };
+
+      // Try OpenAI first, fallback to mock if not configured
+      let answer: string;
+      const suggestions: string[] = [];
+      const relatedData: {
+        transactions?: RecentTransaction[];
+        accounts?: AccountBalance[];
+      } = {};
+
+      if (isOpenAIConfigured()) {
+        // Use real OpenAI API
+        log.info({ userId }, 'Using OpenAI API for question');
+        const aiResponse = await callOpenAI(message, context);
+
+        if (aiResponse.error) {
+          log.warn({ userId, error: aiResponse.error }, 'OpenAI API error, using fallback');
+          // Fallback to mock response
+          const mockResponse = await this.generateMockResponse(userId, message);
+          answer = mockResponse.answer;
+          if (mockResponse.suggestions) {
+            suggestions.push(...mockResponse.suggestions);
+          }
+        } else {
+          answer = aiResponse.content;
+          // Generate suggestions based on context
+          if (context.monthlySummary) {
+            suggestions.push('Show me my spending by category');
+            suggestions.push('What are my biggest expenses this month?');
+          }
+          if (context.accountBalances && context.accountBalances.length > 0) {
+            suggestions.push('Show me my account details');
+          }
+          suggestions.push('How can I save more money?');
+          suggestions.push('What should I budget for?');
+        }
+      } else {
+        // Fallback to mock response
+        log.info({ userId }, 'OpenAI not configured, using mock response');
+        const mockResponse = await this.generateMockResponse(userId, message);
+        answer = mockResponse.answer;
+        if (mockResponse.suggestions) {
+          suggestions.push(...mockResponse.suggestions);
+        }
+      }
+
+      // Add related data
+      if (recentTransactionsResult.success) {
+        relatedData.transactions = recentTransactionsResult.data;
+      }
+      if (accountBalancesResult.success) {
+        relatedData.accounts = accountBalancesResult.data;
+      }
 
       log.info({ userId }, 'AI question processed successfully');
-      return { success: true, data: response };
+      return {
+        success: true,
+        data: {
+          answer,
+          suggestions,
+          relatedData,
+        },
+      };
     } catch (error) {
       log.error(error, 'Error processing AI question');
       return {
         success: false,
         error: error instanceof Error ? error.message : ERROR_MESSAGES.UNEXPECTED,
       };
+    }
+  }
+
+  /**
+   * Generate insights using AI (when OpenAI is configured)
+   */
+  private async generateAIInsights(data: {
+    monthlySummary: MonthlySummary;
+    categorySpending: CategorySpending[];
+    spendingTrends: SpendingTrends[];
+    accountBalances: AccountBalance[];
+  }): Promise<FinancialInsights | null> {
+    try {
+      const { monthlySummary, categorySpending, spendingTrends, accountBalances } = data;
+
+      // Build comprehensive prompt for AI
+      const prompt = `Analyze the following financial data and provide insights:
+
+Monthly Summary:
+- Total Income: $${monthlySummary.totalIncome.toFixed(2)}
+- Total Expenses: $${monthlySummary.totalExpenses.toFixed(2)}
+- Savings: $${monthlySummary.savings.toFixed(2)}
+- Transaction Count: ${monthlySummary.transactionCount}
+
+Top Spending Categories:
+${categorySpending
+  .slice(0, 5)
+  .map((c) => `- ${c.category}: $${(c.totalAmount || 0).toFixed(2)} (${c.percentage.toFixed(1)}%)`)
+  .join('\n')}
+
+Account Balances:
+${accountBalances.map((acc) => `- ${acc.accountName} (${acc.accountType}): $${acc.balance.toFixed(2)}`).join('\n')}
+
+Please provide:
+1. 3-4 spending insights (what patterns you notice)
+2. 3-4 savings tips (actionable advice)
+3. 2-3 budget optimization suggestions
+4. 2-3 areas of concern (if any)
+
+Format your response as a JSON object with these exact keys:
+{
+  "spendingInsights": ["insight1", "insight2", ...],
+  "savingsTips": ["tip1", "tip2", ...],
+  "budgetOptimization": ["suggestion1", "suggestion2", ...],
+  "areasOfConcern": ["concern1", "concern2", ...]
+}
+
+Be concise, specific, and use actual numbers from the data.`;
+
+      const systemPrompt = `You are a financial advisor AI. Analyze user financial data and provide clear, actionable insights. Always format responses as valid JSON.`;
+
+      const aiResponse = await callOpenAI(
+        prompt,
+        {
+          monthlySummary: {
+            totalIncome: monthlySummary.totalIncome,
+            totalExpenses: monthlySummary.totalExpenses,
+            savings: monthlySummary.savings,
+            transactionCount: monthlySummary.transactionCount,
+          },
+          categorySpending: categorySpending.slice(0, 5).map((c) => ({
+            category: c.category,
+            amount: c.totalAmount || 0,
+            percentage: c.percentage || 0,
+          })),
+          accountBalances: accountBalances.map((acc) => ({
+            accountName: acc.accountName,
+            balance: acc.balance,
+            accountType: acc.accountType,
+          })),
+        },
+        systemPrompt,
+      );
+
+      if (aiResponse.error || !aiResponse.content) {
+        return null;
+      }
+
+      // Try to parse JSON response
+      try {
+        // Extract JSON from response (sometimes AI wraps it in markdown)
+        const jsonMatch = aiResponse.content.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          log.warn('Could not extract JSON from AI response');
+          return null;
+        }
+
+        const parsed = JSON.parse(jsonMatch[0]) as FinancialInsights;
+
+        // Validate structure
+        if (
+          Array.isArray(parsed.spendingInsights) &&
+          Array.isArray(parsed.savingsTips) &&
+          Array.isArray(parsed.budgetOptimization) &&
+          Array.isArray(parsed.areasOfConcern)
+        ) {
+          return parsed;
+        }
+
+        log.warn('AI response structure invalid');
+        return null;
+      } catch (parseError) {
+        log.error(parseError, 'Failed to parse AI response as JSON');
+        return null;
+      }
+    } catch (error) {
+      log.error(error, 'Error in generateAIInsights');
+      return null;
     }
   }
 
@@ -210,8 +460,7 @@ export class AIAssistantService {
   }
 
   /**
-   * Generate mock response for AI questions
-   * In a real implementation, this would call OpenAI API
+   * Generate mock response for AI questions (fallback when OpenAI is not configured)
    */
   private async generateMockResponse(userId: string, message: string): Promise<AIQuestionResponse> {
     const lowerMessage = message.toLowerCase();
