@@ -46,7 +46,7 @@ export class AccountService {
         .from('accounts')
         .select('*')
         .eq('user_id', userId)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: true });
 
       if (filters?.type) {
         query = query.eq('type', filters.type);
