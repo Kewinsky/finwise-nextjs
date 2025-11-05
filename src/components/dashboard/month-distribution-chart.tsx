@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/chart';
 import { Wallet } from 'lucide-react';
 import { getAccountDistribution } from '@/lib/actions/finance-actions';
-import { useBaseCurrency } from '@/hooks/use-base-currency';
 
 interface AccountDistributionItem {
   name: string;

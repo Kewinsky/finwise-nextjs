@@ -9,7 +9,6 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { TrendingUp } from 'lucide-react';
 import { useAreaChart, type TimeRange, type SeriesType } from '@/hooks/use-area-chart';
-import { useBaseCurrency } from '@/hooks/use-base-currency';
 import type { DashboardMetrics } from '@/types/finance.types';
 
 interface FinancialTrendsChartProps {

@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { BarChart, Bar, CartesianGrid, XAxis, Cell, LabelList } from 'recharts';
 import { ChartContainer } from '@/components/ui/chart';
 import { BarChart3 } from 'lucide-react';
-import { useBaseCurrency } from '@/hooks/use-base-currency';
 import type { CategorySpending } from '@/hooks/use-category-spending';
 
 interface TopCategoriesChartProps {
