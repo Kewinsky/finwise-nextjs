@@ -18,22 +18,30 @@ export function useAccounts(): UseAccountsResult {
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
-  const loadAccounts = useCallback(async () => {
+  const loadAccounts = useCallback(async (silent = false) => {
     try {
-      setIsLoading(true);
+      if (!silent) {
+        setIsLoading(true);
+      }
       const result = await getAccounts();
 
       if (result.success && 'data' in result) {
         setAccounts(result.data as Account[]);
       } else {
-        notifyError('Failed to load accounts', {
-          description: result.error,
-        });
+        if (!silent) {
+          notifyError('Failed to load accounts', {
+            description: result.error,
+          });
+        }
       }
     } catch {
-      notifyError('Failed to load accounts');
+      if (!silent) {
+        notifyError('Failed to load accounts');
+      }
     } finally {
-      setIsLoading(false);
+      if (!silent) {
+        setIsLoading(false);
+      }
     }
   }, []);
 
@@ -77,7 +85,7 @@ export function useAccounts(): UseAccountsResult {
   return {
     accounts,
     isLoading,
-    refetch: loadAccounts,
+    refetch: () => loadAccounts(true), // Silent refetch - doesn't show loading spinner
     handleDeleteAccount,
     isDeleting,
   };
