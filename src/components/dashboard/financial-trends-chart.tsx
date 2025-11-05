@@ -10,6 +10,8 @@ import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { TrendingUp } from 'lucide-react';
 import { useAreaChart, type TimeRange, type SeriesType } from '@/hooks/use-area-chart';
 import type { DashboardMetrics } from '@/types/finance.types';
+import { ErrorState } from '@/components/common/error-state';
+import { NoDataState } from '@/components/common/no-data-state';
 
 interface FinancialTrendsChartProps {
   dashboardData: DashboardMetrics | null;
@@ -49,7 +51,11 @@ export function FinancialTrendsChart({ dashboardData }: FinancialTrendsChartProp
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('1M');
   const [selectedSeries, setSelectedSeries] = useState<SeriesType>('balance');
 
-  const { data: areaChartData, isLoading: isLoadingAreaChart } = useAreaChart({
+  const {
+    data: areaChartData,
+    isLoading: isLoadingAreaChart,
+    error: areaChartError,
+  } = useAreaChart({
     timeRange: selectedTimeRange,
     series: selectedSeries,
     dashboardData,
@@ -104,6 +110,21 @@ export function FinancialTrendsChart({ dashboardData }: FinancialTrendsChartProp
           <div className="flex items-center justify-center h-[400px]">
             <LoadingSpinner message="Loading chart data..." />
           </div>
+        ) : areaChartError ? (
+          <ErrorState
+            title="Failed to load chart data"
+            description={areaChartError}
+            variant="inline"
+            className="h-[400px]"
+          />
+        ) : areaChartData.length === 0 ? (
+          <NoDataState
+            icon={TrendingUp}
+            title="No chart data available"
+            description="Chart will appear once you have transaction data for this period"
+            variant="inline"
+            height="h-[400px]"
+          />
         ) : (
           <ChartContainer config={chartConfig} className="h-[400px] w-full">
             <AreaChart

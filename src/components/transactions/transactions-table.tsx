@@ -29,7 +29,7 @@ interface TransactionsTableProps {
   onBulkDelete: () => void;
   onPageChange: (page: number) => void;
   onItemsPerPageChange: (itemsPerPage: number) => void;
-  onAddTransaction: () => void;
+  onAddTransaction?: () => void;
 }
 
 export function TransactionsTable({
@@ -51,7 +51,6 @@ export function TransactionsTable({
   onBulkDelete,
   onPageChange,
   onItemsPerPageChange,
-  onAddTransaction,
 }: TransactionsTableProps) {
   const allSelected = selectedRows.length === transactions.length && transactions.length > 0;
 
@@ -85,10 +84,7 @@ export function TransactionsTable({
             />
             <TableBody>
               {transactions.length === 0 ? (
-                <EmptyTransactionsState
-                  hasTransactions={allTransactions.length > 0}
-                  onAddTransaction={onAddTransaction}
-                />
+                <EmptyTransactionsState hasTransactions={allTransactions.length > 0} />
               ) : (
                 transactions.map((transaction) => (
                   <TransactionsTableRow

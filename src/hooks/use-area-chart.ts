@@ -30,6 +30,7 @@ interface UseAreaChartParams {
 interface UseAreaChartResult {
   data: AreaChartDataPoint[];
   isLoading: boolean;
+  error: string | null;
   clearCache: () => void;
 }
 
@@ -164,6 +165,7 @@ export function useAreaChart({
 }: UseAreaChartParams): UseAreaChartResult {
   const [data, setData] = useState<AreaChartDataPoint[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const cacheRef = useRef<Map<string, AreaChartDataPoint[]>>(new Map());
 
   const loadData = useCallback(async () => {
@@ -177,6 +179,7 @@ export function useAreaChart({
     }
 
     setIsLoading(true);
+    setError(null);
     try {
       const { from, to } = getDateRange(timeRange);
       const useDailyAggregation = timeRange === '1W' || timeRange === '1M';
@@ -197,9 +200,18 @@ export function useAreaChart({
 
         setData(transformedData);
         cacheRef.current.set(cacheKey, transformedData);
+        setError(null);
+      } else {
+        const errorMessage = result.error || 'Failed to load chart data';
+        setError(errorMessage);
+        notifyError('Failed to load area chart data', {
+          description: errorMessage,
+        });
       }
     } catch (error) {
       console.error('Error loading area chart data:', error);
+      const errorMessage = 'Failed to load chart data';
+      setError(errorMessage);
       notifyError('Failed to load area chart data');
     } finally {
       setIsLoading(false);
@@ -214,5 +226,5 @@ export function useAreaChart({
     loadData();
   }, [loadData]);
 
-  return { data, isLoading, clearCache };
+  return { data, isLoading, error, clearCache };
 }

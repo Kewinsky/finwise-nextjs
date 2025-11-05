@@ -72,6 +72,20 @@ BEGIN
   VALUES (NEW.id)
   ON CONFLICT (user_id) DO NOTHING;
 
+  -- Create mandatory "Main Account" if accounts table exists
+  IF EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'accounts') THEN
+    INSERT INTO public.accounts (user_id, name, type, balance, color, is_mandatory)
+    VALUES (
+      NEW.id,
+      'Main Account',
+      'checking',
+      0,
+      '#3b82f6', -- Blue color
+      true
+    )
+    ON CONFLICT DO NOTHING;
+  END IF;
+
   RETURN NEW;
 END;
 $$;

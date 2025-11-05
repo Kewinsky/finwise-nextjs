@@ -3,6 +3,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { Zap, Target } from 'lucide-react';
+import { ErrorState } from '@/components/common/error-state';
+import { NoDataState } from '@/components/common/no-data-state';
 
 interface FinancialHealthScore {
   overallScore: number;
@@ -24,12 +26,14 @@ interface AISuggestionsCardProps {
   financialHealthScore: FinancialHealthScore | null;
   aiInsights: AIInsights | null;
   isLoadingInsights: boolean;
+  error?: string | null;
 }
 
 export function AISuggestionsCard({
   financialHealthScore,
   aiInsights,
   isLoadingInsights,
+  error = null,
 }: AISuggestionsCardProps) {
   if (isLoadingInsights) {
     return (
@@ -44,7 +48,7 @@ export function AISuggestionsCard({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center h-32">
+          <div className="flex items-center justify-center h-[250px] sm:h-[300px]">
             <LoadingSpinner message="Generating insights..." />
           </div>
         </CardContent>
@@ -52,7 +56,7 @@ export function AISuggestionsCard({
     );
   }
 
-  if (!aiInsights || aiInsights.recommendations.length === 0) {
+  if (error) {
     return (
       <Card>
         <CardHeader>
@@ -65,13 +69,46 @@ export function AISuggestionsCard({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center justify-center h-32 text-center">
-            <Target className="h-8 w-8 text-muted-foreground mb-2" />
-            <p className="text-sm text-muted-foreground">No AI suggestions available</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Add more transaction data to get personalized recommendations
-            </p>
-          </div>
+          <ErrorState
+            title="Failed to load AI suggestions"
+            description={error}
+            variant="inline"
+            className="h-[250px] sm:h-[300px]"
+          />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Check if we have valid data (not NaN or invalid scores)
+  const hasValidScore =
+    financialHealthScore &&
+    typeof financialHealthScore.overallScore === 'number' &&
+    !isNaN(financialHealthScore.overallScore) &&
+    financialHealthScore.overallScore >= 0 &&
+    financialHealthScore.overallScore <= 100;
+
+  // If no valid score or insights, show no data state
+  if (!hasValidScore || !aiInsights || aiInsights.recommendations.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Zap className="h-4 w-4" />
+            Smart AI Suggestions
+          </CardTitle>
+          <CardDescription>
+            Personalized recommendations based on your financial data
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <NoDataState
+            icon={Target}
+            title="No AI suggestions available"
+            description="Add more transaction data to get personalized recommendations"
+            variant="inline"
+            height="h-[250px] sm:h-[300px]"
+          />
         </CardContent>
       </Card>
     );
@@ -89,7 +126,7 @@ export function AISuggestionsCard({
       <CardContent>
         <div className="space-y-4">
           {/* Financial Health Score */}
-          {financialHealthScore && (
+          {hasValidScore && financialHealthScore && (
             <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-lg border">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-semibold">Financial Health Score</span>

@@ -13,6 +13,8 @@ import {
 import { LineChart, Line, CartesianGrid, XAxis } from 'recharts';
 import { useBalanceHistory } from '@/hooks/use-balance-history';
 import { BalanceHistoryFilters } from './balance-history-filters';
+import { ErrorState } from '@/components/common/error-state';
+import { NoDataState } from '@/components/common/no-data-state';
 import type { Account } from '@/types/finance.types';
 
 interface BalanceHistoryChartProps {
@@ -21,10 +23,10 @@ interface BalanceHistoryChartProps {
 
 export function BalanceHistoryChartComponent({ accounts }: BalanceHistoryChartProps) {
   const {
-    allBalanceHistory,
     selectedAccounts,
     selectedYear,
     isLoading,
+    error,
     chartData,
     chartConfig,
     setSelectedAccounts,
@@ -36,7 +38,8 @@ export function BalanceHistoryChartComponent({ accounts }: BalanceHistoryChartPr
     return null;
   }
 
-  const hasData = allBalanceHistory.length > 0;
+  // Check if we have chart data (should always be true since we always have accounts)
+  const hasChartData = chartData.length > 0;
 
   return (
     <Card className="w-full">
@@ -67,16 +70,21 @@ export function BalanceHistoryChartComponent({ accounts }: BalanceHistoryChartPr
             <div className="flex items-center justify-center h-full">
               <LoadingSpinner message="Loading chart data..." />
             </div>
-          ) : !hasData || chartData.length === 0 ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center">
-                <AreaChart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">No balance history data available</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Chart will appear once you have transaction data
-                </p>
-              </div>
-            </div>
+          ) : error ? (
+            <ErrorState
+              title="Failed to load balance history"
+              description={error}
+              variant="inline"
+              className="h-full"
+            />
+          ) : !hasChartData ? (
+            <NoDataState
+              icon={AreaChart}
+              title="No balance history data available"
+              description="Chart will appear once you have transaction data"
+              variant="inline"
+              height="h-full"
+            />
           ) : (
             <ChartContainer config={chartConfig} className="w-full h-full">
               <LineChart

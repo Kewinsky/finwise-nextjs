@@ -11,6 +11,7 @@ import { notifySuccess, notifyError } from '@/lib/notifications';
 import { deleteManyTransactions, deleteTransaction } from '@/lib/actions/finance-actions';
 import { useTransactions } from '@/hooks/use-transactions';
 import { DeleteConfirmationDialog } from '@/components/common/delete-confirmation-dialog';
+import { ErrorState } from '@/components/common/error-state';
 import type { Transaction } from '@/types/finance.types';
 
 export default function TransactionsPage() {
@@ -18,6 +19,7 @@ export default function TransactionsPage() {
     allTransactions,
     accounts,
     isLoading,
+    error,
     filters,
     selectedRows,
     currentPage,
@@ -175,6 +177,20 @@ export default function TransactionsPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex-1 space-y-6 p-6">
+        <TransactionsHeader onAddTransaction={() => setShowForm(true)} />
+        <ErrorState
+          title="Failed to load transactions"
+          description={error}
+          onRetry={() => refetch()}
+          variant="card"
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 space-y-6 p-6">
       <TransactionsHeader onAddTransaction={() => setShowForm(true)} />
@@ -206,7 +222,6 @@ export default function TransactionsPage() {
         onBulkDelete={handleBulkDeleteClick}
         onPageChange={setCurrentPage}
         onItemsPerPageChange={setItemsPerPage}
-        onAddTransaction={() => setShowForm(true)}
       />
 
       {showForm && (

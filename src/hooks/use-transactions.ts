@@ -14,6 +14,7 @@ interface UseTransactionsResult {
   allTransactions: Transaction[];
   accounts: Account[];
   isLoading: boolean;
+  error: string | null;
   filters: TransactionFilters;
   selectedRows: string[];
   currentPage: number;
@@ -38,6 +39,7 @@ export function useTransactions(): UseTransactionsResult {
   const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<TransactionFilters>({});
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -48,6 +50,7 @@ export function useTransactions(): UseTransactionsResult {
     try {
       if (!silent) {
         setIsLoading(true);
+        setError(null);
       }
 
       const [transactionsResult, accountsResult] = await Promise.all([
@@ -55,9 +58,14 @@ export function useTransactions(): UseTransactionsResult {
         getAccounts(),
       ]);
 
+      let hasError = false;
+      let errorMessage = '';
+
       if (transactionsResult.success && 'data' in transactionsResult) {
         setAllTransactions(transactionsResult.data.data);
       } else {
+        hasError = true;
+        errorMessage = transactionsResult.error || 'Failed to load transactions';
         if (!silent) {
           notifyError('Failed to load transactions', {
             description: transactionsResult.error,
@@ -68,15 +76,25 @@ export function useTransactions(): UseTransactionsResult {
       if (accountsResult.success && 'data' in accountsResult) {
         setAccounts(accountsResult.data);
       } else {
+        hasError = true;
+        errorMessage = accountsResult.error || 'Failed to load accounts';
         if (!silent) {
           notifyError('Failed to load accounts', {
             description: accountsResult.error,
           });
         }
       }
+
+      if (hasError && !silent) {
+        setError(errorMessage);
+      } else if (!hasError) {
+        setError(null);
+      }
     } catch {
+      const errorMessage = 'Failed to load data';
       if (!silent) {
-        notifyError('Failed to load data');
+        setError(errorMessage);
+        notifyError(errorMessage);
       }
     } finally {
       if (!silent) {
@@ -210,6 +228,7 @@ export function useTransactions(): UseTransactionsResult {
     allTransactions,
     accounts,
     isLoading,
+    error,
     filters,
     selectedRows,
     currentPage,

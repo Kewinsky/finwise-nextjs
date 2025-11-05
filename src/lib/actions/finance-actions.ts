@@ -1114,6 +1114,17 @@ export async function getSimpleFinancialHealthScore() {
     const monthlySummary = monthlySummaryResult.data;
     const totalBalance = totalBalanceResult.success ? totalBalanceResult.data : 0;
 
+    // Check if user has any transactions - if not, return null to indicate no data
+    const hasTransactions =
+      monthlySummary.totalIncome > 0 ||
+      monthlySummary.totalExpenses > 0 ||
+      monthlySummary.netIncome !== 0;
+
+    if (!hasTransactions) {
+      // Return null to indicate no data available
+      return { success: true, data: null };
+    }
+
     // Calculate different health metrics
     const savingsRate =
       monthlySummary.totalIncome > 0
@@ -1123,16 +1134,18 @@ export async function getSimpleFinancialHealthScore() {
     // Simplified health score calculation
     const savingsRateScore = Math.min(Math.max(savingsRate, 0), 100);
     const emergencyFundScore =
-      totalBalance > monthlySummary.totalExpenses * 3
+      monthlySummary.totalExpenses > 0 && totalBalance > monthlySummary.totalExpenses * 3
         ? 100
-        : Math.round((totalBalance / (monthlySummary.totalExpenses * 3)) * 100);
+        : monthlySummary.totalExpenses > 0
+          ? Math.round((totalBalance / (monthlySummary.totalExpenses * 3)) * 100)
+          : 50; // Default score if no expenses
     const debtScore =
-      monthlySummary.totalExpenses > 0
+      monthlySummary.totalExpenses > 0 && monthlySummary.totalIncome > 0
         ? Math.max(
             0,
             100 - Math.round((monthlySummary.totalExpenses / monthlySummary.totalIncome) * 100),
           )
-        : 100;
+        : 100; // Perfect score if no expenses
     const consistencyScore = monthlySummary.netIncome > 0 ? 80 : 40; // Simplified
 
     const overallScore = Math.round(

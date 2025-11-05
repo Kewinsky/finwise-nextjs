@@ -8,14 +8,14 @@ import { useAccounts } from '@/hooks/use-accounts';
 import { AccountsHeader } from '@/components/accounts/accounts-header';
 import { TotalBalanceCard } from '@/components/accounts/total-balance-card';
 import { AccountsGrid } from '@/components/accounts/accounts-grid';
-import { EmptyAccountsState } from '@/components/accounts/empty-accounts-state';
 import { ACCOUNT_COLORS } from '@/config/app';
 import { getTotalBalance } from '@/lib/actions/finance-actions';
 import { DeleteConfirmationDialog } from '@/components/common/delete-confirmation-dialog';
+import { ErrorState } from '@/components/common/error-state';
 import type { Account } from '@/types/finance.types';
 
 export default function AccountsPage() {
-  const { accounts, isLoading, refetch, handleDeleteAccount, isDeleting } = useAccounts();
+  const { accounts, isLoading, error, refetch, handleDeleteAccount, isDeleting } = useAccounts();
   const [showForm, setShowForm] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [totalBalance, setTotalBalance] = useState<number>(0);
@@ -89,6 +89,20 @@ export default function AccountsPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex-1 space-y-6 p-6">
+        <AccountsHeader onAddAccount={handleAddAccount} />
+        <ErrorState
+          title="Failed to load accounts"
+          description={error}
+          onRetry={() => refetch()}
+          variant="card"
+        />
+      </div>
+    );
+  }
+
   if (!accounts) {
     return null;
   }
@@ -99,18 +113,14 @@ export default function AccountsPage() {
 
       <TotalBalanceCard totalBalance={totalBalance} />
 
-      {accounts.length === 0 ? (
-        <EmptyAccountsState onAddAccount={handleAddAccount} />
-      ) : (
-        <AccountsGrid
-          accounts={accounts}
-          onEdit={handleEditAccount}
-          onDelete={handleDeleteClick}
-          isDeleting={isDeleting}
-        />
-      )}
+      <AccountsGrid
+        accounts={accounts}
+        onEdit={handleEditAccount}
+        onDelete={handleDeleteClick}
+        isDeleting={isDeleting}
+      />
 
-      {accounts.length > 0 && <BalanceHistoryChartComponent accounts={accounts} />}
+      <BalanceHistoryChartComponent accounts={accounts} />
 
       {showForm && (
         <AccountForm

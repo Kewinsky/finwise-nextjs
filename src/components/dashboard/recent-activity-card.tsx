@@ -6,13 +6,22 @@ import { Button } from '@/components/ui/button';
 import { ArrowRightLeft, ArrowRight, TrendingUp, TrendingDown } from 'lucide-react';
 import { formatCurrency, formatDisplayDate } from '@/lib/utils';
 import { useBaseCurrency } from '@/hooks/use-base-currency';
+import { LoadingSpinner } from '@/components/ui/custom-spinner';
+import { ErrorState } from '@/components/common/error-state';
+import { NoDataState } from '@/components/common/no-data-state';
 import type { DashboardMetrics } from '@/types/finance.types';
 
 interface RecentActivityCardProps {
   recentTransactions: DashboardMetrics['recentTransactions'];
+  isLoading?: boolean;
+  error?: string | null;
 }
 
-export function RecentActivityCard({ recentTransactions }: RecentActivityCardProps) {
+export function RecentActivityCard({
+  recentTransactions,
+  isLoading = false,
+  error = null,
+}: RecentActivityCardProps) {
   const router = useRouter();
   const baseCurrency = useBaseCurrency();
 
@@ -66,11 +75,28 @@ export function RecentActivityCard({ recentTransactions }: RecentActivityCardPro
         </Button>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4 max-h-[600px] overflow-y-auto">
-          {recentTransactions.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-4">No recent transactions</p>
-          ) : (
-            recentTransactions.map((transaction) => {
+        {isLoading ? (
+          <div className="flex items-center justify-center h-[250px] sm:h-[300px]">
+            <LoadingSpinner message="Loading recent activity..." />
+          </div>
+        ) : error ? (
+          <ErrorState
+            title="Failed to load recent activity"
+            description={error}
+            variant="inline"
+            className="h-[250px] sm:h-[300px]"
+          />
+        ) : recentTransactions.length === 0 ? (
+          <NoDataState
+            icon={ArrowRightLeft}
+            title="No recent transactions"
+            description="Start tracking your finances by adding your first transaction"
+            variant="inline"
+            height="h-[250px] sm:h-[300px]"
+          />
+        ) : (
+          <div className="space-y-4 max-h-[600px] overflow-y-auto">
+            {recentTransactions.map((transaction) => {
               const Icon = getTransactionIcon(transaction.type);
               const styles = getTransactionStyles(transaction.type);
 
@@ -93,9 +119,9 @@ export function RecentActivityCard({ recentTransactions }: RecentActivityCardPro
                   </div>
                 </div>
               );
-            })
-          )}
-        </div>
+            })}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
