@@ -31,7 +31,6 @@ export function TransactionsPagination({
             value={itemsPerPage.toString()}
             onValueChange={(value) => {
               onItemsPerPageChange(Number(value));
-              onPageChange(1);
             }}
           >
             <SelectTrigger className="h-8 w-[70px]">

@@ -73,7 +73,8 @@ export function useBalanceHistory({ accounts }: UseBalanceHistoryParams): UseBal
         setAllBalanceHistory(result.data);
         setError(null);
       } else {
-        const errorMessage = 'error' in result ? result.error : 'Unknown error occurred';
+        const errorMessage =
+          'error' in result && result.error ? result.error : 'Unknown error occurred';
         setError(errorMessage);
         notifyError('Failed to load balance history', {
           description: errorMessage,

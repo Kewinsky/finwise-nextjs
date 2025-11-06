@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { NumberTicker } from '@/components/ui/number-ticker';
 import { calculatePercentageChange, formatPercentageChange } from '@/lib/utils';
@@ -25,7 +26,7 @@ interface MetricCardProps {
   reverseComparison?: boolean;
 }
 
-export function MetricCard({
+export const MetricCard = React.memo(function MetricCard({
   title,
   value,
   icon: Icon,
@@ -119,4 +120,4 @@ export function MetricCard({
       </CardContent>
     </Card>
   );
-}
+});

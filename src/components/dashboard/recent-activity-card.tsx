@@ -1,14 +1,15 @@
 'use client';
 
+import React, { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRightLeft, ArrowRight, TrendingUp, TrendingDown } from 'lucide-react';
 import { formatCurrency, formatDisplayDate } from '@/lib/utils';
 import { useBaseCurrency } from '@/hooks/use-base-currency';
-import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { ErrorState } from '@/components/common/error-state';
 import { NoDataState } from '@/components/common/no-data-state';
+import { Skeleton } from '@/components/ui/skeleton';
 import type { DashboardMetrics } from '@/types/finance.types';
 
 interface RecentActivityCardProps {
@@ -17,7 +18,7 @@ interface RecentActivityCardProps {
   error?: string | null;
 }
 
-export function RecentActivityCard({
+export const RecentActivityCard = React.memo(function RecentActivityCard({
   recentTransactions,
   isLoading = false,
   error = null,
@@ -25,39 +26,45 @@ export function RecentActivityCard({
   const router = useRouter();
   const baseCurrency = useBaseCurrency();
 
-  const getTransactionIcon = (type: string) => {
-    switch (type) {
-      case 'income':
-        return TrendingUp;
-      case 'expense':
-        return TrendingDown;
-      default:
-        return ArrowRightLeft;
-    }
-  };
+  const getTransactionIcon = useMemo(
+    () => (type: string) => {
+      switch (type) {
+        case 'income':
+          return TrendingUp;
+        case 'expense':
+          return TrendingDown;
+        default:
+          return ArrowRightLeft;
+      }
+    },
+    [],
+  );
 
-  const getTransactionStyles = (type: string) => {
-    switch (type) {
-      case 'income':
-        return {
-          bg: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
-          text: 'text-green-600 dark:text-green-400',
-          prefix: '+',
-        };
-      case 'expense':
-        return {
-          bg: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
-          text: 'text-red-600 dark:text-red-400',
-          prefix: '-',
-        };
-      default:
-        return {
-          bg: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
-          text: 'text-blue-600 dark:text-blue-400',
-          prefix: '',
-        };
-    }
-  };
+  const getTransactionStyles = useMemo(
+    () => (type: string) => {
+      switch (type) {
+        case 'income':
+          return {
+            bg: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
+            text: 'text-green-600 dark:text-green-400',
+            prefix: '+',
+          };
+        case 'expense':
+          return {
+            bg: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
+            text: 'text-red-600 dark:text-red-400',
+            prefix: '-',
+          };
+        default:
+          return {
+            bg: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
+            text: 'text-blue-600 dark:text-blue-400',
+            prefix: '',
+          };
+      }
+    },
+    [],
+  );
 
   return (
     <Card>
@@ -76,8 +83,17 @@ export function RecentActivityCard({
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div className="flex items-center justify-center h-[250px] sm:h-[300px]">
-            <LoadingSpinner message="Loading recent activity..." />
+          <div className="space-y-4">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={index} className="flex items-center gap-4">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
+                </div>
+                <Skeleton className="h-5 w-20" />
+              </div>
+            ))}
           </div>
         ) : error ? (
           <ErrorState
@@ -125,4 +141,4 @@ export function RecentActivityCard({
       </CardContent>
     </Card>
   );
-}
+});

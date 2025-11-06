@@ -3,8 +3,12 @@
 import { useState, useEffect } from 'react';
 import { AccountForm } from '@/components/accounts/account-form';
 import { BalanceHistoryChartComponent } from '@/components/accounts/balance-history-chart';
-import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { useAccounts } from '@/hooks/use-accounts';
+import {
+  AccountsGridSkeleton,
+  TotalBalanceSkeleton,
+  ChartSkeleton,
+} from '@/components/common/skeletons';
 import { AccountsHeader } from '@/components/accounts/accounts-header';
 import { TotalBalanceCard } from '@/components/accounts/total-balance-card';
 import { AccountsGrid } from '@/components/accounts/accounts-grid';
@@ -81,46 +85,37 @@ export default function AccountsPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen">
-        <LoadingSpinner message="Loading accounts..." />
-      </div>
-    );
-  }
+  return (
+    <div className="flex-1 space-y-6 p-6">
+      <AccountsHeader onAddAccount={handleAddAccount} />
 
-  if (error) {
-    return (
-      <div className="flex-1 space-y-6 p-6">
-        <AccountsHeader onAddAccount={handleAddAccount} />
+      {error ? (
         <ErrorState
           title="Failed to load accounts"
           description={error}
           onRetry={() => refetch()}
           variant="card"
         />
-      </div>
-    );
-  }
+      ) : isLoading || !accounts ? (
+        <>
+          <TotalBalanceSkeleton />
+          <AccountsGridSkeleton />
+          <ChartSkeleton height="h-[400px]" />
+        </>
+      ) : (
+        <>
+          <TotalBalanceCard totalBalance={totalBalance} />
 
-  if (!accounts) {
-    return null;
-  }
+          <AccountsGrid
+            accounts={accounts}
+            onEdit={handleEditAccount}
+            onDelete={handleDeleteClick}
+            isDeleting={isDeleting}
+          />
 
-  return (
-    <div className="flex-1 space-y-6 p-6">
-      <AccountsHeader onAddAccount={handleAddAccount} />
-
-      <TotalBalanceCard totalBalance={totalBalance} />
-
-      <AccountsGrid
-        accounts={accounts}
-        onEdit={handleEditAccount}
-        onDelete={handleDeleteClick}
-        isDeleting={isDeleting}
-      />
-
-      <BalanceHistoryChartComponent accounts={accounts} />
+          <BalanceHistoryChartComponent accounts={accounts} />
+        </>
+      )}
 
       {showForm && (
         <AccountForm

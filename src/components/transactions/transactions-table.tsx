@@ -6,13 +6,12 @@ import { EmptyTransactionsState } from './empty-transactions-state';
 import { TransactionsPagination } from './transactions-pagination';
 import { TransactionsBulkActions } from './transactions-bulk-actions';
 import { TransactionsExportButton } from './transactions-export-button';
+import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import type { Transaction, Account, TransactionFilters } from '@/types/finance.types';
 
 interface TransactionsTableProps {
   transactions: Transaction[];
-  allTransactions: Transaction[];
-  filteredTransactions: Transaction[];
-  sortedTransactionsLength: number;
+  totalTransactions: number;
   accounts: Account[];
   filters: TransactionFilters;
   selectedRows: string[];
@@ -21,6 +20,7 @@ interface TransactionsTableProps {
   totalPages: number;
   sortConfig: { key: string; direction: 'asc' | 'desc' } | null;
   isDeleting: string | null;
+  isLoading?: boolean;
   onSelectAll: (checked: boolean) => void;
   onSelectRow: (id: string, checked: boolean) => void;
   onSort: (key: string) => void;
@@ -34,8 +34,7 @@ interface TransactionsTableProps {
 
 export function TransactionsTable({
   transactions,
-  allTransactions,
-  filteredTransactions,
+  totalTransactions,
   accounts,
   filters,
   selectedRows,
@@ -43,6 +42,7 @@ export function TransactionsTable({
   itemsPerPage,
   totalPages,
   isDeleting,
+  isLoading = false,
   onSelectAll,
   onSelectRow,
   onSort,
@@ -53,6 +53,7 @@ export function TransactionsTable({
   onItemsPerPageChange,
 }: TransactionsTableProps) {
   const allSelected = selectedRows.length === transactions.length && transactions.length > 0;
+  const hasAnyTransactions = totalTransactions > 0;
 
   return (
     <Card>
@@ -61,8 +62,13 @@ export function TransactionsTable({
           <div>
             <CardTitle>Transactions</CardTitle>
             <CardDescription>
-              {filteredTransactions.length} transaction
-              {filteredTransactions.length !== 1 ? 's' : ''} found
+              {isLoading ? (
+                'Loading...'
+              ) : (
+                <>
+                  {totalTransactions} transaction{totalTransactions !== 1 ? 's' : ''} found
+                </>
+              )}
             </CardDescription>
           </div>
           <TransactionsBulkActions
@@ -75,41 +81,49 @@ export function TransactionsTable({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border overflow-x-auto">
-          <Table>
-            <TransactionsTableHeader
-              allSelected={allSelected}
-              onSelectAll={onSelectAll}
-              onSort={onSort}
-            />
-            <TableBody>
-              {transactions.length === 0 ? (
-                <EmptyTransactionsState hasTransactions={allTransactions.length > 0} />
-              ) : (
-                transactions.map((transaction) => (
-                  <TransactionsTableRow
-                    key={transaction.id}
-                    transaction={transaction}
-                    accounts={accounts}
-                    isSelected={selectedRows.includes(transaction.id)}
-                    isDeleting={isDeleting === transaction.id}
-                    onSelect={onSelectRow}
-                    onEdit={onEdit}
-                    onDelete={onDelete}
-                  />
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+        {isLoading && transactions.length === 0 ? (
+          <div className="flex items-center justify-center h-[400px]">
+            <LoadingSpinner message="Loading transactions..." />
+          </div>
+        ) : (
+          <>
+            <div className="rounded-md border overflow-x-auto">
+              <Table>
+                <TransactionsTableHeader
+                  allSelected={allSelected}
+                  onSelectAll={onSelectAll}
+                  onSort={onSort}
+                />
+                <TableBody>
+                  {transactions.length === 0 ? (
+                    <EmptyTransactionsState hasTransactions={hasAnyTransactions} />
+                  ) : (
+                    transactions.map((transaction) => (
+                      <TransactionsTableRow
+                        key={transaction.id}
+                        transaction={transaction}
+                        accounts={accounts}
+                        isSelected={selectedRows.includes(transaction.id)}
+                        isDeleting={isDeleting === transaction.id}
+                        onSelect={onSelectRow}
+                        onEdit={onEdit}
+                        onDelete={onDelete}
+                      />
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
 
-        <TransactionsPagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          itemsPerPage={itemsPerPage}
-          onPageChange={onPageChange}
-          onItemsPerPageChange={onItemsPerPageChange}
-        />
+            <TransactionsPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              itemsPerPage={itemsPerPage}
+              onPageChange={onPageChange}
+              onItemsPerPageChange={onItemsPerPageChange}
+            />
+          </>
+        )}
       </CardContent>
     </Card>
   );

@@ -1,10 +1,11 @@
 'use client';
 
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { Zap, Target } from 'lucide-react';
 import { ErrorState } from '@/components/common/error-state';
 import { NoDataState } from '@/components/common/no-data-state';
+import { AISuggestionsSkeleton } from '@/components/common/skeletons';
 
 interface FinancialHealthScore {
   overallScore: number;
@@ -29,31 +30,26 @@ interface AISuggestionsCardProps {
   error?: string | null;
 }
 
-export function AISuggestionsCard({
+export const AISuggestionsCard = React.memo(function AISuggestionsCard({
   financialHealthScore,
   aiInsights,
   isLoadingInsights,
   error = null,
 }: AISuggestionsCardProps) {
+  // Check if we have valid data (not NaN or invalid scores)
+  // Must be called before any early returns (React Hooks rule)
+  const hasValidScore = useMemo(
+    () =>
+      financialHealthScore &&
+      typeof financialHealthScore.overallScore === 'number' &&
+      !isNaN(financialHealthScore.overallScore) &&
+      financialHealthScore.overallScore >= 0 &&
+      financialHealthScore.overallScore <= 100,
+    [financialHealthScore],
+  );
+
   if (isLoadingInsights) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="h-4 w-4" />
-            Smart AI Suggestions
-          </CardTitle>
-          <CardDescription>
-            Personalized recommendations based on your financial data
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center h-[250px] sm:h-[300px]">
-            <LoadingSpinner message="Generating insights..." />
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return <AISuggestionsSkeleton />;
   }
 
   if (error) {
@@ -79,14 +75,6 @@ export function AISuggestionsCard({
       </Card>
     );
   }
-
-  // Check if we have valid data (not NaN or invalid scores)
-  const hasValidScore =
-    financialHealthScore &&
-    typeof financialHealthScore.overallScore === 'number' &&
-    !isNaN(financialHealthScore.overallScore) &&
-    financialHealthScore.overallScore >= 0 &&
-    financialHealthScore.overallScore <= 100;
 
   // If no valid score or insights, show no data state
   if (!hasValidScore || !aiInsights || aiInsights.recommendations.length === 0) {
@@ -195,4 +183,4 @@ export function AISuggestionsCard({
       </CardContent>
     </Card>
   );
-}
+});

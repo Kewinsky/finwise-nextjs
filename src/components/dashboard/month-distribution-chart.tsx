@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PieChart, Pie, Cell } from 'recharts';
 import {
@@ -12,9 +12,9 @@ import {
 } from '@/components/ui/chart';
 import { Wallet } from 'lucide-react';
 import { getAccountDistribution } from '@/lib/actions/finance-actions';
-import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { ErrorState } from '@/components/common/error-state';
 import { NoDataState } from '@/components/common/no-data-state';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface AccountDistributionItem {
   name: string;
@@ -28,7 +28,9 @@ interface AccountDistributionChartProps {
   className?: string;
 }
 
-export function AccountDistributionChart({ className }: AccountDistributionChartProps) {
+export const AccountDistributionChart = React.memo(function AccountDistributionChart({
+  className,
+}: AccountDistributionChartProps) {
   const [accountData, setAccountData] = useState<AccountDistributionItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -84,25 +86,6 @@ export function AccountDistributionChart({ className }: AccountDistributionChart
     };
   }, [accountData]);
 
-  if (isLoading) {
-    return (
-      <Card className={className}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Wallet className="h-4 w-4" />
-            Account Distribution
-          </CardTitle>
-          <CardDescription>How your total balance is distributed across accounts</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center h-[250px] sm:h-[300px]">
-            <LoadingSpinner message="Loading account data..." />
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <Card className={className}>
       <CardHeader>
@@ -113,7 +96,9 @@ export function AccountDistributionChart({ className }: AccountDistributionChart
         <CardDescription>How your total balance is distributed across accounts</CardDescription>
       </CardHeader>
       <CardContent>
-        {error ? (
+        {isLoading ? (
+          <Skeleton className="h-[250px] sm:h-[300px] w-full" />
+        ) : error ? (
           <ErrorState
             title="Failed to load account distribution"
             description={error}
@@ -152,4 +137,4 @@ export function AccountDistributionChart({ className }: AccountDistributionChart
       </CardContent>
     </Card>
   );
-}
+});

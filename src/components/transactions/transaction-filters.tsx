@@ -57,6 +57,12 @@ export function TransactionFiltersComponent({
   const [dateFrom, setDateFrom] = useState<Date | undefined>();
   const [dateTo, setDateTo] = useState<Date | undefined>();
 
+  const handleSearchChange = (value: string) => {
+    const newFilters = { ...filters, search: value || undefined };
+    setFilters(newFilters);
+    onFiltersChange(newFilters);
+  };
+
   const handleFilterChange = (
     key: keyof TransactionFilters,
     value: string | number | undefined,
@@ -107,7 +113,7 @@ export function TransactionFiltersComponent({
           <Input
             placeholder="Search transactions..."
             value={filters.search || ''}
-            onChange={(e) => handleFilterChange('search', e.target.value || undefined)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="pl-10"
             disabled={isLoading}
           />

@@ -1,14 +1,14 @@
 'use client';
 
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, CartesianGrid, XAxis, Cell, LabelList } from 'recharts';
 import { ChartContainer } from '@/components/ui/chart';
 import { BarChart3 } from 'lucide-react';
 import type { CategorySpending } from '@/hooks/use-category-spending';
-import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { ErrorState } from '@/components/common/error-state';
 import { NoDataState } from '@/components/common/no-data-state';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface TopCategoriesChartProps {
   categorySpending: CategorySpending[];
@@ -65,7 +65,7 @@ function prepareBarChartData(
   };
 }
 
-export function TopCategoriesChart({
+export const TopCategoriesChart = React.memo(function TopCategoriesChart({
   categorySpending,
   isLoading = false,
   error = null,
@@ -86,9 +86,7 @@ export function TopCategoriesChart({
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div className="flex items-center justify-center h-[250px] sm:h-[300px]">
-            <LoadingSpinner message="Loading category data..." />
-          </div>
+          <Skeleton className="h-[250px] sm:h-[300px] w-full" />
         ) : error ? (
           <ErrorState
             title="Failed to load category data"
@@ -121,4 +119,4 @@ export function TopCategoriesChart({
       </CardContent>
     </Card>
   );
-}
+});

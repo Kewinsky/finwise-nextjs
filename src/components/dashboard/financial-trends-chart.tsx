@@ -1,17 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AreaChart, Area, XAxis, CartesianGrid } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { TrendingUp } from 'lucide-react';
 import { useAreaChart, type TimeRange, type SeriesType } from '@/hooks/use-area-chart';
 import type { DashboardMetrics } from '@/types/finance.types';
 import { ErrorState } from '@/components/common/error-state';
 import { NoDataState } from '@/components/common/no-data-state';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface FinancialTrendsChartProps {
   dashboardData: DashboardMetrics | null;
@@ -47,7 +47,9 @@ function prepareAreaChartConfig(
   };
 }
 
-export function FinancialTrendsChart({ dashboardData }: FinancialTrendsChartProps) {
+export const FinancialTrendsChart = React.memo(function FinancialTrendsChart({
+  dashboardData,
+}: FinancialTrendsChartProps) {
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('1M');
   const [selectedSeries, setSelectedSeries] = useState<SeriesType>('balance');
 
@@ -61,7 +63,7 @@ export function FinancialTrendsChart({ dashboardData }: FinancialTrendsChartProp
     dashboardData,
   });
 
-  const chartConfig = prepareAreaChartConfig(selectedSeries);
+  const chartConfig = useMemo(() => prepareAreaChartConfig(selectedSeries), [selectedSeries]);
   const chartColor = chartConfig.value.color;
 
   return (
@@ -107,9 +109,7 @@ export function FinancialTrendsChart({ dashboardData }: FinancialTrendsChartProp
       </CardHeader>
       <CardContent>
         {isLoadingAreaChart ? (
-          <div className="flex items-center justify-center h-[400px]">
-            <LoadingSpinner message="Loading chart data..." />
-          </div>
+          <Skeleton className="h-[400px] w-full" />
         ) : areaChartError ? (
           <ErrorState
             title="Failed to load chart data"
@@ -149,4 +149,4 @@ export function FinancialTrendsChart({ dashboardData }: FinancialTrendsChartProp
       </CardContent>
     </Card>
   );
-}
+});

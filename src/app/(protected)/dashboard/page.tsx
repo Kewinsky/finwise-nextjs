@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { TransactionForm } from '@/components/transactions/transaction-form';
 import { useDashboardData } from '@/hooks/use-dashboard-data';
 import { useCategorySpending } from '@/hooks/use-category-spending';
@@ -15,6 +14,12 @@ import { AISuggestionsCard } from '@/components/dashboard/ai-suggestions-card';
 import { RecentActivityCard } from '@/components/dashboard/recent-activity-card';
 import { QuickActionsCard } from '@/components/dashboard/quick-actions-card';
 import { WelcomeBanner } from '@/components/dashboard/welcome-banner';
+import {
+  MetricsGridSkeleton,
+  ChartSkeleton,
+  RecentActivitySkeleton,
+  AISuggestionsSkeleton,
+} from '@/components/common/skeletons';
 
 export default function DashboardPage() {
   const searchParams = useSearchParams();
@@ -84,13 +89,7 @@ export default function DashboardPage() {
     );
   }
 
-  if (!dashboardData) {
-    return (
-      <div className="min-h-screen">
-        <LoadingSpinner message="Loading dashboard..." />
-      </div>
-    );
-  }
+  const isLoadingDashboard = !dashboardData;
 
   return (
     <div className="flex-1 space-y-6 p-4 sm:p-6">
@@ -101,27 +100,44 @@ export default function DashboardPage() {
         <p className="text-muted-foreground">Advanced financial insights and analytics.</p>
       </div>
 
-      <MetricsGrid data={dashboardData} />
+      {isLoadingDashboard ? (
+        <>
+          <MetricsGridSkeleton />
+          <ChartSkeleton showTabs height="h-[400px]" />
+          <div className="grid gap-6 lg:grid-cols-2">
+            <ChartSkeleton height="h-[250px] sm:h-[300px]" />
+            <ChartSkeleton height="h-[250px] sm:h-[300px]" />
+          </div>
+          <div className="grid gap-6 lg:grid-cols-2">
+            <AISuggestionsSkeleton />
+            <RecentActivitySkeleton />
+          </div>
+        </>
+      ) : (
+        <>
+          <MetricsGrid data={dashboardData} />
 
-      <FinancialTrendsChart dashboardData={dashboardData} />
+          <FinancialTrendsChart dashboardData={dashboardData} />
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <AccountDistributionChart />
-        <TopCategoriesChart
-          categorySpending={monthlyCategorySpending}
-          isLoading={isLoadingCategorySpending}
-          error={categorySpendingError}
-        />
-      </div>
+          <div className="grid gap-6 lg:grid-cols-2">
+            <AccountDistributionChart />
+            <TopCategoriesChart
+              categorySpending={monthlyCategorySpending}
+              isLoading={isLoadingCategorySpending}
+              error={categorySpendingError}
+            />
+          </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <AISuggestionsCard
-          financialHealthScore={financialHealthScore}
-          aiInsights={aiInsights}
-          isLoadingInsights={isLoadingInsights}
-        />
-        <RecentActivityCard recentTransactions={dashboardData.recentTransactions} />
-      </div>
+          <div className="grid gap-6 lg:grid-cols-2">
+            <AISuggestionsCard
+              financialHealthScore={financialHealthScore}
+              aiInsights={aiInsights}
+              isLoadingInsights={isLoadingInsights}
+            />
+            <RecentActivityCard recentTransactions={dashboardData.recentTransactions} />
+          </div>
+        </>
+      )}
 
       <QuickActionsCard onAddTransaction={handleAddTransaction} />
 

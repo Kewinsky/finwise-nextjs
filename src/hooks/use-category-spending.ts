@@ -47,13 +47,14 @@ export function useCategorySpending({
     setError(null);
     try {
       const result = await getCategorySpendingForMonth(year, month);
-      if (result.success) {
-        const categoryData = result.data || [];
+      if (result.success && 'data' in result) {
+        const categoryData = Array.isArray(result.data) ? result.data : [];
         setData(categoryData);
         cacheRef.current.set(cacheKey, categoryData);
         setError(null);
       } else {
-        const errorMessage = result.error || 'Failed to load category data';
+        const errorMessage =
+          'error' in result && result.error ? result.error : 'Failed to load category data';
         setError(errorMessage);
       }
     } catch (error) {
