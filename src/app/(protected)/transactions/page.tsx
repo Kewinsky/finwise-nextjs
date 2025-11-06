@@ -6,25 +6,25 @@ import { TransactionForm } from '@/components/transactions/transaction-form';
 import { TransactionFiltersComponent } from '@/components/transactions/transaction-filters';
 import { TransactionsHeader } from '@/components/transactions/transactions-header';
 import { TransactionsTable } from '@/components/transactions/transactions-table';
-import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { notifySuccess, notifyError } from '@/lib/notifications';
+import { TransactionsTableSkeleton } from '@/components/common/skeletons';
 import { deleteManyTransactions, deleteTransaction } from '@/lib/actions/finance-actions';
 import { useTransactions } from '@/hooks/use-transactions';
 import { DeleteConfirmationDialog } from '@/components/common/delete-confirmation-dialog';
+import { ErrorState } from '@/components/common/error-state';
 import type { Transaction } from '@/types/finance.types';
 
 export default function TransactionsPage() {
   const {
-    allTransactions,
     accounts,
     isLoading,
+    error,
     filters,
     selectedRows,
     currentPage,
     itemsPerPage,
     sortConfig,
     filteredTransactions,
-    sortedTransactions,
     paginatedTransactions,
     totalPages,
     setFilters,
@@ -167,14 +167,6 @@ export default function TransactionsPage() {
     setDefaultTransactionType(undefined);
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen">
-        <LoadingSpinner message="Loading transactions..." />
-      </div>
-    );
-  }
-
   return (
     <div className="flex-1 space-y-6 p-6">
       <TransactionsHeader onAddTransaction={() => setShowForm(true)} />
@@ -183,31 +175,41 @@ export default function TransactionsPage() {
         accounts={accounts}
         onFiltersChange={setFilters}
         onClearFilters={clearFilters}
+        isLoading={isLoading}
       />
 
-      <TransactionsTable
-        transactions={paginatedTransactions}
-        allTransactions={allTransactions}
-        filteredTransactions={filteredTransactions}
-        sortedTransactionsLength={sortedTransactions.length}
-        accounts={accounts}
-        filters={filters}
-        selectedRows={selectedRows}
-        currentPage={currentPage}
-        itemsPerPage={itemsPerPage}
-        totalPages={totalPages}
-        sortConfig={sortConfig}
-        isDeleting={isDeleting}
-        onSelectAll={handleSelectAll}
-        onSelectRow={handleSelectRow}
-        onSort={handleSort}
-        onEdit={handleEditTransaction}
-        onDelete={handleDeleteClick}
-        onBulkDelete={handleBulkDeleteClick}
-        onPageChange={setCurrentPage}
-        onItemsPerPageChange={setItemsPerPage}
-        onAddTransaction={() => setShowForm(true)}
-      />
+      {error ? (
+        <ErrorState
+          title="Failed to load transactions"
+          description={error}
+          onRetry={() => refetch()}
+          variant="card"
+        />
+      ) : isLoading ? (
+        <TransactionsTableSkeleton />
+      ) : (
+        <TransactionsTable
+          transactions={paginatedTransactions}
+          totalTransactions={filteredTransactions.length}
+          accounts={accounts}
+          filters={filters}
+          selectedRows={selectedRows}
+          currentPage={currentPage}
+          itemsPerPage={itemsPerPage}
+          totalPages={totalPages}
+          sortConfig={sortConfig}
+          isDeleting={isDeleting}
+          isLoading={isLoading}
+          onSelectAll={handleSelectAll}
+          onSelectRow={handleSelectRow}
+          onSort={handleSort}
+          onEdit={handleEditTransaction}
+          onDelete={handleDeleteClick}
+          onBulkDelete={handleBulkDeleteClick}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={setItemsPerPage}
+        />
+      )}
 
       {showForm && (
         <TransactionForm

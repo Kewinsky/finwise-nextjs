@@ -30,6 +30,7 @@ interface UseDashboardDataResult {
   financialHealthScore: FinancialHealthScore | null;
   aiInsights: AIInsights | null;
   isLoadingInsights: boolean;
+  error: string | null;
   refetch: () => Promise<void>;
 }
 
@@ -43,21 +44,27 @@ export function useDashboardData(): UseDashboardDataResult {
   );
   const [aiInsights, setAiInsights] = useState<AIInsights | null>(null);
   const [isLoadingInsights, setIsLoadingInsights] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const loadDashboardData = useCallback(async () => {
     try {
+      setError(null);
       const result = await getDashboardData();
       if (result.success && 'data' in result) {
         setDashboardData(result.data as DashboardMetrics);
       } else {
+        const errorMessage = result.error || 'Unknown error occurred';
+        setError(errorMessage);
         notifyError('Failed to load dashboard data', {
-          description: result.error || 'Unknown error occurred',
+          description: errorMessage,
         });
       }
     } catch (error) {
       console.error('Dashboard data loading error:', error);
+      const errorMessage = 'Please try refreshing the page';
+      setError(errorMessage);
       notifyError('Failed to load dashboard data', {
-        description: 'Please try refreshing the page',
+        description: errorMessage,
       });
     }
   }, []);
@@ -75,6 +82,16 @@ export function useDashboardData(): UseDashboardDataResult {
 
   const loadAIInsights = useCallback(async () => {
     if (!financialHealthScore) return;
+
+    // Check if score is valid (not null and not NaN)
+    const isValidScore =
+      financialHealthScore &&
+      typeof financialHealthScore.overallScore === 'number' &&
+      !isNaN(financialHealthScore.overallScore) &&
+      financialHealthScore.overallScore >= 0 &&
+      financialHealthScore.overallScore <= 100;
+
+    if (!isValidScore) return;
 
     setIsLoadingInsights(true);
     try {
@@ -128,6 +145,7 @@ export function useDashboardData(): UseDashboardDataResult {
     financialHealthScore,
     aiInsights,
     isLoadingInsights,
+    error,
     refetch: loadDashboardData,
   };
 }

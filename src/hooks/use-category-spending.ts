@@ -19,6 +19,7 @@ interface UseCategorySpendingParams {
 interface UseCategorySpendingResult {
   data: CategorySpending[];
   isLoading: boolean;
+  error: string | null;
   clearCache: () => void;
 }
 
@@ -31,6 +32,7 @@ export function useCategorySpending({
 }: UseCategorySpendingParams): UseCategorySpendingResult {
   const [data, setData] = useState<CategorySpending[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const cacheRef = useRef<Map<string, CategorySpending[]>>(new Map());
 
   const loadData = useCallback(async () => {
@@ -42,15 +44,22 @@ export function useCategorySpending({
     }
 
     setIsLoading(true);
+    setError(null);
     try {
       const result = await getCategorySpendingForMonth(year, month);
-      if (result.success) {
-        const categoryData = result.data || [];
+      if (result.success && 'data' in result) {
+        const categoryData = Array.isArray(result.data) ? result.data : [];
         setData(categoryData);
         cacheRef.current.set(cacheKey, categoryData);
+        setError(null);
+      } else {
+        const errorMessage =
+          'error' in result && result.error ? result.error : 'Failed to load category data';
+        setError(errorMessage);
       }
     } catch (error) {
       console.error('Error loading monthly category data:', error);
+      setError('Failed to load category data');
     } finally {
       setIsLoading(false);
     }
@@ -64,5 +73,5 @@ export function useCategorySpending({
     loadData();
   }, [loadData]);
 
-  return { data, isLoading, clearCache };
+  return { data, isLoading, error, clearCache };
 }

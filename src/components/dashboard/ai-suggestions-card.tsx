@@ -1,8 +1,11 @@
 'use client';
 
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { Zap, Target } from 'lucide-react';
+import { ErrorState } from '@/components/common/error-state';
+import { NoDataState } from '@/components/common/no-data-state';
+import { AISuggestionsSkeleton } from '@/components/common/skeletons';
 
 interface FinancialHealthScore {
   overallScore: number;
@@ -24,14 +27,32 @@ interface AISuggestionsCardProps {
   financialHealthScore: FinancialHealthScore | null;
   aiInsights: AIInsights | null;
   isLoadingInsights: boolean;
+  error?: string | null;
 }
 
-export function AISuggestionsCard({
+export const AISuggestionsCard = React.memo(function AISuggestionsCard({
   financialHealthScore,
   aiInsights,
   isLoadingInsights,
+  error = null,
 }: AISuggestionsCardProps) {
+  // Check if we have valid data (not NaN or invalid scores)
+  // Must be called before any early returns (React Hooks rule)
+  const hasValidScore = useMemo(
+    () =>
+      financialHealthScore &&
+      typeof financialHealthScore.overallScore === 'number' &&
+      !isNaN(financialHealthScore.overallScore) &&
+      financialHealthScore.overallScore >= 0 &&
+      financialHealthScore.overallScore <= 100,
+    [financialHealthScore],
+  );
+
   if (isLoadingInsights) {
+    return <AISuggestionsSkeleton />;
+  }
+
+  if (error) {
     return (
       <Card>
         <CardHeader>
@@ -44,15 +65,19 @@ export function AISuggestionsCard({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center h-32">
-            <LoadingSpinner message="Generating insights..." />
-          </div>
+          <ErrorState
+            title="Failed to load AI suggestions"
+            description={error}
+            variant="inline"
+            className="h-[250px] sm:h-[300px]"
+          />
         </CardContent>
       </Card>
     );
   }
 
-  if (!aiInsights || aiInsights.recommendations.length === 0) {
+  // If no valid score or insights, show no data state
+  if (!hasValidScore || !aiInsights || aiInsights.recommendations.length === 0) {
     return (
       <Card>
         <CardHeader>
@@ -65,13 +90,13 @@ export function AISuggestionsCard({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center justify-center h-32 text-center">
-            <Target className="h-8 w-8 text-muted-foreground mb-2" />
-            <p className="text-sm text-muted-foreground">No AI suggestions available</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Add more transaction data to get personalized recommendations
-            </p>
-          </div>
+          <NoDataState
+            icon={Target}
+            title="No AI suggestions available"
+            description="Add more transaction data to get personalized recommendations"
+            variant="inline"
+            height="h-[250px] sm:h-[300px]"
+          />
         </CardContent>
       </Card>
     );
@@ -89,7 +114,7 @@ export function AISuggestionsCard({
       <CardContent>
         <div className="space-y-4">
           {/* Financial Health Score */}
-          {financialHealthScore && (
+          {hasValidScore && financialHealthScore && (
             <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-lg border">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-semibold">Financial Health Score</span>
@@ -158,4 +183,4 @@ export function AISuggestionsCard({
       </CardContent>
     </Card>
   );
-}
+});

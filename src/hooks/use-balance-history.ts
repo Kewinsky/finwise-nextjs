@@ -31,6 +31,7 @@ interface UseBalanceHistoryResult {
   selectedAccounts: Set<string>;
   selectedYear: number;
   isLoading: boolean;
+  error: string | null;
   chartData: Array<Record<string, string | number>>;
   chartConfig: Record<string, { label: string; color: string }>;
   setSelectedAccounts: (accounts: Set<string>) => void;
@@ -43,6 +44,7 @@ export function useBalanceHistory({ accounts }: UseBalanceHistoryParams): UseBal
   const [selectedAccounts, setSelectedAccounts] = useState<Set<string>>(new Set());
   const [selectedYear, setSelectedYear] = useState<number>(CURRENT_YEAR);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const years = useMemo(() => Array.from({ length: 5 }, (_, i) => CURRENT_YEAR - i), []);
 
@@ -56,6 +58,7 @@ export function useBalanceHistory({ accounts }: UseBalanceHistoryParams): UseBal
     if (accounts.length === 0) return;
 
     setIsLoading(true);
+    setError(null);
     try {
       const filters: BalanceHistoryFilters = {
         accountIds: accounts.map((account) => account.id),
@@ -68,13 +71,19 @@ export function useBalanceHistory({ accounts }: UseBalanceHistoryParams): UseBal
 
       if (result.success && 'data' in result && Array.isArray(result.data)) {
         setAllBalanceHistory(result.data);
+        setError(null);
       } else {
+        const errorMessage =
+          'error' in result && result.error ? result.error : 'Unknown error occurred';
+        setError(errorMessage);
         notifyError('Failed to load balance history', {
-          description: 'error' in result ? result.error : 'Unknown error occurred',
+          description: errorMessage,
         });
       }
     } catch {
-      notifyError('Failed to load balance history');
+      const errorMessage = 'Failed to load balance history';
+      setError(errorMessage);
+      notifyError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -128,6 +137,7 @@ export function useBalanceHistory({ accounts }: UseBalanceHistoryParams): UseBal
     selectedAccounts,
     selectedYear,
     isLoading,
+    error,
     chartData,
     chartConfig,
     setSelectedAccounts,

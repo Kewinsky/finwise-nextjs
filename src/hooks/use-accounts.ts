@@ -8,6 +8,7 @@ import type { Account } from '@/types/finance.types';
 interface UseAccountsResult {
   accounts: Account[] | null;
   isLoading: boolean;
+  error: string | null;
   refetch: () => Promise<void>;
   handleDeleteAccount: (account: Account) => Promise<void>;
   isDeleting: string | null;
@@ -16,27 +17,34 @@ interface UseAccountsResult {
 export function useAccounts(): UseAccountsResult {
   const [accounts, setAccounts] = useState<Account[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   const loadAccounts = useCallback(async (silent = false) => {
     try {
       if (!silent) {
         setIsLoading(true);
+        setError(null);
       }
       const result = await getAccounts();
 
       if (result.success && 'data' in result) {
         setAccounts(result.data as Account[]);
+        setError(null);
       } else {
+        const errorMessage = result.error || 'Failed to load accounts';
         if (!silent) {
+          setError(errorMessage);
           notifyError('Failed to load accounts', {
             description: result.error,
           });
         }
       }
     } catch {
+      const errorMessage = 'Failed to load accounts';
       if (!silent) {
-        notifyError('Failed to load accounts');
+        setError(errorMessage);
+        notifyError(errorMessage);
       }
     } finally {
       if (!silent) {
@@ -85,6 +93,7 @@ export function useAccounts(): UseAccountsResult {
   return {
     accounts,
     isLoading,
+    error,
     refetch: () => loadAccounts(true), // Silent refetch - doesn't show loading spinner
     handleDeleteAccount,
     isDeleting,

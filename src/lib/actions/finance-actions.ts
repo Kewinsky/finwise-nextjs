@@ -3,6 +3,7 @@
 import { createClientForServer } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { AccountService, TransactionService, AIAssistantService } from '@/services';
+import { RedisCache, CacheKeys, CacheTTL } from '@/lib/cache/redis-cache';
 import {
   createAccountSchema,
   updateAccountSchema,
@@ -11,9 +12,26 @@ import {
   bulkDeleteTransactionsSchema,
   aiQuestionSchema,
 } from '@/validation/finance';
+
 import { z } from 'zod';
 import { ERROR_MESSAGES } from '@/lib/constants/errors';
 import { handleActionError, handleValidationError } from '@/lib/utils/error-handler';
+
+/**
+ * Helper function to invalidate user's cache when data changes
+ */
+async function invalidateUserCache(userId: string) {
+  try {
+    // Invalidate dashboard cache
+    await RedisCache.delete(CacheKeys.dashboard(userId));
+    // Note: We could invalidate all caches, but for now we'll let them expire naturally
+    // Category spending and area chart caches will be invalidated when new transactions are added
+  } catch (error) {
+    console.error('Error invalidating cache:', error);
+    // Don't throw - cache invalidation failure shouldn't break the operation
+  }
+}
+
 import type {
   CreateTransactionInput as ServiceCreateTransactionInput,
   UpdateTransactionInput as ServiceUpdateTransactionInput,
@@ -57,6 +75,8 @@ export async function createAccount(formData: FormData) {
     const result = await accountService.createAccount(user.id, validatedData);
 
     if (result.success) {
+      // Invalidate cache
+      await invalidateUserCache(user.id);
       revalidatePath('/accounts');
       revalidatePath('/dashboard');
     }
@@ -94,6 +114,8 @@ export async function updateAccount(accountId: string, formData: FormData) {
     const result = await accountService.updateAccount(accountId, user.id, validatedData);
 
     if (result.success) {
+      // Invalidate cache
+      await invalidateUserCache(user.id);
       revalidatePath('/accounts');
       revalidatePath('/dashboard');
     }
@@ -122,6 +144,8 @@ export async function deleteAccount(accountId: string) {
     const result = await accountService.deleteAccount(accountId, user.id);
 
     if (result.success) {
+      // Invalidate cache
+      await invalidateUserCache(user.id);
       revalidatePath('/accounts');
       revalidatePath('/dashboard');
     }
@@ -209,8 +233,24 @@ export async function getBalanceHistory(filters: BalanceHistoryFilters) {
       return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
     }
 
+    // Create cache key from filters
+    const accountIdsKey = filters.accountIds.sort().join(',');
+    const year = filters.startDate.getFullYear();
+    const cacheKey = CacheKeys.balanceHistory(user.id, year, accountIdsKey);
+    const cached = await RedisCache.get(cacheKey);
+    if (cached) {
+      return { success: true, data: cached };
+    }
+
     const transactionService = new TransactionService(supabase);
-    return await transactionService.getBalanceHistory(user.id, filters);
+    const result = await transactionService.getBalanceHistory(user.id, filters);
+
+    if (result.success && 'data' in result) {
+      // Cache the result
+      await RedisCache.set(cacheKey, result.data, CacheTTL.MEDIUM);
+    }
+
+    return result;
   } catch (error) {
     return handleActionError(error, 'getBalanceHistory');
   }
@@ -255,6 +295,8 @@ export async function createTransaction(formData: FormData) {
     const result = await transactionService.createTransaction(user.id, validatedData);
 
     if (result.success) {
+      // Invalidate cache
+      await invalidateUserCache(user.id);
       // Only revalidate dashboard and accounts - transactions page uses client-side refetch
       revalidatePath('/dashboard');
       revalidatePath('/accounts');
@@ -308,6 +350,8 @@ export async function updateTransaction(transactionId: string, formData: FormDat
     );
 
     if (result.success) {
+      // Invalidate cache
+      await invalidateUserCache(user.id);
       // Only revalidate dashboard and accounts - transactions page uses client-side refetch
       revalidatePath('/dashboard');
       revalidatePath('/accounts');
@@ -369,6 +413,8 @@ export async function deleteTransaction(transactionId: string) {
     const result = await transactionService.deleteTransaction(transactionId, user.id);
 
     if (result.success) {
+      // Invalidate cache
+      await invalidateUserCache(user.id);
       // Only revalidate dashboard and accounts - transactions page uses client-side refetch
       revalidatePath('/dashboard');
       revalidatePath('/accounts');
@@ -403,6 +449,8 @@ export async function deleteManyTransactions(transactionIds: string[]) {
     );
 
     if (result.success) {
+      // Invalidate cache
+      await invalidateUserCache(user.id);
       // Only revalidate dashboard and accounts - transactions page uses client-side refetch
       revalidatePath('/dashboard');
       revalidatePath('/accounts');
@@ -478,6 +526,13 @@ export async function getDashboardData(dateRange?: { from?: Date; to?: Date }) {
       return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
     }
 
+    // Check cache first
+    const cacheKey = CacheKeys.dashboard(user.id);
+    const cached = await RedisCache.get(cacheKey);
+    if (cached) {
+      return { success: true, data: cached };
+    }
+
     const transactionService = new TransactionService(supabase);
     const accountService = new AccountService(supabase);
 
@@ -516,6 +571,9 @@ export async function getDashboardData(dateRange?: { from?: Date; to?: Date }) {
       accountCount: accountCountResult.success ? accountCountResult.data : 0,
       previousMonthBalance,
     };
+
+    // Cache the result
+    await RedisCache.set(cacheKey, dashboardData, CacheTTL.MEDIUM);
 
     return { success: true, data: dashboardData };
   } catch (error) {
@@ -634,6 +692,14 @@ export async function getMonthlyCashFlowTrend(dateRange: {
       return { success: false, error: 'Date range is required' };
     }
 
+    // Create cache key from date range
+    const dateRangeKey = `${dateRange.from.toISOString()}-${dateRange.to.toISOString()}`;
+    const cacheKey = CacheKeys.areaChart(user.id, 'monthly', dateRangeKey);
+    const cached = await RedisCache.get(cacheKey);
+    if (cached) {
+      return { success: true, data: cached };
+    }
+
     // Optimized: Single batch query instead of loop
     const startDate = new Date(dateRange.from);
     startDate.setDate(1);
@@ -727,6 +793,14 @@ export async function getDailyCashFlowTrend(dateRange: {
       return { success: false, error: 'Date range is required' };
     }
 
+    // Create cache key from date range
+    const dateRangeKey = `${dateRange.from.toISOString()}-${dateRange.to.toISOString()}`;
+    const cacheKey = CacheKeys.areaChart(user.id, 'daily', dateRangeKey);
+    const cached = await RedisCache.get(cacheKey);
+    if (cached) {
+      return { success: true, data: cached };
+    }
+
     // Optimized: Single batch query instead of loop
     const startDate = new Date(dateRange.from);
     startDate.setHours(0, 0, 0, 0);
@@ -783,6 +857,9 @@ export async function getDailyCashFlowTrend(dateRange: {
 
       currentDate.setDate(currentDate.getDate() + 1);
     }
+
+    // Cache the result
+    await RedisCache.set(cacheKey, trendData, CacheTTL.MEDIUM);
 
     return { success: true, data: trendData };
   } catch (error) {
@@ -993,6 +1070,13 @@ export async function getCategorySpendingForMonth(year: number, month: number) {
       return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
     }
 
+    // Check cache first
+    const cacheKey = CacheKeys.categorySpending(user.id, year, month);
+    const cached = await RedisCache.get(cacheKey);
+    if (cached) {
+      return { success: true, data: cached };
+    }
+
     // Create date range for the specific month
     const startDate = new Date(year, month - 1, 1); // month is 1-based, Date constructor is 0-based
     const endDate = new Date(year, month, 0); // Last day of the month
@@ -1018,6 +1102,9 @@ export async function getCategorySpendingForMonth(year: number, month: number) {
         avgCategory: Math.round(item.totalAmount * 0.8), // Placeholder - 80% of current amount as "average"
       }))
       .sort((a, b) => b.amount - a.amount);
+
+    // Cache the result
+    await RedisCache.set(cacheKey, breakdown, CacheTTL.MEDIUM);
 
     return { success: true, data: breakdown };
   } catch (error) {
@@ -1114,6 +1201,17 @@ export async function getSimpleFinancialHealthScore() {
     const monthlySummary = monthlySummaryResult.data;
     const totalBalance = totalBalanceResult.success ? totalBalanceResult.data : 0;
 
+    // Check if user has any transactions - if not, return null to indicate no data
+    const hasTransactions =
+      monthlySummary.totalIncome > 0 ||
+      monthlySummary.totalExpenses > 0 ||
+      monthlySummary.netIncome !== 0;
+
+    if (!hasTransactions) {
+      // Return null to indicate no data available
+      return { success: true, data: null };
+    }
+
     // Calculate different health metrics
     const savingsRate =
       monthlySummary.totalIncome > 0
@@ -1123,16 +1221,18 @@ export async function getSimpleFinancialHealthScore() {
     // Simplified health score calculation
     const savingsRateScore = Math.min(Math.max(savingsRate, 0), 100);
     const emergencyFundScore =
-      totalBalance > monthlySummary.totalExpenses * 3
+      monthlySummary.totalExpenses > 0 && totalBalance > monthlySummary.totalExpenses * 3
         ? 100
-        : Math.round((totalBalance / (monthlySummary.totalExpenses * 3)) * 100);
+        : monthlySummary.totalExpenses > 0
+          ? Math.round((totalBalance / (monthlySummary.totalExpenses * 3)) * 100)
+          : 50; // Default score if no expenses
     const debtScore =
-      monthlySummary.totalExpenses > 0
+      monthlySummary.totalExpenses > 0 && monthlySummary.totalIncome > 0
         ? Math.max(
             0,
             100 - Math.round((monthlySummary.totalExpenses / monthlySummary.totalIncome) * 100),
           )
-        : 100;
+        : 100; // Perfect score if no expenses
     const consistencyScore = monthlySummary.netIncome > 0 ? 80 : 40; // Simplified
 
     const overallScore = Math.round(

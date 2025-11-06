@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PieChart, Pie, Cell } from 'recharts';
 import {
@@ -12,6 +12,9 @@ import {
 } from '@/components/ui/chart';
 import { Wallet } from 'lucide-react';
 import { getAccountDistribution } from '@/lib/actions/finance-actions';
+import { ErrorState } from '@/components/common/error-state';
+import { NoDataState } from '@/components/common/no-data-state';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface AccountDistributionItem {
   name: string;
@@ -25,20 +28,29 @@ interface AccountDistributionChartProps {
   className?: string;
 }
 
-export function AccountDistributionChart({ className }: AccountDistributionChartProps) {
+export const AccountDistributionChart = React.memo(function AccountDistributionChart({
+  className,
+}: AccountDistributionChartProps) {
   const [accountData, setAccountData] = useState<AccountDistributionItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadAccountData = async () => {
       try {
         setIsLoading(true);
+        setError(null);
         const result = await getAccountDistribution();
         if (result.success && 'data' in result && result.data) {
           setAccountData(result.data);
+          setError(null);
+        } else {
+          const errorMessage = result.error || 'Failed to load account distribution';
+          setError(errorMessage);
         }
       } catch (error) {
         console.error('Failed to load account distribution:', error);
+        setError('Failed to load account distribution');
       } finally {
         setIsLoading(false);
       }
@@ -74,25 +86,6 @@ export function AccountDistributionChart({ className }: AccountDistributionChart
     };
   }, [accountData]);
 
-  if (isLoading) {
-    return (
-      <Card className={className}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Wallet className="h-4 w-4" />
-            Account Distribution
-          </CardTitle>
-          <CardDescription>How your total balance is distributed across accounts</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center h-[300px] text-center text-muted-foreground">
-            <p>Loading account data...</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <Card className={className}>
       <CardHeader>
@@ -103,7 +96,16 @@ export function AccountDistributionChart({ className }: AccountDistributionChart
         <CardDescription>How your total balance is distributed across accounts</CardDescription>
       </CardHeader>
       <CardContent>
-        {pieChartData.length > 0 ? (
+        {isLoading ? (
+          <Skeleton className="h-[250px] sm:h-[300px] w-full" />
+        ) : error ? (
+          <ErrorState
+            title="Failed to load account distribution"
+            description={error}
+            variant="inline"
+            className="h-[250px] sm:h-[300px]"
+          />
+        ) : pieChartData.length > 0 ? (
           <ChartContainer config={chartConfig} className="h-[250px] sm:h-[300px] w-full">
             <PieChart>
               <Pie
@@ -124,11 +126,15 @@ export function AccountDistributionChart({ className }: AccountDistributionChart
             </PieChart>
           </ChartContainer>
         ) : (
-          <div className="flex items-center justify-center h-[250px] sm:h-[300px] text-center text-muted-foreground">
-            <p className="text-sm sm:text-base">No accounts with balance available</p>
-          </div>
+          <NoDataState
+            icon={Wallet}
+            title="No accounts with balance available"
+            description="Add transactions to see your account distribution"
+            variant="inline"
+            height="h-[250px] sm:h-[300px]"
+          />
         )}
       </CardContent>
     </Card>
   );
-}
+});

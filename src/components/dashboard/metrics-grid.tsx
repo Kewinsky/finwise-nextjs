@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useMemo } from 'react';
 import { MetricCard } from './metric-card';
 import { DollarSign, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
 import type { DashboardMetrics } from '@/types/finance.types';
@@ -8,17 +9,19 @@ interface MetricsGridProps {
   data: DashboardMetrics;
 }
 
-export function MetricsGrid({ data }: MetricsGridProps) {
-  const calculateSavingsRate = () => {
+export const MetricsGrid = React.memo(function MetricsGrid({ data }: MetricsGridProps) {
+  const savingsRate = useMemo(() => {
     if (data.monthlySummary.totalIncome > 0) {
       return (data.monthlySummary.savings / data.monthlySummary.totalIncome) * 100;
     }
     return 0;
-  };
+  }, [data.monthlySummary.totalIncome, data.monthlySummary.savings]);
 
-  const savingsRate = calculateSavingsRate();
-  const savingsSubtitle =
-    savingsRate > 0 ? `${savingsRate.toFixed(1)}% savings rate` : 'Negative savings this month';
+  const savingsSubtitle = useMemo(
+    () =>
+      savingsRate > 0 ? `${savingsRate.toFixed(1)}% savings rate` : 'Negative savings this month',
+    [savingsRate],
+  );
 
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -84,4 +87,4 @@ export function MetricsGrid({ data }: MetricsGridProps) {
       />
     </div>
   );
-}
+});

@@ -1,14 +1,19 @@
 'use client';
 
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, CartesianGrid, XAxis, Cell, LabelList } from 'recharts';
 import { ChartContainer } from '@/components/ui/chart';
 import { BarChart3 } from 'lucide-react';
 import type { CategorySpending } from '@/hooks/use-category-spending';
+import { ErrorState } from '@/components/common/error-state';
+import { NoDataState } from '@/components/common/no-data-state';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface TopCategoriesChartProps {
   categorySpending: CategorySpending[];
+  isLoading?: boolean;
+  error?: string | null;
 }
 
 const CATEGORY_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
@@ -60,7 +65,11 @@ function prepareBarChartData(
   };
 }
 
-export function TopCategoriesChart({ categorySpending }: TopCategoriesChartProps) {
+export const TopCategoriesChart = React.memo(function TopCategoriesChart({
+  categorySpending,
+  isLoading = false,
+  error = null,
+}: TopCategoriesChartProps) {
   const { chartData, chartConfig } = useMemo(
     () => prepareBarChartData(categorySpending, CATEGORY_COLORS),
     [categorySpending],
@@ -76,7 +85,16 @@ export function TopCategoriesChart({ categorySpending }: TopCategoriesChartProps
         <CardDescription>Your highest spending categories this month</CardDescription>
       </CardHeader>
       <CardContent>
-        {chartData.length > 0 ? (
+        {isLoading ? (
+          <Skeleton className="h-[250px] sm:h-[300px] w-full" />
+        ) : error ? (
+          <ErrorState
+            title="Failed to load category data"
+            description={error}
+            variant="inline"
+            className="h-[250px] sm:h-[300px]"
+          />
+        ) : chartData.length > 0 ? (
           <ChartContainer config={chartConfig} className="h-[250px] sm:h-[300px] w-full">
             <BarChart accessibilityLayer data={chartData}>
               <CartesianGrid vertical={false} />
@@ -90,11 +108,15 @@ export function TopCategoriesChart({ categorySpending }: TopCategoriesChartProps
             </BarChart>
           </ChartContainer>
         ) : (
-          <div className="flex items-center justify-center h-[250px] sm:h-[300px] text-muted-foreground">
-            <p className="text-sm sm:text-base">No category data available</p>
-          </div>
+          <NoDataState
+            icon={BarChart3}
+            title="No category data available"
+            description="Add expenses to see your spending by category"
+            variant="inline"
+            height="h-[250px] sm:h-[300px]"
+          />
         )}
       </CardContent>
     </Card>
   );
-}
+});
