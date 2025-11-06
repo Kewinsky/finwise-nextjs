@@ -267,7 +267,7 @@ export class AIAssistantService {
     accountBalances: AccountBalance[];
   }): Promise<FinancialInsights | null> {
     try {
-      const { monthlySummary, categorySpending, spendingTrends, accountBalances } = data;
+      const { monthlySummary, categorySpending, accountBalances } = data;
 
       // Build comprehensive prompt for AI
       const prompt = `Analyze the following financial data and provide insights:

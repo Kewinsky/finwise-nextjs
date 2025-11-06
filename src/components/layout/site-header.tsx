@@ -10,6 +10,7 @@ import { RefreshCw } from 'lucide-react';
 import { generateHeaderTitle } from '@/lib/header-utils';
 import type { HeaderTitleType, FinancialSummary } from '@/types/header.types';
 import { useSettings } from '@/contexts/settings-context';
+import { ChatSidebarTrigger } from '@/components/layout/chat-sidebar-trigger';
 
 interface SiteHeaderProps {
   title?: string;
@@ -31,6 +32,9 @@ export function SiteHeader({
   const [displayTitle, setDisplayTitle] = useState(title || 'Dashboard');
   const pathname = usePathname();
   const { headerTitlePreference } = useSettings();
+
+  // Check if we're on a page that should show AI chat sidebar
+  const showAIChatSidebar = ['/dashboard', '/transactions', '/accounts'].includes(pathname);
 
   // Generate dynamic title based on user preference
   useEffect(() => {
@@ -77,6 +81,7 @@ export function SiteHeader({
           )}
           {showThemeToggle && <ThemeToggle />}
         </div>
+        {showAIChatSidebar && <ChatSidebarTrigger />}
       </div>
     </header>
   );
