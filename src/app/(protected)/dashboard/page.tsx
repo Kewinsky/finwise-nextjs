@@ -9,7 +9,6 @@ import { MetricsGrid } from '@/components/dashboard/metrics-grid';
 import { FinancialTrendsChart } from '@/components/dashboard/financial-trends-chart';
 import { AccountDistributionChart } from '@/components/dashboard/month-distribution-chart';
 import { TopCategoriesChart } from '@/components/dashboard/top-categories-chart';
-import { AISuggestionsCard } from '@/components/dashboard/ai-suggestions-card';
 import { RecentActivityCard } from '@/components/dashboard/recent-activity-card';
 import { QuickActionsCard } from '@/components/dashboard/quick-actions-card';
 
@@ -19,8 +18,7 @@ export default function DashboardPage() {
     'expense',
   );
 
-  const { dashboardData, financialHealthScore, aiInsights, isLoadingInsights, refetch } =
-    useDashboardData();
+  const { dashboardData, refetch } = useDashboardData();
 
   const currentDate = new Date();
   const { data: monthlyCategorySpending, clearCache: clearCategoryCache } = useCategorySpending({
@@ -64,15 +62,9 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <AISuggestionsCard
-          financialHealthScore={financialHealthScore}
-          aiInsights={aiInsights}
-          isLoadingInsights={isLoadingInsights}
-        />
+        <QuickActionsCard onAddTransaction={handleAddTransaction} />
         <RecentActivityCard recentTransactions={dashboardData.recentTransactions} />
       </div>
-
-      <QuickActionsCard onAddTransaction={handleAddTransaction} />
 
       {showTransactionForm && (
         <TransactionForm

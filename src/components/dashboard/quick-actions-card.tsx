@@ -54,7 +54,7 @@ export function QuickActionsCard({ onAddTransaction }: QuickActionsCardProps) {
         <CardDescription>Common tasks at your fingertips</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-4">
           {actions.map((action) => (
             <Button
               key={action.label}
