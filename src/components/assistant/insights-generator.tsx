@@ -113,7 +113,12 @@ export function InsightsGenerator({
               </p>
             )}
           </div>
-          <Button variant="outline" size="sm" onClick={() => setInsights(null)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setInsights(null)}
+            disabled={!canMakeQuery || isLimitReached}
+          >
             Generate New
           </Button>
         </div>
