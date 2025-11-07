@@ -87,7 +87,7 @@ export function ChatInterface() {
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex gap-3 min-w-0 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               {message.type === 'assistant' && (
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground flex-shrink-0">
@@ -95,11 +95,11 @@ export function ChatInterface() {
                 </div>
               )}
               <div
-                className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                className={`max-w-[80%] min-w-0 rounded-lg px-4 py-2 break-words ${
                   message.type === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
                 }`}
               >
-                <p className="text-sm">{message.content}</p>
+                <p className="text-sm break-words whitespace-pre-wrap">{message.content}</p>
                 <p
                   className={`text-xs mt-1 ${
                     message.type === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
