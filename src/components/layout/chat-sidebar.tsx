@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { IconMessageCircle } from '@tabler/icons-react';
 import {
   SidebarContent,
@@ -14,6 +15,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MessageCircle, Sparkles } from 'lucide-react';
 import { ChatInterface } from '@/components/assistant/chat-interface';
 import { InsightsGenerator } from '@/components/assistant/insights-generator';
+import { AIUsageIndicator } from '@/components/assistant/ai-usage-indicator';
+import { useAIUsage } from '@/hooks/use-ai-usage';
+import { useSubscription } from '@/hooks/use-subscription';
 import { useChatSidebar } from './chat-sidebar-provider';
 import { cn } from '@/lib/utils';
 import {
@@ -27,9 +31,19 @@ import {
 const CHAT_SIDEBAR_WIDTH = 'calc(var(--spacing) * 80)';
 const CHAT_SIDEBAR_WIDTH_MOBILE = '18rem';
 
+const ALLOWED_PAGES = ['/dashboard', '/transactions', '/accounts'];
+
 export function ChatSidebar() {
+  const pathname = usePathname();
   const [activeTab, setActiveTab] = useState<'chat' | 'insights'>('chat');
   const { isMobile, isOpen, openMobile, setOpenMobile } = useChatSidebar();
+  const { usage, isLoading: isUsageLoading, refetch, canMakeQuery, isLimitReached } = useAIUsage();
+  const { planType } = useSubscription();
+
+  // Only show sidebar on allowed pages
+  if (!ALLOWED_PAGES.includes(pathname)) {
+    return null;
+  }
 
   const state = isOpen ? 'expanded' : 'collapsed';
 
@@ -57,9 +71,18 @@ export function ChatSidebar() {
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
-                    <div className="flex items-center gap-2">
-                      <IconMessageCircle className="!size-5" />
-                      <span className="text-base font-semibold">AI Assistant</span>
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex items-center gap-2">
+                        <IconMessageCircle className="!size-5" />
+                        <span className="text-base font-semibold">AI Assistant</span>
+                      </div>
+                      <AIUsageIndicator
+                        queryCount={usage?.queryCount ?? 0}
+                        limit={usage?.limit ?? 5}
+                        isLoading={isUsageLoading}
+                        tokensUsed={usage?.tokensUsed ?? 0}
+                        resetDate={usage?.resetDate}
+                      />
                     </div>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -90,7 +113,13 @@ export function ChatSidebar() {
                   className="flex-1 m-0 mt-0 data-[state=active]:flex overflow-hidden"
                 >
                   <div className="flex-1 flex flex-col min-h-0 h-full">
-                    <ChatInterface />
+                    <ChatInterface
+                      usage={usage}
+                      canMakeQuery={canMakeQuery}
+                      isLimitReached={isLimitReached}
+                      refetch={refetch}
+                      planType={planType ?? undefined}
+                    />
                   </div>
                 </TabsContent>
 
@@ -98,7 +127,13 @@ export function ChatSidebar() {
                   value="insights"
                   className="flex-1 m-0 mt-0 p-2 overflow-y-auto data-[state=active]:block"
                 >
-                  <InsightsGenerator />
+                  <InsightsGenerator
+                    usage={usage}
+                    canMakeQuery={canMakeQuery}
+                    isLimitReached={isLimitReached}
+                    refetch={refetch}
+                    planType={planType ?? undefined}
+                  />
                 </TabsContent>
               </Tabs>
             </SidebarContent>
@@ -152,9 +187,18 @@ export function ChatSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
-                  <div className="flex items-center gap-2">
-                    <IconMessageCircle className="!size-5" />
-                    <span className="text-base font-semibold">AI Assistant</span>
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-2">
+                      <IconMessageCircle className="!size-5" />
+                      <span className="text-base font-semibold">AI Assistant</span>
+                    </div>
+                    <AIUsageIndicator
+                      queryCount={usage?.queryCount ?? 0}
+                      limit={usage?.limit ?? 5}
+                      isLoading={isUsageLoading}
+                      tokensUsed={usage?.tokensUsed ?? 0}
+                      resetDate={usage?.resetDate}
+                    />
                   </div>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -185,7 +229,13 @@ export function ChatSidebar() {
                 className="flex-1 m-0 mt-0 data-[state=active]:flex overflow-hidden"
               >
                 <div className="flex-1 flex flex-col min-h-0 h-full">
-                  <ChatInterface />
+                  <ChatInterface
+                    usage={usage}
+                    canMakeQuery={canMakeQuery}
+                    isLimitReached={isLimitReached}
+                    refetch={refetch}
+                    planType={planType ?? undefined}
+                  />
                 </div>
               </TabsContent>
 
@@ -193,7 +243,13 @@ export function ChatSidebar() {
                 value="insights"
                 className="flex-1 m-0 mt-0 p-2 overflow-y-auto data-[state=active]:block"
               >
-                <InsightsGenerator />
+                <InsightsGenerator
+                  usage={usage}
+                  canMakeQuery={canMakeQuery}
+                  isLimitReached={isLimitReached}
+                  refetch={refetch}
+                  planType={planType ?? undefined}
+                />
               </TabsContent>
             </Tabs>
           </SidebarContent>

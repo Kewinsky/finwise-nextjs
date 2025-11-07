@@ -281,4 +281,8 @@ END $$;
 -- - Mandatory account creation and synchronization
 -- - Currency backfill for existing transactions
 -- 
+-- Run openai-migration.sql to add:
+-- - openai_usage table for tracking AI query usage
+-- - ai_insights table for storing generated insights
+-- 
 -- =============================================================================

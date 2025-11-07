@@ -215,7 +215,7 @@ export class UserService {
       }
 
       log.info({ userId }, 'User profile soft deleted successfully');
-      return { success: true, data: undefined };
+      return { success: true };
     } catch (error) {
       log.error(error, 'Error soft deleting user profile');
       return {
@@ -242,7 +242,7 @@ export class UserService {
       }
 
       log.info({ userId }, 'User profile hard deleted successfully');
-      return { success: true, data: undefined };
+      return { success: true };
     } catch (error) {
       log.error(error, 'Error hard deleting user profile');
       return {
@@ -402,7 +402,7 @@ export class UserService {
         return { success: false, error: error.message };
       }
 
-      return { success: true, data: undefined };
+      return { success: true };
     } catch (error) {
       return {
         success: false,

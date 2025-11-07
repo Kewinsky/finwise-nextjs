@@ -39,6 +39,11 @@ export const ERROR_MESSAGES = {
   SERVICE_UNAVAILABLE: 'Service is temporarily unavailable',
   MAINTENANCE_MODE: 'System is under maintenance',
   CONFIGURATION_ERROR: 'System configuration error',
+
+  // AI errors
+  AI_QUERY_LIMIT_REACHED:
+    'You have reached your monthly AI query limit. Upgrade your plan to continue using AI features.',
+  AI_SERVICE_ERROR: 'AI service is temporarily unavailable. Please try again later.',
 } as const;
 
 /**

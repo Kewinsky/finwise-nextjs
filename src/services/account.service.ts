@@ -267,7 +267,7 @@ export class AccountService {
       }
 
       log.info({ accountId, userId }, 'Account deleted successfully');
-      return { success: true, data: undefined };
+      return { success: true };
     } catch (error) {
       log.error(error, 'Error deleting account');
       return {
@@ -335,7 +335,7 @@ export class AccountService {
         accountName: account.name,
         accountType: account.type as AccountType,
         balance: Number(account.balance),
-        color: account.color || undefined,
+        color: account.color ?? undefined,
       }));
 
       log.info({ userId, count: balances.length }, 'Account balances retrieved');

@@ -331,7 +331,7 @@ export class TransactionService {
       }
 
       log.info({ transactionId, userId }, 'Transaction deleted successfully');
-      return { success: true, data: undefined };
+      return { success: true };
     } catch (error) {
       log.error(error, 'Error deleting transaction');
       return {
@@ -424,7 +424,7 @@ export class TransactionService {
       }
 
       log.info({ userId, count: transactionIds.length }, 'Transactions deleted successfully');
-      return { success: true, data: undefined };
+      return { success: true };
     } catch (error) {
       log.error(error, 'Error deleting transactions');
       return {

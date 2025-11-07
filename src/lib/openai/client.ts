@@ -63,13 +63,14 @@ export async function callOpenAI(
     }>;
   },
   systemPrompt?: string,
-): Promise<{ content: string; error?: string }> {
+): Promise<{ content: string; tokensUsed: number; error?: string }> {
   try {
     if (!isOpenAIConfigured()) {
       log.warn('OpenAI is not configured, returning fallback response');
       return {
         content:
           'AI Assistant is not configured. Please set OPENAI_API_KEY in your environment variables.',
+        tokensUsed: 0,
         error: 'OPENAI_API_KEY not configured',
       };
     }
@@ -162,12 +163,14 @@ Guidelines:
       log.error('OpenAI returned empty response');
       return {
         content: 'I apologize, but I was unable to generate a response. Please try again.',
+        tokensUsed: 0,
         error: 'Empty response from OpenAI',
       };
     }
 
-    log.info({ model, tokensUsed: completion.usage?.total_tokens }, 'OpenAI API call successful');
-    return { content };
+    const tokensUsed = completion.usage?.total_tokens || 0;
+    log.info({ model, tokensUsed }, 'OpenAI API call successful');
+    return { content, tokensUsed };
   } catch (error) {
     log.error(error, 'Error calling OpenAI API');
 
@@ -176,6 +179,7 @@ Guidelines:
       if (error.message.includes('API key')) {
         return {
           content: 'AI Assistant is not properly configured. Please check your API key settings.',
+          tokensUsed: 0,
           error: 'Invalid API key',
         };
       }
@@ -183,6 +187,7 @@ Guidelines:
         return {
           content:
             'AI Assistant is temporarily unavailable due to rate limits. Please try again in a moment.',
+          tokensUsed: 0,
           error: 'Rate limit exceeded',
         };
       }
@@ -190,6 +195,7 @@ Guidelines:
         return {
           content:
             'AI Assistant is temporarily unavailable. Please contact support if this issue persists.',
+          tokensUsed: 0,
           error: 'Insufficient quota',
         };
       }
@@ -198,6 +204,7 @@ Guidelines:
     return {
       content:
         'I encountered an error while processing your request. Please try again or rephrase your question.',
+      tokensUsed: 0,
       error: error instanceof Error ? error.message : ERROR_MESSAGES.UNEXPECTED,
     };
   }

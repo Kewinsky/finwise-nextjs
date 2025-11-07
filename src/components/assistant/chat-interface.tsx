@@ -4,16 +4,36 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Bot, User } from 'lucide-react';
+import { Send, Bot, User, AlertCircle, XCircle, Clock } from 'lucide-react';
+import { UsageLimitModal } from './usage-limit-modal';
+import { askAIQuestion } from '@/lib/actions/finance-actions';
+import { notifyError } from '@/lib/notifications';
+import type { AIUsageData } from '@/hooks/use-ai-usage';
+import type { PlanType } from '@/config/app';
 
 interface ChatMessage {
   id: string;
-  type: 'user' | 'assistant';
+  type: 'user' | 'assistant' | 'error';
   content: string;
   timestamp: Date;
+  errorType?: 'limit' | 'service' | 'rate-limit';
 }
 
-export function ChatInterface() {
+interface ChatInterfaceProps {
+  usage: AIUsageData | null;
+  canMakeQuery: boolean;
+  isLimitReached: boolean;
+  refetch: () => Promise<void>;
+  planType?: PlanType;
+}
+
+export function ChatInterface({
+  usage,
+  canMakeQuery,
+  isLimitReached,
+  refetch,
+  planType,
+}: ChatInterfaceProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
@@ -25,9 +45,45 @@ export function ChatInterface() {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showLimitModal, setShowLimitModal] = useState(false);
+
+  const addErrorMessage = (errorType: 'limit' | 'service' | 'rate-limit') => {
+    const errorMessages = {
+      limit: {
+        content:
+          "You've reached your AI query limit (5/5 queries used this month).\n\nUpgrade to continue chatting with AI assistant.",
+        action: 'Upgrade Plan',
+      },
+      service: {
+        content: 'AI service is temporarily unavailable. Please try again in a moment.',
+        action: 'Retry',
+      },
+      'rate-limit': {
+        content: 'Too many requests. Please wait a moment before trying again.',
+        action: 'OK',
+      },
+    };
+
+    const errorMessage: ChatMessage = {
+      id: Date.now().toString(),
+      type: 'error',
+      content: errorMessages[errorType].content,
+      timestamp: new Date(),
+      errorType,
+    };
+
+    setMessages((prev) => [...prev, errorMessage]);
+  };
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
+
+    // Check limit before sending
+    if (!canMakeQuery || isLimitReached) {
+      setShowLimitModal(true);
+      addErrorMessage('limit');
+      return;
+    }
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
@@ -41,36 +97,48 @@ export function ChatInterface() {
     setInputMessage('');
     setIsLoading(true);
 
-    // Mock response - simulate API call
-    setTimeout(() => {
-      const mockResponses: Record<string, string> = {
-        'how can i save more money?':
-          'Based on your spending patterns, I recommend reviewing your recurring subscriptions and reducing dining out expenses. Consider setting up automatic transfers to your savings account.',
-        'what are my biggest expenses?':
-          'Your top spending categories this month are Food & Dining (30%), Transportation (20%), and Shopping (15%). Focus on these areas to reduce overall spending.',
-        'how is my spending trending?':
-          'Your spending has increased by 12% compared to last month. The main drivers are increased dining expenses and transportation costs. Consider setting monthly limits for these categories.',
-        'should i invest more?':
-          "Before increasing investments, ensure you have an emergency fund covering 3-6 months of expenses. Once that's established, consider investing 20% of your income.",
-        "what's my financial health score?":
-          "Your financial health score is calculated based on savings rate, expense-to-income ratio, and account diversity. I can generate detailed insights if you'd like!",
-      };
+    try {
+      const formData = new FormData();
+      formData.append('message', currentMessage);
 
-      const lowerMessage = currentMessage.toLowerCase();
-      const response =
-        mockResponses[lowerMessage] ||
-        `I understand you're asking about "${currentMessage}". Based on your financial data, I'd recommend reviewing your monthly spending patterns and setting clear savings goals. Would you like me to generate detailed insights?`;
+      const result = await askAIQuestion(formData);
+
+      if (!result.success) {
+        if (result.error?.includes('limit')) {
+          addErrorMessage('limit');
+          setShowLimitModal(true);
+        } else if (result.error?.includes('rate limit')) {
+          addErrorMessage('rate-limit');
+        } else {
+          addErrorMessage('service');
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      if (!('data' in result) || !result.data) {
+        addErrorMessage('service');
+        setIsLoading(false);
+        return;
+      }
 
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: response,
+        content: result.data.answer,
         timestamp: new Date(),
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+
+      // Refetch usage to update the counter (shared context will update all components)
+      await refetch();
+    } catch (error) {
+      notifyError(error instanceof Error ? error.message : 'Failed to send message');
+      addErrorMessage('service');
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const formatTime = (date: Date) => {
@@ -82,39 +150,101 @@ export function ChatInterface() {
 
   return (
     <div className="flex flex-col h-full">
+      {/* Limit Modal */}
+      {usage && (
+        <UsageLimitModal
+          open={showLimitModal}
+          onOpenChange={setShowLimitModal}
+          queryCount={usage.queryCount}
+          limit={usage.limit}
+          currentPlan={planType || 'free'}
+        />
+      )}
+
       <ScrollArea className="flex-1 p-2">
         <div className="space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex gap-3 min-w-0 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              {message.type === 'assistant' && (
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground flex-shrink-0">
-                  <Bot className="h-4 w-4" />
+          {messages.map((message) => {
+            if (message.type === 'error') {
+              const errorIcon =
+                message.errorType === 'limit' ? (
+                  <AlertCircle className="h-4 w-4" />
+                ) : message.errorType === 'rate-limit' ? (
+                  <Clock className="h-4 w-4" />
+                ) : (
+                  <XCircle className="h-4 w-4" />
+                );
+
+              return (
+                <div key={message.id} className="flex gap-3 min-w-0 justify-start">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-destructive/10 text-destructive flex-shrink-0">
+                    {errorIcon}
+                  </div>
+                  <div className="max-w-[80%] min-w-0 rounded-lg px-4 py-2 break-words bg-destructive/10 border border-destructive/20">
+                    <p className="text-sm break-words whitespace-pre-wrap text-destructive">
+                      {message.content}
+                    </p>
+                    {message.errorType === 'limit' && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-2"
+                        onClick={() => setShowLimitModal(true)}
+                      >
+                        Upgrade Plan
+                      </Button>
+                    )}
+                    {message.errorType === 'service' && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-2"
+                        onClick={handleSendMessage}
+                      >
+                        Retry
+                      </Button>
+                    )}
+                    <p className="text-xs mt-1 text-destructive/70">
+                      {formatTime(message.timestamp)}
+                    </p>
+                  </div>
                 </div>
-              )}
+              );
+            }
+
+            return (
               <div
-                className={`max-w-[80%] min-w-0 rounded-lg px-4 py-2 break-words ${
-                  message.type === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                }`}
+                key={message.id}
+                className={`flex gap-3 min-w-0 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                <p className="text-sm break-words whitespace-pre-wrap">{message.content}</p>
-                <p
-                  className={`text-xs mt-1 ${
-                    message.type === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                {message.type === 'assistant' && (
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground flex-shrink-0">
+                    <Bot className="h-4 w-4" />
+                  </div>
+                )}
+                <div
+                  className={`max-w-[80%] min-w-0 rounded-lg px-4 py-2 break-words ${
+                    message.type === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
                   }`}
                 >
-                  {formatTime(message.timestamp)}
-                </p>
-              </div>
-              {message.type === 'user' && (
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted flex-shrink-0">
-                  <User className="h-4 w-4" />
+                  <p className="text-sm break-words whitespace-pre-wrap">{message.content}</p>
+                  <p
+                    className={`text-xs mt-1 ${
+                      message.type === 'user'
+                        ? 'text-primary-foreground/70'
+                        : 'text-muted-foreground'
+                    }`}
+                  >
+                    {formatTime(message.timestamp)}
+                  </p>
                 </div>
-              )}
-            </div>
-          ))}
+                {message.type === 'user' && (
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted flex-shrink-0">
+                    <User className="h-4 w-4" />
+                  </div>
+                )}
+              </div>
+            );
+          })}
           {isLoading && (
             <div className="flex gap-3 justify-start">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground flex-shrink-0">
@@ -144,11 +274,11 @@ export function ChatInterface() {
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            disabled={isLoading}
+            disabled={isLoading || !canMakeQuery}
           />
           <Button
             onClick={handleSendMessage}
-            disabled={!inputMessage.trim() || isLoading}
+            disabled={!inputMessage.trim() || isLoading || !canMakeQuery}
             size="icon"
           >
             <Send className="h-4 w-4" />

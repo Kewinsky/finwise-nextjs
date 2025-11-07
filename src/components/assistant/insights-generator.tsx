@@ -1,52 +1,118 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sparkles, Lightbulb, Target, AlertCircle, BarChart3 } from 'lucide-react';
 import type { FinancialInsights } from '@/types/finance.types';
+import { UsageLimitModal } from './usage-limit-modal';
+import { generateInsights, getLastInsights } from '@/lib/actions/finance-actions';
+import { notifyError } from '@/lib/notifications';
+import { LoadingSpinner } from '@/components/ui/custom-spinner';
+import type { AIUsageData } from '@/hooks/use-ai-usage';
+import type { PlanType } from '@/config/app';
 
-export function InsightsGenerator() {
+interface InsightsGeneratorProps {
+  usage: AIUsageData | null;
+  canMakeQuery: boolean;
+  isLimitReached: boolean;
+  refetch: () => Promise<void>;
+  planType?: PlanType;
+}
+
+export function InsightsGenerator({
+  usage,
+  canMakeQuery,
+  isLimitReached,
+  refetch,
+  planType,
+}: InsightsGeneratorProps) {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [insights, setInsights] = useState<FinancialInsights | null>(null);
+  const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
+  const [showLimitModal, setShowLimitModal] = useState(false);
+
+  // Load last insights on mount
+  useEffect(() => {
+    const loadLastInsights = async () => {
+      setIsLoading(true);
+      const result = await getLastInsights();
+      if (result.success && 'data' in result && result.data) {
+        setInsights(result.data.insights);
+        setGeneratedAt(result.data.generatedAt);
+      }
+      setIsLoading(false);
+    };
+    loadLastInsights();
+  }, []);
 
   const handleGenerate = async () => {
+    // Check limit before generating
+    if (!canMakeQuery || isLimitReached) {
+      setShowLimitModal(true);
+      return;
+    }
+
     setIsGenerating(true);
 
-    // Mock insights generation
-    setTimeout(() => {
-      const mockInsights: FinancialInsights = {
-        spendingInsights: [
-          'Your spending on Food & Dining has increased by 15% this month compared to last month.',
-          'You have 8 recurring subscriptions totaling $120/month.',
-          'Your transportation costs are higher than average for your income level.',
-        ],
-        savingsTips: [
-          'Consider canceling unused subscriptions to save $40/month.',
-          'Set up automatic transfers of $200/month to your savings account.',
-          'Review your dining out expenses - reducing by 20% could save $80/month.',
-        ],
-        budgetOptimization: [
-          'Allocate 50% of income to needs, 30% to wants, and 20% to savings.',
-          'Create separate budgets for variable expenses like entertainment.',
-          'Track your spending weekly to stay within budget limits.',
-        ],
-        areasOfConcern: [
-          'Your expenses exceed your income by 5% this month.',
-          'You have limited emergency fund coverage (less than 1 month).',
-        ],
-      };
+    try {
+      const result = await generateInsights();
+      if (!result.success) {
+        notifyError(result.error || 'Failed to generate insights');
+        setIsGenerating(false);
+        return;
+      }
 
-      setInsights(mockInsights);
+      if (!('data' in result) || !result.data) {
+        notifyError('Failed to generate insights');
+        setIsGenerating(false);
+        return;
+      }
+
+      setInsights(result.data);
+      setGeneratedAt(new Date());
+
+      // Refetch usage to update the counter (shared context will update all components)
+      await refetch();
+    } catch (error) {
+      notifyError(error instanceof Error ? error.message : 'Failed to generate insights');
+    } finally {
       setIsGenerating(false);
-    }, 2000);
+    }
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
   };
 
   if (insights) {
     return (
       <div className="space-y-4">
+        {/* Limit Modal */}
+        {usage && (
+          <UsageLimitModal
+            open={showLimitModal}
+            onOpenChange={setShowLimitModal}
+            queryCount={usage.queryCount}
+            limit={usage.limit}
+            currentPlan={planType || 'free'}
+          />
+        )}
+
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold">Generated Insights</h3>
+          <div>
+            <h3 className="font-semibold">Generated Insights</h3>
+            {generatedAt && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Last generated: {formatDate(generatedAt)}
+              </p>
+            )}
+          </div>
           <Button variant="outline" size="sm" onClick={() => setInsights(null)}>
             Generate New
           </Button>
@@ -135,8 +201,40 @@ export function InsightsGenerator() {
     );
   }
 
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              Generate Insights
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Get AI-powered analysis of your financial data
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <LoadingSpinner message="Loading insights..." className="py-4" />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
+      {/* Limit Modal */}
+      {usage && (
+        <UsageLimitModal
+          open={showLimitModal}
+          onOpenChange={setShowLimitModal}
+          queryCount={usage.queryCount}
+          limit={usage.limit}
+          currentPlan={planType || 'free'}
+        />
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle className="text-sm flex items-center gap-2">
@@ -148,15 +246,24 @@ export function InsightsGenerator() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button
-            onClick={handleGenerate}
-            disabled={isGenerating}
-            className="w-full"
-            variant="outline"
-          >
-            <Sparkles className="mr-2 h-4 w-4" />
-            {isGenerating ? 'Generating...' : 'Generate Insights'}
-          </Button>
+          {isGenerating ? (
+            <LoadingSpinner
+              size="default"
+              variant="pinwheel"
+              message="Generating insights..."
+              className="py-4"
+            />
+          ) : (
+            <Button
+              onClick={handleGenerate}
+              disabled={!canMakeQuery}
+              className="w-full"
+              variant="outline"
+            >
+              <Sparkles className="mr-2 h-4 w-4" />
+              Generate Insights
+            </Button>
+          )}
         </CardContent>
       </Card>
     </div>

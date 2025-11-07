@@ -228,7 +228,7 @@ export class NotificationService {
       }
 
       log.info({ userId }, 'Notification preferences deleted successfully');
-      return { success: true, data: undefined };
+      return { success: true };
     } catch (error) {
       log.error(error, 'Error deleting notification preferences');
       return {

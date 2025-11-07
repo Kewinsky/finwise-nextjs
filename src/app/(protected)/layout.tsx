@@ -31,9 +31,11 @@ function HeaderSkeleton() {
 async function HeaderWithFinancialSummary({ userFullName }: { userFullName: string }) {
   // Fetch financial summary for header display
   const financialSummaryResult = await getFinancialSummary();
-  const financialSummary = financialSummaryResult.success ? financialSummaryResult.data : undefined;
+  const financialSummary = financialSummaryResult.success ? financialSummaryResult.data : null;
 
-  return <SiteHeader userFullName={userFullName} financialSummary={financialSummary} />;
+  return (
+    <SiteHeader userFullName={userFullName} financialSummary={financialSummary || undefined} />
+  );
 }
 
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
