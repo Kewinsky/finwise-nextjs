@@ -100,7 +100,7 @@ export const RecentActivityCard = React.memo(function RecentActivityCard({
             title="Failed to load recent activity"
             description={error}
             variant="inline"
-            className="h-[250px] sm:h-[300px]"
+            className="h-[250px] @sm:h-[300px]"
           />
         ) : recentTransactions.length === 0 ? (
           <NoDataState
@@ -108,7 +108,7 @@ export const RecentActivityCard = React.memo(function RecentActivityCard({
             title="No recent transactions"
             description="Start tracking your finances by adding your first transaction"
             variant="inline"
-            height="h-[250px] sm:h-[300px]"
+            height="h-[250px] @sm:h-[300px]"
           />
         ) : (
           <div className="space-y-4 max-h-[600px] overflow-y-auto">

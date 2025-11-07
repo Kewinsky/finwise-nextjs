@@ -10,6 +10,7 @@ import { RefreshCw } from 'lucide-react';
 import { generateHeaderTitle } from '@/lib/header-utils';
 import type { HeaderTitleType, FinancialSummary } from '@/types/header.types';
 import { useSettings } from '@/contexts/settings-context';
+import { ChatSidebarTrigger } from '@/components/layout/chat-sidebar-trigger';
 
 interface SiteHeaderProps {
   title?: string;
@@ -31,6 +32,9 @@ export function SiteHeader({
   const [displayTitle, setDisplayTitle] = useState(title || 'Dashboard');
   const pathname = usePathname();
   const { headerTitlePreference } = useSettings();
+
+  // Check if we're on a page that should show AI chat sidebar
+  const showAIChatSidebar = ['/dashboard', '/transactions', '/accounts'].includes(pathname);
 
   // Generate dynamic title based on user preference
   useEffect(() => {
@@ -58,7 +62,7 @@ export function SiteHeader({
 
   return (
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
-      <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
+      <div className="flex w-full items-center gap-2 px-6">
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
         <h1 className="text-base font-medium">{displayTitle}</h1>
@@ -77,6 +81,7 @@ export function SiteHeader({
           )}
           {showThemeToggle && <ThemeToggle />}
         </div>
+        {showAIChatSidebar && <ChatSidebarTrigger />}
       </div>
     </header>
   );

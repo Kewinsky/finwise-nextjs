@@ -56,3 +56,4 @@
     ✔ handle consistent loading state on every section @done(25-11-06 00:54)
     ✔ handle consistent error state on every section @done(25-11-06 00:55)
     ☐ improve preferences page to avoid overflow on dashboard
+    ☐ fix chart responsiveness (overflow issues)

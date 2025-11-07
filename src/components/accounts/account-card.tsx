@@ -46,15 +46,15 @@ export function AccountCard({
             <div className="min-w-0 flex-1">
               <h3 className="font-bold text-lg flex items-center gap-2 min-w-0">
                 <span className="truncate">{account.name}</span>
-                {account.is_mandatory && (
-                  <Badge
-                    variant="destructive"
-                    className="bg-white/20 text-white border-white/30 flex-shrink-0"
-                  >
-                    Mandatory
-                  </Badge>
-                )}
               </h3>
+              {account.is_mandatory && (
+                <Badge
+                  variant="destructive"
+                  className="bg-white/20 text-white border-white/30 flex-shrink-0 mr-1"
+                >
+                  Mandatory
+                </Badge>
+              )}
               <Badge variant="outline" className="bg-white/20 text-white border-white/30 mt-1">
                 {typeLabel}
               </Badge>

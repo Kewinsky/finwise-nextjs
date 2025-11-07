@@ -2,7 +2,12 @@
 
 import { createClientForServer } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
-import { AccountService, TransactionService, AIAssistantService } from '@/services';
+import {
+  AccountService,
+  TransactionService,
+  AIAssistantService,
+  OpenAIUsageService,
+} from '@/services';
 import { RedisCache, CacheKeys, CacheTTL } from '@/lib/cache/redis-cache';
 import {
   createAccountSchema,
@@ -16,6 +21,7 @@ import {
 import { z } from 'zod';
 import { ERROR_MESSAGES } from '@/lib/constants/errors';
 import { handleActionError, handleValidationError } from '@/lib/utils/error-handler';
+import type { PlanType } from '@/config/app';
 
 /**
  * Helper function to invalidate user's cache when data changes
@@ -544,7 +550,7 @@ export async function getDashboardData(dateRange?: { from?: Date; to?: Date }) {
       accountCountResult,
     ] = await Promise.all([
       transactionService.getMonthlySummary(user.id),
-      transactionService.getRecentTransactions(user.id, 10),
+      transactionService.getRecentTransactions(user.id, 5),
       transactionService.getSpendingTrends(user.id, 7, dateRange),
       accountService.getTotalBalance(user.id),
       accountService.getAccountCount(user.id),
@@ -1328,6 +1334,60 @@ export async function askAIQuestion(formData: FormData) {
     return await aiService.askQuestion(user.id, validatedData.message);
   } catch (error) {
     return handleActionError(error, 'askAIQuestion');
+  }
+}
+
+/**
+ * Get AI usage data for current month
+ */
+export async function getAIUsage() {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    // Get subscription once and pass planType to avoid redundant fetches
+    const { SubscriptionService } = await import('@/services/subscription.service');
+    const subscriptionService = new SubscriptionService(supabase);
+    const subscriptionResult = await subscriptionService.getUserSubscription(user.id);
+
+    if (!subscriptionResult.success) {
+      return { success: false, error: subscriptionResult.error };
+    }
+
+    const subscription = subscriptionResult.data;
+    const planType = (subscription?.plan_type || 'free') as PlanType;
+
+    const usageService = new OpenAIUsageService(supabase);
+    return await usageService.getCurrentMonthUsage(user.id, planType);
+  } catch (error) {
+    return handleActionError(error, 'getAIUsage');
+  }
+}
+
+/**
+ * Get last generated insights for user
+ */
+export async function getLastInsights() {
+  try {
+    const supabase = await createClientForServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    const aiService = new AIAssistantService(supabase);
+    return await aiService.getLastInsights(user.id);
+  } catch (error) {
+    return handleActionError(error, 'getLastInsights');
   }
 }
 

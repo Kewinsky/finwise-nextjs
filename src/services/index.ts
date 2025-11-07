@@ -94,6 +94,8 @@ export {
 export { AccountService } from './account.service';
 export { TransactionService } from './transaction.service';
 export { AIAssistantService } from './ai.service';
+export { OpenAIUsageService } from './openai-usage.service';
+export type { AIUsageData } from './openai-usage.service';
 export type {
   Account,
   AccountInsert,

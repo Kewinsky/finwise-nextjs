@@ -104,7 +104,7 @@ export const MetricCard = React.memo(function MetricCard({
       )}
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className={cn('text-sm font-medium', textColor)}>{title}</CardTitle>
+        <CardTitle className={cn('text-sm font-medium truncate', textColor)}>{title}</CardTitle>
         <Icon className={cn('h-4 w-4', iconColor)} />
       </CardHeader>
       <CardContent className="flex flex-col justify-end flex-1 mt-auto">
@@ -113,10 +113,10 @@ export const MetricCard = React.memo(function MetricCard({
             value={value}
             decimalPlaces={decimalPlaces}
             delay={delay}
-            className={valueColor}
+            className={cn('truncate', valueColor)}
           />
         </div>
-        <p className={cn('text-xs', subtitleColor)}>{renderSubtitle()}</p>
+        <p className={cn('text-xs truncate', subtitleColor)}>{renderSubtitle()}</p>
       </CardContent>
     </Card>
   );

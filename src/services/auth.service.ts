@@ -108,7 +108,7 @@ export class AuthService {
       }
 
       log.info({ email: input.email }, 'Magic link sent successfully');
-      return { success: true, data: undefined };
+      return { success: true };
     } catch (error) {
       log.error(error, 'Magic link error');
       return {
@@ -171,7 +171,7 @@ export class AuthService {
       }
 
       log.info('User signout successful');
-      return { success: true, data: undefined };
+      return { success: true };
     } catch (error) {
       log.error(error, 'Signout error');
       return {
@@ -198,7 +198,7 @@ export class AuthService {
       }
 
       log.info({ email }, 'Password reset email sent');
-      return { success: true, data: undefined };
+      return { success: true };
     } catch (error) {
       log.error(error, 'Password reset error');
       return {
@@ -225,7 +225,7 @@ export class AuthService {
       }
 
       log.info('Password reset successful');
-      return { success: true, data: undefined };
+      return { success: true };
     } catch (error) {
       log.error(error, 'Password reset error');
       return {

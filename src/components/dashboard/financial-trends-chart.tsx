@@ -69,7 +69,7 @@ export const FinancialTrendsChart = React.memo(function FinancialTrendsChart({
   return (
     <Card>
       <CardHeader>
-        <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+        <div className="flex flex-col space-y-4 @sm:flex-row @sm:items-center @sm:justify-between @sm:space-y-0">
           <div className="flex flex-col gap-2">
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
@@ -126,25 +126,27 @@ export const FinancialTrendsChart = React.memo(function FinancialTrendsChart({
             height="h-[400px]"
           />
         ) : (
-          <ChartContainer config={chartConfig} className="h-[400px] w-full">
-            <AreaChart
-              accessibilityLayer
-              data={areaChartData}
-              margin={{ top: 16, bottom: 16, left: 32, right: 32 }}
-            >
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="label"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={10}
-                minTickGap={selectedTimeRange === '1M' ? 100 : 50}
-                interval={selectedTimeRange === '1M' ? Math.floor(areaChartData.length / 15) : 0}
-              />
-              <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-              <Area dataKey="value" stroke={chartColor} fill={chartColor} fillOpacity={0.3} />
-            </AreaChart>
-          </ChartContainer>
+          <div className="overflow-x-auto">
+            <ChartContainer config={chartConfig} className="h-[400px] w-full min-w-[600px]">
+              <AreaChart
+                accessibilityLayer
+                data={areaChartData}
+                margin={{ top: 16, bottom: 16, left: 32, right: 32 }}
+              >
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="label"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={10}
+                  minTickGap={selectedTimeRange === '1M' ? 100 : 50}
+                  interval={selectedTimeRange === '1M' ? Math.floor(areaChartData.length / 15) : 0}
+                />
+                <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                <Area dataKey="value" stroke={chartColor} fill={chartColor} fillOpacity={0.3} />
+              </AreaChart>
+            </ChartContainer>
+          </div>
         )}
       </CardContent>
     </Card>

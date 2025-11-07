@@ -5,6 +5,8 @@ import { requireAuth } from '@/lib/actions/auth-actions';
 import { FontWrapper } from '@/components/layout/font-wrapper';
 import { SiteHeader } from '@/components/layout/site-header';
 import { getFinancialSummary } from '@/lib/actions/finance-actions';
+import { ChatSidebar } from '@/components/layout/chat-sidebar';
+import { ChatSidebarProvider } from '@/components/layout/chat-sidebar-provider';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // Force dynamic rendering since we use cookies for authentication
@@ -29,9 +31,11 @@ function HeaderSkeleton() {
 async function HeaderWithFinancialSummary({ userFullName }: { userFullName: string }) {
   // Fetch financial summary for header display
   const financialSummaryResult = await getFinancialSummary();
-  const financialSummary = financialSummaryResult.success ? financialSummaryResult.data : undefined;
+  const financialSummary = financialSummaryResult.success ? financialSummaryResult.data : null;
 
-  return <SiteHeader userFullName={userFullName} financialSummary={financialSummary} />;
+  return (
+    <SiteHeader userFullName={userFullName} financialSummary={financialSummary || undefined} />
+  );
 }
 
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
@@ -40,22 +44,25 @@ export default async function ProtectedLayout({ children }: { children: React.Re
 
   return (
     <FontWrapper>
-      <SidebarProvider
-        style={
-          {
-            '--sidebar-width': 'calc(var(--spacing) * 72)',
-            '--header-height': 'calc(var(--spacing) * 12)',
-          } as React.CSSProperties
-        }
-      >
-        <AppSidebar variant="inset" user={user} />
-        <SidebarInset>
-          <Suspense fallback={<HeaderSkeleton />}>
-            <HeaderWithFinancialSummary userFullName={user.profile.full_name || ''} />
-          </Suspense>
-          <div className="flex-1">{children}</div>
-        </SidebarInset>
-      </SidebarProvider>
+      <ChatSidebarProvider>
+        <SidebarProvider
+          style={
+            {
+              '--sidebar-width': 'calc(var(--spacing) * 72)',
+              '--header-height': 'calc(var(--spacing) * 12)',
+            } as React.CSSProperties
+          }
+        >
+          <AppSidebar variant="inset" user={user} />
+          <SidebarInset>
+            <Suspense fallback={<HeaderSkeleton />}>
+              <HeaderWithFinancialSummary userFullName={user.profile.full_name || ''} />
+            </Suspense>
+            <div className="flex-1">{children}</div>
+          </SidebarInset>
+          <ChatSidebar />
+        </SidebarProvider>
+      </ChatSidebarProvider>
     </FontWrapper>
   );
 }

@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Database } from '@/types/database.types';
+import type { Database, Json } from '@/types/database.types';
 import type { ServiceResult } from '@/types/service.types';
 import type {
   FinancialInsights,
@@ -14,6 +14,9 @@ import { log } from '@/lib/logger';
 import { ERROR_MESSAGES } from '@/lib/constants/errors';
 import { TransactionService } from './transaction.service';
 import { AccountService } from './account.service';
+import { OpenAIUsageService } from './openai-usage.service';
+import { callOpenAI } from '@/lib/openai/client';
+import { isOpenAIConfigured } from '@/lib/openai/config';
 
 /**
  * AIAssistantService handles AI-powered financial insights and analysis
@@ -38,10 +41,82 @@ import { AccountService } from './account.service';
 export class AIAssistantService {
   private transactionService: TransactionService;
   private accountService: AccountService;
+  private usageService: OpenAIUsageService;
 
   constructor(private readonly supabase: SupabaseClient<Database>) {
     this.transactionService = new TransactionService(supabase);
     this.accountService = new AccountService(supabase);
+    this.usageService = new OpenAIUsageService(supabase);
+  }
+
+  /**
+   * Save insights to database
+   */
+  async saveInsights(userId: string, insights: FinancialInsights): Promise<ServiceResult<void>> {
+    try {
+      const { error } = await this.supabase.from('ai_insights').upsert(
+        {
+          user_id: userId,
+          insights: insights as unknown as Json,
+          generated_at: new Date().toISOString(),
+        },
+        {
+          onConflict: 'user_id',
+        },
+      );
+
+      if (error) {
+        log.error({ userId, error: error.message }, 'Failed to save insights');
+        return { success: false, error: error.message };
+      }
+
+      log.info({ userId }, 'Insights saved successfully');
+      return { success: true };
+    } catch (error) {
+      log.error(error, 'Error saving insights');
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
+
+  /**
+   * Get last generated insights for a user
+   */
+  async getLastInsights(
+    userId: string,
+  ): Promise<ServiceResult<{ insights: FinancialInsights; generatedAt: Date } | null>> {
+    try {
+      const { data, error } = await this.supabase
+        .from('ai_insights')
+        .select('insights, generated_at')
+        .eq('user_id', userId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        log.error({ userId, error: error.message }, 'Failed to get last insights');
+        return { success: false, error: error.message };
+      }
+
+      if (!data) {
+        return { success: true, data: null };
+      }
+
+      return {
+        success: true,
+        data: {
+          insights: data.insights as unknown as FinancialInsights,
+          generatedAt: new Date(data.generated_at),
+        },
+      };
+    } catch (error) {
+      log.error(error, 'Error getting last insights');
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
   }
 
   /**
@@ -51,7 +126,15 @@ export class AIAssistantService {
     try {
       log.info({ userId }, 'Generating financial insights');
 
-      // Gather data for analysis
+      const canMakeCallResult = await this.usageService.canMakeAPICall(userId);
+      if (!canMakeCallResult.success) {
+        return { success: false, error: canMakeCallResult.error };
+      }
+
+      if (!canMakeCallResult.data) {
+        return { success: false, error: ERROR_MESSAGES.AI_QUERY_LIMIT_REACHED };
+      }
+
       const [
         monthlySummaryResult,
         categorySpendingResult,
@@ -64,7 +147,6 @@ export class AIAssistantService {
         this.accountService.getAccountBalances(userId),
       ]);
 
-      // Check if we have enough data
       if (!monthlySummaryResult.success || !categorySpendingResult.success) {
         return { success: false, error: 'Unable to gather financial data for analysis' };
       }
@@ -74,13 +156,27 @@ export class AIAssistantService {
       const spendingTrends = spendingTrendsResult.success ? spendingTrendsResult.data : [];
       const accountBalances = accountBalancesResult.success ? accountBalancesResult.data : [];
 
-      // Generate insights
+      log.info({ userId }, 'Using rule-based insights (mock mode)');
       const insights = this.analyzeFinancialData({
         monthlySummary,
         categorySpending,
         spendingTrends,
         accountBalances,
       });
+
+      const saveResult = await this.saveInsights(userId, insights);
+      if (!saveResult.success) {
+        log.warn({ userId, error: saveResult.error }, 'Failed to save insights, but continuing');
+      }
+
+      const mockTokensUsed = 320;
+      const recordResult = await this.usageService.recordAPICall(userId, mockTokensUsed);
+      if (!recordResult.success) {
+        log.warn(
+          { userId, error: recordResult.error },
+          'Failed to record API call, but continuing',
+        );
+      }
 
       log.info({ userId }, 'Financial insights generated successfully');
       return { success: true, data: insights };
@@ -100,18 +196,296 @@ export class AIAssistantService {
     try {
       log.info({ userId, messageLength: message.length }, 'Processing AI question');
 
-      // For now, we'll provide mock responses based on common questions
-      // In a real implementation, you'd integrate with OpenAI or another AI service
-      const response = await this.generateMockResponse(userId, message);
+      const canMakeCallResult = await this.usageService.canMakeAPICall(userId);
+      if (!canMakeCallResult.success) {
+        return { success: false, error: canMakeCallResult.error };
+      }
 
-      log.info({ userId }, 'AI question processed successfully');
-      return { success: true, data: response };
+      if (!canMakeCallResult.data) {
+        return { success: false, error: ERROR_MESSAGES.AI_QUERY_LIMIT_REACHED };
+      }
+
+      const [
+        monthlySummaryResult,
+        categorySpendingResult,
+        categoryIncomeResult,
+        spendingTrendsResult,
+        recentTransactionsResult,
+        accountBalancesResult,
+      ] = await Promise.all([
+        this.transactionService.getMonthlySummary(userId),
+        this.transactionService.getCategorySpending(userId, 'expense'),
+        this.transactionService.getCategorySpending(userId, 'income'),
+        this.transactionService.getSpendingTrends(userId, 30),
+        this.transactionService.getRecentTransactions(userId, 15),
+        this.accountService.getAccountBalances(userId),
+      ]);
+
+      const monthlySummary = monthlySummaryResult.success ? monthlySummaryResult.data : undefined;
+      const categorySpending = categorySpendingResult.success
+        ? categorySpendingResult.data.slice(0, 10)
+        : undefined;
+      const categoryIncome = categoryIncomeResult.success
+        ? categoryIncomeResult.data.slice(0, 5)
+        : undefined;
+      const spendingTrends = spendingTrendsResult.success ? spendingTrendsResult.data : undefined;
+      const recentTransactions = recentTransactionsResult.success
+        ? recentTransactionsResult.data
+        : undefined;
+      const accountBalances = accountBalancesResult.success
+        ? accountBalancesResult.data
+        : undefined;
+
+      const totalBalance = accountBalances?.reduce((sum, acc) => sum + acc.balance, 0) ?? 0;
+      const avgTransactionAmount =
+        recentTransactions && recentTransactions.length > 0
+          ? recentTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0) /
+            recentTransactions.length
+          : 0;
+      const mostActiveCategory =
+        categorySpending && categorySpending.length > 0 ? categorySpending[0] : undefined;
+
+      let dailyAverage = 0;
+      let weeklyAverage = 0;
+      if (spendingTrends && spendingTrends.length > 0) {
+        const expenseTrends = spendingTrends.filter((t) => t.type === 'expense');
+        const totalSpending = expenseTrends.reduce((sum, t) => sum + t.amount, 0);
+        const days = expenseTrends.length;
+        dailyAverage = days > 0 ? totalSpending / days : 0;
+        weeklyAverage = dailyAverage * 7;
+      }
+
+      const context = {
+        monthlySummary: monthlySummary
+          ? {
+              month: monthlySummary.month,
+              totalIncome: monthlySummary.totalIncome,
+              totalExpenses: monthlySummary.totalExpenses,
+              savings: monthlySummary.savings,
+              netIncome: monthlySummary.netIncome,
+              transactionCount: monthlySummary.transactionCount,
+              previousMonth: monthlySummary.previousMonth,
+            }
+          : undefined,
+        categorySpending: categorySpending?.map((c) => ({
+          category: c.category,
+          amount: c.totalAmount,
+          percentage: c.percentage,
+          transactionCount: c.transactionCount,
+        })),
+        categoryIncome: categoryIncome?.map((c) => ({
+          category: c.category,
+          amount: c.totalAmount,
+          percentage: c.percentage,
+          transactionCount: c.transactionCount,
+        })),
+        accountBalances: accountBalances?.map((acc) => ({
+          accountName: acc.accountName,
+          balance: acc.balance,
+          accountType: acc.accountType,
+        })),
+        recentTransactions: recentTransactions?.map((t) => ({
+          description: t.description,
+          amount: t.amount,
+          category: t.category,
+          date: t.date,
+          type: t.type,
+          accountName: t.accountName,
+        })),
+        spendingTrends: spendingTrends?.slice(-30).map((t) => ({
+          date: t.date,
+          amount: t.amount,
+          type: t.type,
+          category: t.category,
+        })),
+        metrics: {
+          totalBalance,
+          accountCount: accountBalances?.length ?? 0,
+          avgTransactionAmount,
+          mostActiveCategory: mostActiveCategory?.category,
+          dailyAverage,
+          weeklyAverage,
+          savingsRate:
+            monthlySummary && monthlySummary.totalIncome > 0
+              ? (monthlySummary.savings / monthlySummary.totalIncome) * 100
+              : 0,
+        },
+      };
+
+      let answer: string;
+      let tokensUsed = 0;
+      const suggestions: string[] = [];
+
+      if (isOpenAIConfigured()) {
+        log.info({ userId }, 'Using OpenAI for question');
+        const openAIResult = await callOpenAI(message, context);
+        answer = openAIResult.content;
+        tokensUsed = openAIResult.tokensUsed;
+
+        if (openAIResult.error) {
+          log.warn({ userId, error: openAIResult.error }, 'OpenAI returned error, using fallback');
+          const mockResponse = await this.generateMockResponse(userId, message);
+          answer = mockResponse.answer;
+          suggestions.push(...(mockResponse.suggestions || []));
+        }
+      } else {
+        log.info({ userId }, 'Using mock response (OpenAI not configured)');
+        const mockResponse = await this.generateMockResponse(userId, message);
+        answer = mockResponse.answer;
+        suggestions.push(...(mockResponse.suggestions || []));
+        tokensUsed = 150;
+      }
+
+      const relatedData: {
+        transactions?: RecentTransaction[];
+        accounts?: AccountBalance[];
+      } = {};
+      if (recentTransactions) {
+        relatedData.transactions = recentTransactions;
+      }
+      if (accountBalances) {
+        relatedData.accounts = accountBalances;
+      }
+
+      const recordResult = await this.usageService.recordAPICall(userId, tokensUsed);
+      if (!recordResult.success) {
+        log.warn(
+          { userId, error: recordResult.error },
+          'Failed to record API call, but continuing',
+        );
+      }
+
+      log.info({ userId, tokensUsed }, 'AI question processed successfully');
+      return {
+        success: true,
+        data: {
+          answer,
+          suggestions,
+          relatedData,
+        },
+      };
     } catch (error) {
       log.error(error, 'Error processing AI question');
       return {
         success: false,
         error: error instanceof Error ? error.message : ERROR_MESSAGES.UNEXPECTED,
       };
+    }
+  }
+
+  /**
+   * Generate insights using AI (when OpenAI is configured)
+   * Returns insights and tokens used
+   */
+  private async generateAIInsights(data: {
+    monthlySummary: MonthlySummary;
+    categorySpending: CategorySpending[];
+    spendingTrends: SpendingTrends[];
+    accountBalances: AccountBalance[];
+  }): Promise<{ insights: FinancialInsights; tokensUsed: number } | null> {
+    try {
+      const { monthlySummary, categorySpending, accountBalances } = data;
+
+      // Build comprehensive prompt for AI
+      const prompt = `Analyze the following financial data and provide insights:
+
+Monthly Summary:
+- Total Income: $${monthlySummary.totalIncome.toFixed(2)}
+- Total Expenses: $${monthlySummary.totalExpenses.toFixed(2)}
+- Savings: $${monthlySummary.savings.toFixed(2)}
+- Transaction Count: ${monthlySummary.transactionCount}
+
+Top Spending Categories:
+${categorySpending
+  .slice(0, 5)
+  .map((c) => `- ${c.category}: $${(c.totalAmount || 0).toFixed(2)} (${c.percentage.toFixed(1)}%)`)
+  .join('\n')}
+
+Account Balances:
+${accountBalances.map((acc) => `- ${acc.accountName} (${acc.accountType}): $${acc.balance.toFixed(2)}`).join('\n')}
+
+Please provide:
+1. 3-4 spending insights (what patterns you notice)
+2. 3-4 savings tips (actionable advice)
+3. 2-3 budget optimization suggestions
+4. 2-3 areas of concern (if any)
+
+Format your response as a JSON object with these exact keys:
+{
+  "spendingInsights": ["insight1", "insight2", ...],
+  "savingsTips": ["tip1", "tip2", ...],
+  "budgetOptimization": ["suggestion1", "suggestion2", ...],
+  "areasOfConcern": ["concern1", "concern2", ...]
+}
+
+Be concise, specific, and use actual numbers from the data.`;
+
+      const systemPrompt = `You are a financial advisor AI. Analyze user financial data and provide clear, actionable insights. Always format responses as valid JSON.`;
+
+      const aiResponse = await callOpenAI(
+        prompt,
+        {
+          monthlySummary: {
+            month: monthlySummary.month,
+            totalIncome: monthlySummary.totalIncome,
+            totalExpenses: monthlySummary.totalExpenses,
+            savings: monthlySummary.savings,
+            netIncome: monthlySummary.netIncome,
+            transactionCount: monthlySummary.transactionCount,
+            previousMonth: monthlySummary.previousMonth,
+          },
+          categorySpending: categorySpending.slice(0, 5).map((c) => ({
+            category: c.category,
+            amount: c.totalAmount || 0,
+            percentage: c.percentage || 0,
+            transactionCount: c.transactionCount,
+          })),
+          accountBalances: accountBalances.map((acc) => ({
+            accountName: acc.accountName,
+            balance: acc.balance,
+            accountType: acc.accountType,
+          })),
+        },
+        systemPrompt,
+      );
+
+      if (aiResponse.error || !aiResponse.content) {
+        return null;
+      }
+
+      // Try to parse JSON response
+      try {
+        // Extract JSON from response (sometimes AI wraps it in markdown)
+        const jsonMatch = aiResponse.content.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          log.warn('Could not extract JSON from AI response');
+          return null;
+        }
+
+        const parsed = JSON.parse(jsonMatch[0]) as FinancialInsights;
+
+        // Validate structure
+        if (
+          Array.isArray(parsed.spendingInsights) &&
+          Array.isArray(parsed.savingsTips) &&
+          Array.isArray(parsed.budgetOptimization) &&
+          Array.isArray(parsed.areasOfConcern)
+        ) {
+          return {
+            insights: parsed,
+            tokensUsed: aiResponse.tokensUsed,
+          };
+        }
+
+        log.warn('AI response structure invalid');
+        return null;
+      } catch (parseError) {
+        log.error(parseError, 'Failed to parse AI response as JSON');
+        return null;
+      }
+    } catch (error) {
+      log.error(error, 'Error in generateAIInsights');
+      return null;
     }
   }
 
@@ -210,8 +584,7 @@ export class AIAssistantService {
   }
 
   /**
-   * Generate mock response for AI questions
-   * In a real implementation, this would call OpenAI API
+   * Generate mock response for AI questions (fallback when OpenAI is not configured)
    */
   private async generateMockResponse(userId: string, message: string): Promise<AIQuestionResponse> {
     const lowerMessage = message.toLowerCase();

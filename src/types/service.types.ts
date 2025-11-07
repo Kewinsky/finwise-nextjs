@@ -1,8 +1,11 @@
 /**
  * Generic result type for service operations
  * Uses discriminated unions for type safety
+ * When T is void, data field is not required
  */
-export type ServiceResult<T> = { success: true; data: T } | { success: false; error: string };
+export type ServiceResult<T> = T extends void
+  ? { success: true } | { success: false; error: string }
+  : { success: true; data: T } | { success: false; error: string };
 
 /**
  * Pagination options for list queries

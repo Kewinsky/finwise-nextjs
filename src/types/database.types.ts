@@ -329,6 +329,82 @@ export type Database = {
           },
         ];
       };
+      ai_insights: {
+        Row: {
+          id: string;
+          user_id: string;
+          generated_at: string;
+          insights: Json;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          generated_at?: string;
+          insights: Json;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          generated_at?: string;
+          insights?: Json;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'ai_insights_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      openai_usage: {
+        Row: {
+          id: string;
+          user_id: string;
+          year: number;
+          month: number;
+          query_count: number;
+          tokens_used: number;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          year: number;
+          month: number;
+          query_count?: number;
+          tokens_used?: number;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          year?: number;
+          month?: number;
+          query_count?: number;
+          tokens_used?: number;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'openai_usage_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;

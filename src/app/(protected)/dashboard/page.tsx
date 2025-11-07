@@ -10,7 +10,6 @@ import { FinancialTrendsChart } from '@/components/dashboard/financial-trends-ch
 import { AccountDistributionChart } from '@/components/dashboard/month-distribution-chart';
 import { TopCategoriesChart } from '@/components/dashboard/top-categories-chart';
 import { ErrorState } from '@/components/common/error-state';
-import { AISuggestionsCard } from '@/components/dashboard/ai-suggestions-card';
 import { RecentActivityCard } from '@/components/dashboard/recent-activity-card';
 import { QuickActionsCard } from '@/components/dashboard/quick-actions-card';
 import { WelcomeBanner } from '@/components/dashboard/welcome-banner';
@@ -29,14 +28,7 @@ export default function DashboardPage() {
     'expense',
   );
 
-  const {
-    dashboardData,
-    financialHealthScore,
-    aiInsights,
-    isLoadingInsights,
-    error: dashboardError,
-    refetch,
-  } = useDashboardData();
+  const { dashboardData, refetch, error: dashboardError } = useDashboardData();
 
   const currentDate = new Date();
   const {
@@ -74,9 +66,9 @@ export default function DashboardPage() {
 
   if (dashboardError) {
     return (
-      <div className="flex-1 space-y-6 p-4 sm:p-6">
+      <div className="flex-1 space-y-4 @sm:space-y-6 p-4 @sm:p-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Dashboard</h1>
+          <h1 className="text-2xl @sm:text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground">Advanced financial insights and analytics.</p>
         </div>
         <ErrorState
@@ -92,11 +84,11 @@ export default function DashboardPage() {
   const isLoadingDashboard = !dashboardData;
 
   return (
-    <div className="flex-1 space-y-6 p-4 sm:p-6">
+    <div className="flex-1 space-y-4 @sm:space-y-6 p-4 @sm:p-6">
       {showWelcome && <WelcomeBanner onDismiss={() => setShowWelcome(false)} />}
 
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Dashboard</h1>
+        <h1 className="text-2xl @sm:text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">Advanced financial insights and analytics.</p>
       </div>
 
@@ -104,11 +96,11 @@ export default function DashboardPage() {
         <>
           <MetricsGridSkeleton />
           <ChartSkeleton showTabs height="h-[400px]" />
-          <div className="grid gap-6 lg:grid-cols-2">
-            <ChartSkeleton height="h-[250px] sm:h-[300px]" />
-            <ChartSkeleton height="h-[250px] sm:h-[300px]" />
+          <div className="grid grid-cols-1 gap-4 @md:grid-cols-2 @sm:gap-6">
+            <ChartSkeleton height="h-[250px] @sm:h-[300px]" />
+            <ChartSkeleton height="h-[250px] @sm:h-[300px]" />
           </div>
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 @md:grid-cols-2 @sm:gap-6">
             <AISuggestionsSkeleton />
             <RecentActivitySkeleton />
           </div>
@@ -119,7 +111,7 @@ export default function DashboardPage() {
 
           <FinancialTrendsChart dashboardData={dashboardData} />
 
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 @3xl:grid-cols-2">
             <AccountDistributionChart />
             <TopCategoriesChart
               categorySpending={monthlyCategorySpending}
@@ -128,18 +120,12 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-2">
-            <AISuggestionsCard
-              financialHealthScore={financialHealthScore}
-              aiInsights={aiInsights}
-              isLoadingInsights={isLoadingInsights}
-            />
+          <div className="grid grid-cols-1 gap-6 @3xl:grid-cols-2">
+            <QuickActionsCard onAddTransaction={handleAddTransaction} />
             <RecentActivityCard recentTransactions={dashboardData.recentTransactions} />
           </div>
         </>
       )}
-
-      <QuickActionsCard onAddTransaction={handleAddTransaction} />
 
       {showTransactionForm && (
         <TransactionForm

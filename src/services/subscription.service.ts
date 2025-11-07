@@ -225,7 +225,7 @@ export class SubscriptionService {
       }
 
       log.info({ userId }, 'Subscription deleted successfully');
-      return { success: true, data: undefined };
+      return { success: true };
     } catch (error) {
       log.error(error, 'Error deleting subscription');
       return {
