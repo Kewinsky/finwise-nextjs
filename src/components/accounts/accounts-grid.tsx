@@ -11,7 +11,7 @@ interface AccountsGridProps {
 
 export function AccountsGrid({ accounts, onEdit, onDelete, isDeleting }: AccountsGridProps) {
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-6 @2xl:grid-cols-2 @3xl:grid-cols-3">
       {accounts.map((account) => {
         const accountTypeConfig =
           ACCOUNT_TYPES[account.type as keyof typeof ACCOUNT_TYPES] || ACCOUNT_TYPES.other;

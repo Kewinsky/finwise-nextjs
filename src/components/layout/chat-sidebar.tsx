@@ -110,7 +110,7 @@ export function ChatSidebar() {
 
   return (
     <div
-      className="group peer text-sidebar-foreground hidden md:block"
+      className="group peer text-sidebar-foreground hidden xl:block"
       data-state={state}
       data-collapsible={state === 'collapsed' ? 'offcanvas' : ''}
       data-variant="inset"
@@ -121,7 +121,7 @@ export function ChatSidebar() {
       <div
         data-slot="chat-sidebar-gap"
         className={cn(
-          'relative hidden md:block w-[var(--chat-sidebar-width)] bg-transparent transition-[width] duration-200 ease-linear flex-shrink-0',
+          'relative hidden xl:block w-[var(--chat-sidebar-width)] bg-transparent transition-[width] duration-200 ease-linear flex-shrink-0',
           'group-data-[collapsible=offcanvas]:w-0',
         )}
         style={
@@ -133,7 +133,7 @@ export function ChatSidebar() {
       <div
         data-slot="chat-sidebar-container"
         className={cn(
-          'fixed inset-y-0 z-10 hidden h-svh w-[var(--chat-sidebar-width)] transition-[left,right,width] duration-200 ease-linear md:flex',
+          'fixed inset-y-0 z-10 hidden h-svh w-[var(--chat-sidebar-width)] transition-[left,right,width] duration-200 ease-linear xl:flex',
           'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--chat-sidebar-width)*-1)]',
           'p-2 pl-0',
         )}

@@ -8,7 +8,6 @@ import {
   IconSearch,
   IconCreditCard,
   IconBuilding,
-  IconMessageCircle,
 } from '@tabler/icons-react';
 import { NavMain } from '@/components/layout/nav-main';
 import { NavSecondary } from '@/components/layout/nav-secondary';
@@ -41,11 +40,6 @@ const data = {
       title: 'Accounts',
       url: '/accounts',
       icon: IconBuilding,
-    },
-    {
-      title: 'AI Assistant',
-      url: '/assistant',
-      icon: IconMessageCircle,
     },
   ],
   navSecondary: [

@@ -107,7 +107,7 @@ export function TransactionFiltersComponent({
   return (
     <div className="space-y-6">
       {/* Search Bar and Toggle Button */}
-      <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2">
+      <div className="flex flex-col space-y-3 @sm:flex-row @sm:items-center @sm:space-y-0 @sm:space-x-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -122,11 +122,11 @@ export function TransactionFiltersComponent({
         <Button
           variant="outline"
           onClick={() => setIsOpen(!isOpen)}
-          className="relative w-full sm:w-auto"
+          className="relative w-full @sm:w-auto"
         >
           <Filter className="h-4 w-4 mr-2" />
-          <span className="hidden sm:inline">{isOpen ? 'Hide Filters' : 'Show Filters'}</span>
-          <span className="sm:hidden">{isOpen ? 'Hide' : 'Filters'}</span>
+          <span className="hidden @sm:inline">{isOpen ? 'Hide Filters' : 'Show Filters'}</span>
+          <span className="@sm:hidden">{isOpen ? 'Hide' : 'Filters'}</span>
           {activeFiltersCount > 0 && (
             <Badge variant="secondary" className="ml-2 h-5 w-5 rounded-full p-0 text-xs">
               {activeFiltersCount}
@@ -154,7 +154,7 @@ export function TransactionFiltersComponent({
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Basic Filters Row */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 @lg:grid-cols-3">
               {/* Transaction Type */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Transaction Type</label>
@@ -233,7 +233,7 @@ export function TransactionFiltersComponent({
             {/* Date Range Row */}
             <div className="space-y-3">
               <label className="text-sm font-medium">Date Range</label>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-3 @sm:grid-cols-2">
                 <div className="space-y-1">
                   <label className="text-xs text-muted-foreground">From</label>
                   <Popover>
@@ -299,7 +299,7 @@ export function TransactionFiltersComponent({
             {/* Amount Range Row */}
             <div className="space-y-3">
               <label className="text-sm font-medium">Amount Range</label>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-3 @sm:grid-cols-2">
                 <div className="space-y-1">
                   <label className="text-xs text-muted-foreground">Min Amount</label>
                   <div className="relative">

@@ -44,10 +44,10 @@ export function BalanceHistoryChartComponent({ accounts }: BalanceHistoryChartPr
   return (
     <Card className="w-full">
       <CardHeader>
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+        <div className="flex flex-col @lg:flex-row items-stretch @lg:items-center justify-between gap-4">
           <div className="flex flex-col gap-2">
-            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-              <AreaChart className="h-4 w-4 sm:h-5 sm:w-5" />
+            <CardTitle className="flex items-center gap-2 text-lg @sm:text-xl">
+              <AreaChart className="h-4 w-4 @sm:h-5 @sm:w-5" />
               Balance History
             </CardTitle>
             <CardDescription>Track your balance history over time</CardDescription>
@@ -86,43 +86,45 @@ export function BalanceHistoryChartComponent({ accounts }: BalanceHistoryChartPr
               height="h-full"
             />
           ) : (
-            <ChartContainer config={chartConfig} className="w-full h-full">
-              <LineChart
-                accessibilityLayer
-                data={chartData}
-                className="w-full h-full"
-                margin={{ top: 16, bottom: 16, left: 32, right: 32 }}
-              >
-                <CartesianGrid vertical={false} />
-                <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={10} />
-                <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                {Array.from(selectedAccounts).map((accountId) => {
-                  const account = accounts.find((acc) => acc.id === accountId);
-                  if (!account) return null;
+            <div className="overflow-x-auto">
+              <ChartContainer config={chartConfig} className="w-full h-full min-w-[600px]">
+                <LineChart
+                  accessibilityLayer
+                  data={chartData}
+                  className="w-full h-full"
+                  margin={{ top: 16, bottom: 16, left: 32, right: 32 }}
+                >
+                  <CartesianGrid vertical={false} />
+                  <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={10} />
+                  <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                  {Array.from(selectedAccounts).map((accountId) => {
+                    const account = accounts.find((acc) => acc.id === accountId);
+                    if (!account) return null;
 
-                  return (
-                    <Line
-                      key={accountId}
-                      dataKey={accountId}
-                      type="linear"
-                      stroke={`var(--color-${accountId})`}
-                      strokeWidth={2}
-                      dot={{
-                        fill: `var(--color-${accountId})`,
-                        strokeWidth: 2,
-                        r: 4,
-                      }}
-                      activeDot={{
-                        r: 6,
-                        stroke: `var(--color-${accountId})`,
-                        strokeWidth: 2,
-                      }}
-                    />
-                  );
-                })}
-                <ChartLegend content={<ChartLegendContent />} />
-              </LineChart>
-            </ChartContainer>
+                    return (
+                      <Line
+                        key={accountId}
+                        dataKey={accountId}
+                        type="linear"
+                        stroke={`var(--color-${accountId})`}
+                        strokeWidth={2}
+                        dot={{
+                          fill: `var(--color-${accountId})`,
+                          strokeWidth: 2,
+                          r: 4,
+                        }}
+                        activeDot={{
+                          r: 6,
+                          stroke: `var(--color-${accountId})`,
+                          strokeWidth: 2,
+                        }}
+                      />
+                    );
+                  })}
+                  <ChartLegend content={<ChartLegendContent />} />
+                </LineChart>
+              </ChartContainer>
+            </div>
           )}
         </div>
       </CardContent>
