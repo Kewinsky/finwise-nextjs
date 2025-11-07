@@ -126,7 +126,6 @@ export class AIAssistantService {
     try {
       log.info({ userId }, 'Generating financial insights');
 
-      // Check if user can make API call
       const canMakeCallResult = await this.usageService.canMakeAPICall(userId);
       if (!canMakeCallResult.success) {
         return { success: false, error: canMakeCallResult.error };
@@ -136,7 +135,6 @@ export class AIAssistantService {
         return { success: false, error: ERROR_MESSAGES.AI_QUERY_LIMIT_REACHED };
       }
 
-      // Gather data for analysis
       const [
         monthlySummaryResult,
         categorySpendingResult,
@@ -149,7 +147,6 @@ export class AIAssistantService {
         this.accountService.getAccountBalances(userId),
       ]);
 
-      // Check if we have enough data
       if (!monthlySummaryResult.success || !categorySpendingResult.success) {
         return { success: false, error: 'Unable to gather financial data for analysis' };
       }
@@ -159,8 +156,6 @@ export class AIAssistantService {
       const spendingTrends = spendingTrendsResult.success ? spendingTrendsResult.data : [];
       const accountBalances = accountBalancesResult.success ? accountBalancesResult.data : [];
 
-      // Use rule-based analysis (mock for now, will use OpenAI later)
-      // For now, we always use rule-based to test the flow
       log.info({ userId }, 'Using rule-based insights (mock mode)');
       const insights = this.analyzeFinancialData({
         monthlySummary,
@@ -169,15 +164,12 @@ export class AIAssistantService {
         accountBalances,
       });
 
-      // Save insights to database
       const saveResult = await this.saveInsights(userId, insights);
       if (!saveResult.success) {
         log.warn({ userId, error: saveResult.error }, 'Failed to save insights, but continuing');
       }
 
-      // Record API call usage (mock tokens for now)
-      // Fallbacki też incrementują queries
-      const mockTokensUsed = 320; // Average tokens for insights generation
+      const mockTokensUsed = 320;
       const recordResult = await this.usageService.recordAPICall(userId, mockTokensUsed);
       if (!recordResult.success) {
         log.warn(
@@ -204,7 +196,6 @@ export class AIAssistantService {
     try {
       log.info({ userId, messageLength: message.length }, 'Processing AI question');
 
-      // Check if user can make API call
       const canMakeCallResult = await this.usageService.canMakeAPICall(userId);
       if (!canMakeCallResult.success) {
         return { success: false, error: canMakeCallResult.error };
@@ -214,7 +205,6 @@ export class AIAssistantService {
         return { success: false, error: ERROR_MESSAGES.AI_QUERY_LIMIT_REACHED };
       }
 
-      // Gather comprehensive financial context
       const [
         monthlySummaryResult,
         categorySpendingResult,
@@ -231,7 +221,6 @@ export class AIAssistantService {
         this.accountService.getAccountBalances(userId),
       ]);
 
-      // Build context for AI
       const monthlySummary = monthlySummaryResult.success ? monthlySummaryResult.data : undefined;
       const categorySpending = categorySpendingResult.success
         ? categorySpendingResult.data.slice(0, 10)
@@ -247,7 +236,6 @@ export class AIAssistantService {
         ? accountBalancesResult.data
         : undefined;
 
-      // Calculate additional metrics
       const totalBalance = accountBalances?.reduce((sum, acc) => sum + acc.balance, 0) ?? 0;
       const avgTransactionAmount =
         recentTransactions && recentTransactions.length > 0
@@ -257,7 +245,6 @@ export class AIAssistantService {
       const mostActiveCategory =
         categorySpending && categorySpending.length > 0 ? categorySpending[0] : undefined;
 
-      // Calculate spending velocity (daily average from trends)
       let dailyAverage = 0;
       let weeklyAverage = 0;
       if (spendingTrends && spendingTrends.length > 0) {
@@ -268,7 +255,6 @@ export class AIAssistantService {
         weeklyAverage = dailyAverage * 7;
       }
 
-      // Build context object for OpenAI
       const context = {
         monthlySummary: monthlySummary
           ? {
@@ -326,7 +312,6 @@ export class AIAssistantService {
         },
       };
 
-      // Try OpenAI first, fallback to mock if not configured
       let answer: string;
       let tokensUsed = 0;
       const suggestions: string[] = [];
@@ -339,7 +324,6 @@ export class AIAssistantService {
 
         if (openAIResult.error) {
           log.warn({ userId, error: openAIResult.error }, 'OpenAI returned error, using fallback');
-          // Fallback to mock if OpenAI fails
           const mockResponse = await this.generateMockResponse(userId, message);
           answer = mockResponse.answer;
           suggestions.push(...(mockResponse.suggestions || []));
@@ -349,10 +333,9 @@ export class AIAssistantService {
         const mockResponse = await this.generateMockResponse(userId, message);
         answer = mockResponse.answer;
         suggestions.push(...(mockResponse.suggestions || []));
-        tokensUsed = 150; // Mock tokens
+        tokensUsed = 150;
       }
 
-      // Add related data
       const relatedData: {
         transactions?: RecentTransaction[];
         accounts?: AccountBalance[];
@@ -364,7 +347,6 @@ export class AIAssistantService {
         relatedData.accounts = accountBalances;
       }
 
-      // Record API call usage
       const recordResult = await this.usageService.recordAPICall(userId, tokensUsed);
       if (!recordResult.success) {
         log.warn(

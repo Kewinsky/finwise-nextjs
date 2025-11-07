@@ -90,18 +90,14 @@ export function ChatInterface({
 
   const handleSuggestedQuestion = (question: string) => {
     setShowSuggestions(false);
-    setInputMessage(question);
-    // Trigger send after a brief delay to ensure input is set
-    setTimeout(() => {
-      handleSendMessage(question);
-    }, 0);
+    setInputMessage('');
+    handleSendMessage(question);
   };
 
   const handleSendMessage = async (messageOverride?: string) => {
     const messageToSend = messageOverride || inputMessage;
     if (!messageToSend.trim() || isLoading) return;
 
-    // Check limit before sending
     if (!canMakeQuery || isLimitReached) {
       setShowLimitModal(true);
       addErrorMessage('limit');
@@ -156,7 +152,6 @@ export function ChatInterface({
 
       setMessages((prev) => [...prev, assistantMessage]);
 
-      // Refetch usage to update the counter (shared context will update all components)
       await refetch();
     } catch (error) {
       notifyError(error instanceof Error ? error.message : 'Failed to send message');
@@ -175,7 +170,6 @@ export function ChatInterface({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Limit Modal */}
       {usage && (
         <UsageLimitModal
           open={showLimitModal}

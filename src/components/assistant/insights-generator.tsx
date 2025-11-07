@@ -33,7 +33,6 @@ export function InsightsGenerator({
   const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
   const [showLimitModal, setShowLimitModal] = useState(false);
 
-  // Load last insights on mount
   useEffect(() => {
     const loadLastInsights = async () => {
       setIsLoading(true);
@@ -48,7 +47,6 @@ export function InsightsGenerator({
   }, []);
 
   const handleGenerate = async () => {
-    // Check limit before generating
     if (!canMakeQuery || isLimitReached) {
       setShowLimitModal(true);
       return;

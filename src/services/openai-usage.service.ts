@@ -50,7 +50,6 @@ export class OpenAIUsageService {
     planType?: PlanType,
   ): Promise<ServiceResult<AIUsageData>> {
     try {
-      // Get user's subscription plan only if not provided
       let finalPlanType: PlanType;
       if (planType) {
         finalPlanType = planType;
@@ -65,12 +64,10 @@ export class OpenAIUsageService {
 
       const limit = PLAN_LIMITS[finalPlanType].aiQueriesPerMonth;
 
-      // Get current year and month
       const now = new Date();
       const year = now.getFullYear();
-      const month = now.getMonth() + 1; // 1-12
+      const month = now.getMonth() + 1;
 
-      // Get or create usage record for current month
       const { data: usage, error } = await this.supabase
         .from('openai_usage')
         .select('*')
@@ -84,7 +81,6 @@ export class OpenAIUsageService {
         return { success: false, error: error.message };
       }
 
-      // If no record exists, create one
       if (!usage) {
         const { data: newUsage, error: insertError } = await this.supabase
           .from('openai_usage')
@@ -170,9 +166,8 @@ export class OpenAIUsageService {
     try {
       const now = new Date();
       const year = now.getFullYear();
-      const month = now.getMonth() + 1; // 1-12
+      const month = now.getMonth() + 1;
 
-      // Get or create usage record
       const { data: usage, error: selectError } = await this.supabase
         .from('openai_usage')
         .select('*')
@@ -190,7 +185,6 @@ export class OpenAIUsageService {
       }
 
       if (usage) {
-        // Update existing record
         const { error: updateError } = await this.supabase
           .from('openai_usage')
           .update({

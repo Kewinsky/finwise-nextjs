@@ -111,7 +111,6 @@ export async function callOpenAI(
     const client = getOpenAIClient();
     const model = getModel();
 
-    // Build system prompt
     const defaultSystemPrompt = `You are a helpful and knowledgeable AI financial assistant. Your role is to help users understand their finances, provide insights about their spending patterns, offer budgeting advice, and answer questions about their financial data.
 
 Guidelines:
@@ -126,12 +125,10 @@ Guidelines:
 
     const finalSystemPrompt = systemPrompt || defaultSystemPrompt;
 
-    // Build comprehensive context string
     let contextString = '';
     if (context) {
       const parts: string[] = [];
 
-      // Monthly Summary
       if (context.monthlySummary) {
         const ms = context.monthlySummary;
         let summaryText = `=== CURRENT MONTH SUMMARY ===\nMonth: ${ms.month}\n- Total Income: $${ms.totalIncome.toFixed(2)}\n- Total Expenses: $${ms.totalExpenses.toFixed(2)}\n- Net Income: $${ms.netIncome.toFixed(2)}\n- Savings: $${ms.savings.toFixed(2)}\n- Transaction Count: ${ms.transactionCount}`;
@@ -154,7 +151,6 @@ Guidelines:
         parts.push(summaryText);
       }
 
-      // Top Spending Categories
       if (context.categorySpending && context.categorySpending.length > 0) {
         parts.push(
           `=== TOP SPENDING CATEGORIES (Current Month) ===\n${context.categorySpending
@@ -167,7 +163,6 @@ Guidelines:
         );
       }
 
-      // Top Income Categories
       if (context.categoryIncome && context.categoryIncome.length > 0) {
         parts.push(
           `=== TOP INCOME CATEGORIES (Current Month) ===\n${context.categoryIncome
@@ -179,7 +174,6 @@ Guidelines:
         );
       }
 
-      // Account Balances
       if (context.accountBalances && context.accountBalances.length > 0) {
         const totalBalance = context.accountBalances.reduce((sum, acc) => sum + acc.balance, 0);
         parts.push(
@@ -189,7 +183,6 @@ Guidelines:
         );
       }
 
-      // Recent Transactions
       if (context.recentTransactions && context.recentTransactions.length > 0) {
         parts.push(
           `=== RECENT TRANSACTIONS (Last ${context.recentTransactions.length}) ===\n${context.recentTransactions
@@ -202,7 +195,6 @@ Guidelines:
         );
       }
 
-      // Spending Trends
       if (context.spendingTrends && context.spendingTrends.length > 0) {
         const expenseTrends = context.spendingTrends.filter((t) => t.type === 'expense');
         if (expenseTrends.length > 0) {
@@ -225,7 +217,6 @@ Guidelines:
         }
       }
 
-      // Financial Metrics
       if (context.metrics) {
         const m = context.metrics;
         parts.push(
@@ -238,7 +229,6 @@ Guidelines:
       }
     }
 
-    // Call OpenAI API
     const completion = await client.chat.completions.create({
       model,
       messages: [
