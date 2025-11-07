@@ -4,12 +4,13 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Bot, User, AlertCircle, XCircle, Clock } from 'lucide-react';
+import { Send, Bot, User, AlertCircle, XCircle, Clock, Sparkles } from 'lucide-react';
 import { UsageLimitModal } from './usage-limit-modal';
 import { askAIQuestion } from '@/lib/actions/finance-actions';
 import { notifyError } from '@/lib/notifications';
 import type { AIUsageData } from '@/hooks/use-ai-usage';
 import type { PlanType } from '@/config/app';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface ChatMessage {
   id: string;
@@ -26,6 +27,17 @@ interface ChatInterfaceProps {
   refetch: () => Promise<void>;
   planType?: PlanType;
 }
+
+const SUGGESTED_QUESTIONS = [
+  'How much did I spend this month?',
+  'What are my biggest expenses?',
+  'How can I save more money?',
+  "What's my current account balance?",
+  'Show me my spending trends',
+  'What categories am I spending the most on?',
+  'Compare this month to last month',
+  'Give me budgeting advice',
+] as const;
 
 export function ChatInterface({
   usage,
@@ -46,6 +58,7 @@ export function ChatInterface({
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showLimitModal, setShowLimitModal] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const addErrorMessage = (errorType: 'limit' | 'service' | 'rate-limit') => {
     const errorMessages = {
@@ -75,8 +88,18 @@ export function ChatInterface({
     setMessages((prev) => [...prev, errorMessage]);
   };
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim() || isLoading) return;
+  const handleSuggestedQuestion = (question: string) => {
+    setShowSuggestions(false);
+    setInputMessage(question);
+    // Trigger send after a brief delay to ensure input is set
+    setTimeout(() => {
+      handleSendMessage(question);
+    }, 0);
+  };
+
+  const handleSendMessage = async (messageOverride?: string) => {
+    const messageToSend = messageOverride || inputMessage;
+    if (!messageToSend.trim() || isLoading) return;
 
     // Check limit before sending
     if (!canMakeQuery || isLimitReached) {
@@ -88,13 +111,15 @@ export function ChatInterface({
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       type: 'user',
-      content: inputMessage,
+      content: messageToSend,
       timestamp: new Date(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    const currentMessage = inputMessage;
-    setInputMessage('');
+    const currentMessage = messageToSend;
+    if (!messageOverride) {
+      setInputMessage('');
+    }
     setIsLoading(true);
 
     try {
@@ -198,7 +223,7 @@ export function ChatInterface({
                         variant="outline"
                         size="sm"
                         className="mt-2"
-                        onClick={handleSendMessage}
+                        onClick={() => handleSendMessage()}
                       >
                         Retry
                       </Button>
@@ -269,15 +294,50 @@ export function ChatInterface({
       </ScrollArea>
       <div className="p-2">
         <div className="flex gap-2">
+          <Popover open={showSuggestions} onOpenChange={setShowSuggestions}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="flex-shrink-0"
+                disabled={isLoading || !canMakeQuery}
+                title="Suggested questions"
+              >
+                <Sparkles className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 p-3" align="start" side="top">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-muted-foreground mb-2">
+                  Suggested questions:
+                </p>
+                <div className="space-y-1.5">
+                  {SUGGESTED_QUESTIONS.map((question, index) => (
+                    <Button
+                      key={index}
+                      variant="ghost"
+                      size="sm"
+                      className="w-full justify-start text-xs h-auto py-2 px-3 text-left whitespace-normal"
+                      onClick={() => handleSuggestedQuestion(question)}
+                      disabled={isLoading || !canMakeQuery}
+                    >
+                      {question}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
           <Input
             placeholder="Ask me anything about your finances..."
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+            onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
             disabled={isLoading || !canMakeQuery}
+            className="flex-1"
           />
           <Button
-            onClick={handleSendMessage}
+            onClick={() => handleSendMessage()}
             disabled={!inputMessage.trim() || isLoading || !canMakeQuery}
             size="icon"
           >

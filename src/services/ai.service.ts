@@ -16,6 +16,7 @@ import { TransactionService } from './transaction.service';
 import { AccountService } from './account.service';
 import { OpenAIUsageService } from './openai-usage.service';
 import { callOpenAI } from '@/lib/openai/client';
+import { isOpenAIConfigured } from '@/lib/openai/config';
 
 /**
  * AIAssistantService handles AI-powered financial insights and analysis
@@ -213,34 +214,158 @@ export class AIAssistantService {
         return { success: false, error: ERROR_MESSAGES.AI_QUERY_LIMIT_REACHED };
       }
 
-      // Gather financial context for mock response
-      const [recentTransactionsResult, accountBalancesResult] = await Promise.all([
-        this.transactionService.getRecentTransactions(userId, 10),
+      // Gather comprehensive financial context
+      const [
+        monthlySummaryResult,
+        categorySpendingResult,
+        categoryIncomeResult,
+        spendingTrendsResult,
+        recentTransactionsResult,
+        accountBalancesResult,
+      ] = await Promise.all([
+        this.transactionService.getMonthlySummary(userId),
+        this.transactionService.getCategorySpending(userId, 'expense'),
+        this.transactionService.getCategorySpending(userId, 'income'),
+        this.transactionService.getSpendingTrends(userId, 30),
+        this.transactionService.getRecentTransactions(userId, 15),
         this.accountService.getAccountBalances(userId),
       ]);
 
-      // Use mock response for now (will use OpenAI later)
-      log.info({ userId }, 'Using mock response (mock mode)');
-      const mockResponse = await this.generateMockResponse(userId, message);
-      const answer = mockResponse.answer;
-      const suggestions: string[] = mockResponse.suggestions || [];
+      // Build context for AI
+      const monthlySummary = monthlySummaryResult.success ? monthlySummaryResult.data : undefined;
+      const categorySpending = categorySpendingResult.success
+        ? categorySpendingResult.data.slice(0, 10)
+        : undefined;
+      const categoryIncome = categoryIncomeResult.success
+        ? categoryIncomeResult.data.slice(0, 5)
+        : undefined;
+      const spendingTrends = spendingTrendsResult.success ? spendingTrendsResult.data : undefined;
+      const recentTransactions = recentTransactionsResult.success
+        ? recentTransactionsResult.data
+        : undefined;
+      const accountBalances = accountBalancesResult.success
+        ? accountBalancesResult.data
+        : undefined;
+
+      // Calculate additional metrics
+      const totalBalance = accountBalances?.reduce((sum, acc) => sum + acc.balance, 0) ?? 0;
+      const avgTransactionAmount =
+        recentTransactions && recentTransactions.length > 0
+          ? recentTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0) /
+            recentTransactions.length
+          : 0;
+      const mostActiveCategory =
+        categorySpending && categorySpending.length > 0 ? categorySpending[0] : undefined;
+
+      // Calculate spending velocity (daily average from trends)
+      let dailyAverage = 0;
+      let weeklyAverage = 0;
+      if (spendingTrends && spendingTrends.length > 0) {
+        const expenseTrends = spendingTrends.filter((t) => t.type === 'expense');
+        const totalSpending = expenseTrends.reduce((sum, t) => sum + t.amount, 0);
+        const days = expenseTrends.length;
+        dailyAverage = days > 0 ? totalSpending / days : 0;
+        weeklyAverage = dailyAverage * 7;
+      }
+
+      // Build context object for OpenAI
+      const context = {
+        monthlySummary: monthlySummary
+          ? {
+              month: monthlySummary.month,
+              totalIncome: monthlySummary.totalIncome,
+              totalExpenses: monthlySummary.totalExpenses,
+              savings: monthlySummary.savings,
+              netIncome: monthlySummary.netIncome,
+              transactionCount: monthlySummary.transactionCount,
+              previousMonth: monthlySummary.previousMonth,
+            }
+          : undefined,
+        categorySpending: categorySpending?.map((c) => ({
+          category: c.category,
+          amount: c.totalAmount,
+          percentage: c.percentage,
+          transactionCount: c.transactionCount,
+        })),
+        categoryIncome: categoryIncome?.map((c) => ({
+          category: c.category,
+          amount: c.totalAmount,
+          percentage: c.percentage,
+          transactionCount: c.transactionCount,
+        })),
+        accountBalances: accountBalances?.map((acc) => ({
+          accountName: acc.accountName,
+          balance: acc.balance,
+          accountType: acc.accountType,
+        })),
+        recentTransactions: recentTransactions?.map((t) => ({
+          description: t.description,
+          amount: t.amount,
+          category: t.category,
+          date: t.date,
+          type: t.type,
+          accountName: t.accountName,
+        })),
+        spendingTrends: spendingTrends?.slice(-30).map((t) => ({
+          date: t.date,
+          amount: t.amount,
+          type: t.type,
+          category: t.category,
+        })),
+        metrics: {
+          totalBalance,
+          accountCount: accountBalances?.length ?? 0,
+          avgTransactionAmount,
+          mostActiveCategory: mostActiveCategory?.category,
+          dailyAverage,
+          weeklyAverage,
+          savingsRate:
+            monthlySummary && monthlySummary.totalIncome > 0
+              ? (monthlySummary.savings / monthlySummary.totalIncome) * 100
+              : 0,
+        },
+      };
+
+      // Try OpenAI first, fallback to mock if not configured
+      let answer: string;
+      let tokensUsed = 0;
+      const suggestions: string[] = [];
+
+      if (isOpenAIConfigured()) {
+        log.info({ userId }, 'Using OpenAI for question');
+        const openAIResult = await callOpenAI(message, context);
+        answer = openAIResult.content;
+        tokensUsed = openAIResult.tokensUsed;
+
+        if (openAIResult.error) {
+          log.warn({ userId, error: openAIResult.error }, 'OpenAI returned error, using fallback');
+          // Fallback to mock if OpenAI fails
+          const mockResponse = await this.generateMockResponse(userId, message);
+          answer = mockResponse.answer;
+          suggestions.push(...(mockResponse.suggestions || []));
+        }
+      } else {
+        log.info({ userId }, 'Using mock response (OpenAI not configured)');
+        const mockResponse = await this.generateMockResponse(userId, message);
+        answer = mockResponse.answer;
+        suggestions.push(...(mockResponse.suggestions || []));
+        tokensUsed = 150; // Mock tokens
+      }
 
       // Add related data
       const relatedData: {
         transactions?: RecentTransaction[];
         accounts?: AccountBalance[];
       } = {};
-      if (recentTransactionsResult.success) {
-        relatedData.transactions = recentTransactionsResult.data;
+      if (recentTransactions) {
+        relatedData.transactions = recentTransactions;
       }
-      if (accountBalancesResult.success) {
-        relatedData.accounts = accountBalancesResult.data;
+      if (accountBalances) {
+        relatedData.accounts = accountBalances;
       }
 
-      // Record API call usage (mock tokens for now)
-      // Fallbacki też incrementują queries
-      const mockTokensUsed = 150; // Average tokens for chat query
-      const recordResult = await this.usageService.recordAPICall(userId, mockTokensUsed);
+      // Record API call usage
+      const recordResult = await this.usageService.recordAPICall(userId, tokensUsed);
       if (!recordResult.success) {
         log.warn(
           { userId, error: recordResult.error },
@@ -248,7 +373,7 @@ export class AIAssistantService {
         );
       }
 
-      log.info({ userId }, 'AI question processed successfully');
+      log.info({ userId, tokensUsed }, 'AI question processed successfully');
       return {
         success: true,
         data: {
@@ -319,15 +444,19 @@ Be concise, specific, and use actual numbers from the data.`;
         prompt,
         {
           monthlySummary: {
+            month: monthlySummary.month,
             totalIncome: monthlySummary.totalIncome,
             totalExpenses: monthlySummary.totalExpenses,
             savings: monthlySummary.savings,
+            netIncome: monthlySummary.netIncome,
             transactionCount: monthlySummary.transactionCount,
+            previousMonth: monthlySummary.previousMonth,
           },
           categorySpending: categorySpending.slice(0, 5).map((c) => ({
             category: c.category,
             amount: c.totalAmount || 0,
             percentage: c.percentage || 0,
+            transactionCount: c.transactionCount,
           })),
           accountBalances: accountBalances.map((acc) => ({
             accountName: acc.accountName,

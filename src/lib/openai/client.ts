@@ -39,10 +39,20 @@ export async function callOpenAI(
   prompt: string,
   context?: {
     monthlySummary?: {
+      month: string;
       totalIncome: number;
       totalExpenses: number;
       savings: number;
+      netIncome: number;
       transactionCount: number;
+      previousMonth?: {
+        month: string;
+        totalIncome: number;
+        totalExpenses: number;
+        netIncome: number;
+        savings: number;
+        transactionCount: number;
+      };
     };
     recentTransactions?: Array<{
       description: string;
@@ -50,6 +60,7 @@ export async function callOpenAI(
       category: string;
       date: string;
       type: string;
+      accountName?: string;
     }>;
     accountBalances?: Array<{
       accountName: string;
@@ -60,7 +71,29 @@ export async function callOpenAI(
       category: string;
       amount: number;
       percentage: number;
+      transactionCount?: number;
     }>;
+    categoryIncome?: Array<{
+      category: string;
+      amount: number;
+      percentage: number;
+      transactionCount?: number;
+    }>;
+    spendingTrends?: Array<{
+      date: string;
+      amount: number;
+      type: string;
+      category: string;
+    }>;
+    metrics?: {
+      totalBalance: number;
+      accountCount: number;
+      avgTransactionAmount: number;
+      mostActiveCategory?: string;
+      dailyAverage: number;
+      weeklyAverage: number;
+      savingsRate: number;
+    };
   },
   systemPrompt?: string,
 ): Promise<{ content: string; tokensUsed: number; error?: string }> {
@@ -93,50 +126,115 @@ Guidelines:
 
     const finalSystemPrompt = systemPrompt || defaultSystemPrompt;
 
-    // Build context string
+    // Build comprehensive context string
     let contextString = '';
     if (context) {
       const parts: string[] = [];
 
+      // Monthly Summary
       if (context.monthlySummary) {
         const ms = context.monthlySummary;
-        parts.push(
-          `Monthly Summary:\n- Total Income: $${ms.totalIncome.toFixed(2)}\n- Total Expenses: $${ms.totalExpenses.toFixed(2)}\n- Savings: $${ms.savings.toFixed(2)}\n- Transaction Count: ${ms.transactionCount}`,
-        );
+        let summaryText = `=== CURRENT MONTH SUMMARY ===\nMonth: ${ms.month}\n- Total Income: $${ms.totalIncome.toFixed(2)}\n- Total Expenses: $${ms.totalExpenses.toFixed(2)}\n- Net Income: $${ms.netIncome.toFixed(2)}\n- Savings: $${ms.savings.toFixed(2)}\n- Transaction Count: ${ms.transactionCount}`;
+
+        if (ms.previousMonth) {
+          const pm = ms.previousMonth;
+          const incomeChange = ms.totalIncome - pm.totalIncome;
+          const expenseChange = ms.totalExpenses - pm.totalExpenses;
+          const savingsChange = ms.savings - pm.savings;
+          const incomeChangePercent =
+            pm.totalIncome > 0 ? (incomeChange / pm.totalIncome) * 100 : 0;
+          const expenseChangePercent =
+            pm.totalExpenses > 0 ? (expenseChange / pm.totalExpenses) * 100 : 0;
+          const savingsChangePercent =
+            pm.savings !== 0 ? (savingsChange / Math.abs(pm.savings)) * 100 : 0;
+
+          summaryText += `\n\n=== PREVIOUS MONTH COMPARISON ===\nMonth: ${pm.month}\n- Total Income: $${pm.totalIncome.toFixed(2)} (${incomeChange >= 0 ? '+' : ''}$${incomeChange.toFixed(2)}, ${incomeChangePercent >= 0 ? '+' : ''}${incomeChangePercent.toFixed(1)}%)\n- Total Expenses: $${pm.totalExpenses.toFixed(2)} (${expenseChange >= 0 ? '+' : ''}$${expenseChange.toFixed(2)}, ${expenseChangePercent >= 0 ? '+' : ''}${expenseChangePercent.toFixed(1)}%)\n- Net Income: $${pm.netIncome.toFixed(2)} (${savingsChange >= 0 ? '+' : ''}$${savingsChange.toFixed(2)}, ${savingsChangePercent >= 0 ? '+' : ''}${savingsChangePercent.toFixed(1)}%)\n- Savings: $${pm.savings.toFixed(2)} (${savingsChange >= 0 ? '+' : ''}$${savingsChange.toFixed(2)})\n- Transaction Count: ${pm.transactionCount}`;
+        }
+
+        parts.push(summaryText);
       }
 
+      // Top Spending Categories
       if (context.categorySpending && context.categorySpending.length > 0) {
         parts.push(
-          `Top Spending Categories:\n${context.categorySpending
-            .slice(0, 5)
-            .map((c) => `- ${c.category}: $${c.amount.toFixed(2)} (${c.percentage.toFixed(1)}%)`)
-            .join('\n')}`,
-        );
-      }
-
-      if (context.accountBalances && context.accountBalances.length > 0) {
-        const totalBalance = context.accountBalances.reduce((sum, acc) => sum + acc.balance, 0);
-        parts.push(
-          `Account Balances:\n- Total Balance: $${totalBalance.toFixed(2)}\n${context.accountBalances
-            .map((acc) => `- ${acc.accountName} (${acc.accountType}): $${acc.balance.toFixed(2)}`)
-            .join('\n')}`,
-        );
-      }
-
-      if (context.recentTransactions && context.recentTransactions.length > 0) {
-        parts.push(
-          `Recent Transactions:\n${context.recentTransactions
-            .slice(0, 5)
+          `=== TOP SPENDING CATEGORIES (Current Month) ===\n${context.categorySpending
+            .slice(0, 10)
             .map(
-              (t) =>
-                `- ${t.date}: ${t.description} - $${t.amount.toFixed(2)} (${t.category}, ${t.type})`,
+              (c, i) =>
+                `${i + 1}. ${c.category}: $${c.amount.toFixed(2)} (${c.percentage.toFixed(1)}%)${c.transactionCount ? ` - ${c.transactionCount} transactions` : ''}`,
             )
             .join('\n')}`,
         );
       }
 
+      // Top Income Categories
+      if (context.categoryIncome && context.categoryIncome.length > 0) {
+        parts.push(
+          `=== TOP INCOME CATEGORIES (Current Month) ===\n${context.categoryIncome
+            .map(
+              (c, i) =>
+                `${i + 1}. ${c.category}: $${c.amount.toFixed(2)} (${c.percentage.toFixed(1)}%)${c.transactionCount ? ` - ${c.transactionCount} transactions` : ''}`,
+            )
+            .join('\n')}`,
+        );
+      }
+
+      // Account Balances
+      if (context.accountBalances && context.accountBalances.length > 0) {
+        const totalBalance = context.accountBalances.reduce((sum, acc) => sum + acc.balance, 0);
+        parts.push(
+          `=== ACCOUNT BALANCES ===\nTotal Balance: $${totalBalance.toFixed(2)}\n${context.accountBalances
+            .map((acc) => `- ${acc.accountName} (${acc.accountType}): $${acc.balance.toFixed(2)}`)
+            .join('\n')}`,
+        );
+      }
+
+      // Recent Transactions
+      if (context.recentTransactions && context.recentTransactions.length > 0) {
+        parts.push(
+          `=== RECENT TRANSACTIONS (Last ${context.recentTransactions.length}) ===\n${context.recentTransactions
+            .slice(0, 15)
+            .map(
+              (t) =>
+                `${t.date}: ${t.description} - $${Math.abs(t.amount).toFixed(2)} (${t.category}, ${t.type})${t.accountName ? ` [${t.accountName}]` : ''}`,
+            )
+            .join('\n')}`,
+        );
+      }
+
+      // Spending Trends
+      if (context.spendingTrends && context.spendingTrends.length > 0) {
+        const expenseTrends = context.spendingTrends.filter((t) => t.type === 'expense');
+        if (expenseTrends.length > 0) {
+          const totalSpending = expenseTrends.reduce((sum, t) => sum + t.amount, 0);
+          const days = expenseTrends.length;
+          const dailyAverage = days > 0 ? totalSpending / days : 0;
+          const weeklyAverage = dailyAverage * 7;
+          const peakDay = expenseTrends.reduce(
+            (max, t) => (t.amount > max.amount ? t : max),
+            expenseTrends[0],
+          );
+          const lowestDay = expenseTrends.reduce(
+            (min, t) => (t.amount < min.amount ? t : min),
+            expenseTrends[0],
+          );
+
+          parts.push(
+            `=== SPENDING TRENDS (Last 30 Days) ===\n- Daily average: $${dailyAverage.toFixed(2)}\n- Weekly average: $${weeklyAverage.toFixed(2)}\n- Peak spending day: ${peakDay.date} ($${peakDay.amount.toFixed(2)})\n- Lowest spending day: ${lowestDay.date} ($${lowestDay.amount.toFixed(2)})`,
+          );
+        }
+      }
+
+      // Financial Metrics
+      if (context.metrics) {
+        const m = context.metrics;
+        parts.push(
+          `=== FINANCIAL METRICS ===\n- Total Accounts: ${m.accountCount}\n- Total Balance: $${m.totalBalance.toFixed(2)}\n- Average Transaction Amount: $${m.avgTransactionAmount.toFixed(2)}\n${m.mostActiveCategory ? `- Most Active Category: ${m.mostActiveCategory}\n` : ''}- Spending Velocity: $${m.dailyAverage.toFixed(2)}/day, $${m.weeklyAverage.toFixed(2)}/week\n- Savings Rate: ${m.savingsRate.toFixed(1)}% of income`,
+        );
+      }
+
       if (parts.length > 0) {
-        contextString = `\n\nUser's Financial Context:\n${parts.join('\n\n')}`;
+        contextString = `\n\nUser's Financial Context:\n\n${parts.join('\n\n')}`;
       }
     }
 
