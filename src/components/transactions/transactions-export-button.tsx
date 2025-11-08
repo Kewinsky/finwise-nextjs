@@ -9,12 +9,15 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Download, FileJson, FileText, ChevronDown } from 'lucide-react';
+import { Download, FileJson, FileText, ChevronDown, Lock } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
 import { exportTransactionsToCSV, exportTransactionsToJSON } from '@/lib/actions/finance-actions';
 import { downloadCSV, generateCSVFilename } from '@/lib/utils/csv-export';
 import { downloadJSON, generateJSONFilename } from '@/lib/utils/json-export';
 import { notifyError, notifySuccess } from '@/lib/notifications';
+import { useSubscription } from '@/hooks/use-subscription';
+import { PLAN_LIMITS } from '@/config/app';
+import { useRouter } from 'next/navigation';
 import type { TransactionFilters } from '@/types/finance.types';
 
 interface TransactionsExportButtonProps {
@@ -27,6 +30,18 @@ export function TransactionsExportButton({
   className,
 }: TransactionsExportButtonProps) {
   const [isExporting, setIsExporting] = useState(false);
+  const { planType, isLoading: isLoadingPlan } = useSubscription();
+  const router = useRouter();
+
+  const currentPlan = planType || 'free';
+  const planLimits = PLAN_LIMITS[currentPlan];
+  const canExportCSV = planLimits.exportCSV;
+  const canExportJSON = planLimits.exportJSON;
+  const canExport = canExportCSV || canExportJSON;
+
+  const handleUpgradeClick = () => {
+    router.push('/settings/billing');
+  };
 
   const handleExportCSV = async () => {
     setIsExporting(true);
@@ -80,10 +95,25 @@ export function TransactionsExportButton({
     }
   };
 
+  // Show upgrade message if user can't export
+  if (!isLoadingPlan && !canExport) {
+    return (
+      <Button variant="outline" size="sm" onClick={handleUpgradeClick} className={className}>
+        <Lock className="h-4 w-4 mr-2" />
+        Upgrade to Export
+      </Button>
+    );
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" disabled={isExporting} className={className}>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={isExporting || isLoadingPlan}
+          className={className}
+        >
           {isExporting ? (
             <LoadingSpinner size="sm" message="Exporting..." inline className="mr-2" />
           ) : (
@@ -97,14 +127,28 @@ export function TransactionsExportButton({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>Export Format</DropdownMenuLabel>
-        <DropdownMenuItem onClick={handleExportCSV} disabled={isExporting}>
-          <FileText className="h-4 w-4 mr-2" />
-          Export as CSV
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleExportJSON} disabled={isExporting}>
-          <FileJson className="h-4 w-4 mr-2" />
-          Export as JSON
-        </DropdownMenuItem>
+        {canExportCSV ? (
+          <DropdownMenuItem onClick={handleExportCSV} disabled={isExporting}>
+            <FileText className="h-4 w-4 mr-2" />
+            Export as CSV
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem onClick={handleUpgradeClick} disabled={isExporting}>
+            <Lock className="h-4 w-4 mr-2" />
+            CSV (Upgrade Required)
+          </DropdownMenuItem>
+        )}
+        {canExportJSON ? (
+          <DropdownMenuItem onClick={handleExportJSON} disabled={isExporting}>
+            <FileJson className="h-4 w-4 mr-2" />
+            Export as JSON
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem onClick={handleUpgradeClick} disabled={isExporting}>
+            <Lock className="h-4 w-4 mr-2" />
+            JSON (Upgrade Required)
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

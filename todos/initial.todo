@@ -55,5 +55,7 @@
     ✔ handle consistent no data scenario on every section @done(25-11-06 00:54)
     ✔ handle consistent loading state on every section @done(25-11-06 00:54)
     ✔ handle consistent error state on every section @done(25-11-06 00:55)
-    ☐ improve preferences page to avoid overflow on dashboard
-    ☐ fix chart responsiveness (overflow issues)
+    ✔ improve preferences page to avoid overflow on dashboard @done(25-11-09 00:24)
+    ✔ fix chart responsiveness (overflow issues) @done(25-11-09 00:24)
+    ✔ update tiers @done(25-11-09 00:29)
+    ☐ update branding colors and logo

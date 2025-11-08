@@ -8,6 +8,7 @@ import {
   AIAssistantService,
   OpenAIUsageService,
 } from '@/services';
+import { SubscriptionService } from '@/services/subscription.service';
 import { RedisCache, CacheKeys, CacheTTL } from '@/lib/cache/redis-cache';
 import {
   createAccountSchema,
@@ -21,7 +22,7 @@ import {
 import { z } from 'zod';
 import { ERROR_MESSAGES } from '@/lib/constants/errors';
 import { handleActionError, handleValidationError } from '@/lib/utils/error-handler';
-import type { PlanType } from '@/config/app';
+import { PLAN_LIMITS, type PlanType } from '@/config/app';
 
 /**
  * Helper function to invalidate user's cache when data changes
@@ -1474,6 +1475,26 @@ export async function exportTransactionsToCSV(filters: TransactionFilters = {}) 
       return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
     }
 
+    // Check if user has export permission
+    const subscriptionService = new SubscriptionService(supabase);
+    const subscriptionResult = await subscriptionService.getUserSubscription(user.id);
+
+    if (!subscriptionResult.success) {
+      return { success: false, error: subscriptionResult.error };
+    }
+
+    const subscription = subscriptionResult.data;
+    const planType = (subscription?.plan_type || 'free') as PlanType;
+    const planLimits = PLAN_LIMITS[planType];
+
+    if (!planLimits.exportCSV) {
+      return {
+        success: false,
+        error:
+          'CSV export is not available on your current plan. Please upgrade to Basic or Pro plan.',
+      };
+    }
+
     const transactionService = new TransactionService(supabase);
     const result = await transactionService.exportTransactionsToCSV(user.id, filters);
 
@@ -1499,6 +1520,26 @@ export async function exportTransactionsToJSON(filters: TransactionFilters = {})
 
     if (!user) {
       return { success: false, error: ERROR_MESSAGES.AUTH_REQUIRED };
+    }
+
+    // Check if user has export permission
+    const subscriptionService = new SubscriptionService(supabase);
+    const subscriptionResult = await subscriptionService.getUserSubscription(user.id);
+
+    if (!subscriptionResult.success) {
+      return { success: false, error: subscriptionResult.error };
+    }
+
+    const subscription = subscriptionResult.data;
+    const planType = (subscription?.plan_type || 'free') as PlanType;
+    const planLimits = PLAN_LIMITS[planType];
+
+    if (!planLimits.exportJSON) {
+      return {
+        success: false,
+        error:
+          'JSON export is not available on your current plan. Please upgrade to Basic or Pro plan.',
+      };
     }
 
     const transactionService = new TransactionService(supabase);

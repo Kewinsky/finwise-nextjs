@@ -161,7 +161,7 @@ export function BillingClientWrapper({
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground">
-                {currentPlan.features[0] || 'Perfect for getting started'}
+                {currentPlan.description || 'Perfect for getting started'}
               </p>
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1">
@@ -229,7 +229,7 @@ export function BillingClientWrapper({
                         </span>
                       </div>
                       <p className="text-sm text-muted-foreground line-clamp-2">
-                        {plan.features[0] || 'Perfect for getting started'}
+                        {plan.description || 'Perfect for getting started'}
                       </p>
                     </div>
 

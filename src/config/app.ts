@@ -31,11 +31,15 @@ export const SUBSCRIPTION_PLANS = {
     name: 'Free',
     priceId: null,
     price: 0,
+    description: 'Perfect for getting started with basic expense tracking.',
     features: [
       'Track expenses and income',
       'Up to 2 accounts',
       '100 transactions/month',
-      'Basic financial insights',
+      'AI financial insights (5 queries/month)',
+      'Financial dashboard',
+      'Category spending analysis',
+      'Balance history (last 3 months)',
     ],
     trialDays: 0,
   },
@@ -43,12 +47,17 @@ export const SUBSCRIPTION_PLANS = {
     name: 'Basic',
     priceId: process.env.NEXT_PUBLIC_STRIPE_BASIC_PRICE_ID,
     price: 12,
+    description: 'Ideal for regular users who need advanced analytics.',
     features: [
       'Up to 5 accounts',
       '1,000 transactions/month',
-      'Export to CSV',
       'AI financial insights (50 queries/month)',
+      'Export to CSV & JSON',
+      'Full transaction history',
       'Advanced analytics dashboard',
+      'Spending trends & analytics',
+      'Monthly financial summaries',
+      'Email support',
     ],
     trialDays: 14,
   },
@@ -56,13 +65,17 @@ export const SUBSCRIPTION_PLANS = {
     name: 'Pro',
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID,
     price: 29,
+    description: 'For power users who need unlimited access to all features.',
     features: [
-      'Unlimited accounts & transactions',
+      'Unlimited accounts',
+      'Unlimited transactions',
       'Unlimited AI financial insights',
+      'Export to CSV & JSON',
+      'Full transaction history',
       'Advanced analytics & reporting',
-      'Data export (CSV, Excel)',
-      'Team sharing (up to 5 members)',
+      'Detailed financial reports',
       'Priority support',
+      'Access to all features',
     ],
     trialDays: 0,
   },
@@ -430,8 +443,10 @@ export type PlanLimits = {
   apiAccess: boolean;
   teamMembers: number;
   exportCSV: boolean;
+  exportJSON: boolean;
   exportExcel: boolean;
   advancedAnalytics: boolean;
+  historyMonths: number; // Number of months of history available (Infinity for full history)
   support: 'none' | 'standard' | 'priority';
 };
 
@@ -442,40 +457,46 @@ export const PLAN_LIMITS = {
   free: {
     maxAccounts: 2,
     maxTransactionsPerMonth: 100,
-    maxStorageMB: 100,
+    maxStorageMB: 0, // Not used - no file upload system
     aiQueriesPerMonth: 5,
-    dashboards: 1,
-    apiAccess: false,
-    teamMembers: 0,
+    dashboards: 1, // Only one dashboard exists
+    apiAccess: false, // No external API
+    teamMembers: 0, // No team sharing
     exportCSV: false,
-    exportExcel: false,
-    advancedAnalytics: false,
+    exportJSON: false,
+    exportExcel: false, // Not implemented
+    advancedAnalytics: false, // Same analytics for all, but limit features
+    historyMonths: 3, // Last 3 months of data
     support: 'none',
   },
   basic: {
     maxAccounts: 5,
     maxTransactionsPerMonth: 1000,
-    maxStorageMB: 2048,
+    maxStorageMB: 0, // Not used - no file upload system
     aiQueriesPerMonth: 50,
-    dashboards: 3,
-    apiAccess: true,
-    teamMembers: 0,
+    dashboards: 1, // Only one dashboard exists
+    apiAccess: false, // No external API
+    teamMembers: 0, // No team sharing
     exportCSV: true,
-    exportExcel: false,
-    advancedAnalytics: false,
+    exportJSON: true,
+    exportExcel: false, // Not implemented
+    advancedAnalytics: true, // Full analytics features
+    historyMonths: Infinity, // Full history
     support: 'standard',
   },
   pro: {
     maxAccounts: Infinity,
     maxTransactionsPerMonth: Infinity,
-    maxStorageMB: Infinity,
+    maxStorageMB: 0, // Not used - no file upload system
     aiQueriesPerMonth: Infinity,
-    dashboards: Infinity,
-    apiAccess: true,
-    teamMembers: 5,
+    dashboards: 1, // Only one dashboard exists
+    apiAccess: false, // No external API
+    teamMembers: 0, // No team sharing
     exportCSV: true,
-    exportExcel: true,
-    advancedAnalytics: true,
+    exportJSON: true,
+    exportExcel: false, // Not implemented
+    advancedAnalytics: true, // Full analytics features
+    historyMonths: Infinity, // Full history
     support: 'priority',
   },
 } as const;

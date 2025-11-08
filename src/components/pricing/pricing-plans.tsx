@@ -41,7 +41,7 @@ export function PricingPlans() {
     name: plan.name,
     price: plan.price === 0 ? 'Free' : `${appConfig.settings.currencySymbol}${plan.price}`,
     period: plan.price === 0 ? '' : '/month',
-    description: plan.features[0] || 'Perfect for getting started',
+    description: plan.description || 'Perfect for getting started',
     features: plan.features,
     planType: key as PlanType,
     recommended: key === 'basic', // Set basic as recommended instead of pro
