@@ -156,21 +156,48 @@ export class AIAssistantService {
       const spendingTrends = spendingTrendsResult.success ? spendingTrendsResult.data : [];
       const accountBalances = accountBalancesResult.success ? accountBalancesResult.data : [];
 
-      log.info({ userId }, 'Using rule-based insights (mock mode)');
-      const insights = this.analyzeFinancialData({
-        monthlySummary,
-        categorySpending,
-        spendingTrends,
-        accountBalances,
-      });
+      let insights: FinancialInsights;
+      let tokensUsed = 0;
+
+      if (isOpenAIConfigured()) {
+        log.info({ userId }, 'Using OpenAI for insights generation');
+        const aiResult = await this.generateAIInsights({
+          monthlySummary,
+          categorySpending,
+          spendingTrends,
+          accountBalances,
+        });
+
+        if (aiResult && aiResult.insights) {
+          insights = aiResult.insights;
+          tokensUsed = aiResult.tokensUsed;
+        } else {
+          log.warn({ userId }, 'OpenAI failed, falling back to rule-based insights');
+          insights = this.analyzeFinancialData({
+            monthlySummary,
+            categorySpending,
+            spendingTrends,
+            accountBalances,
+          });
+          tokensUsed = 320;
+        }
+      } else {
+        log.info({ userId }, 'Using rule-based insights (mock mode)');
+        insights = this.analyzeFinancialData({
+          monthlySummary,
+          categorySpending,
+          spendingTrends,
+          accountBalances,
+        });
+        tokensUsed = 320;
+      }
 
       const saveResult = await this.saveInsights(userId, insights);
       if (!saveResult.success) {
         log.warn({ userId, error: saveResult.error }, 'Failed to save insights, but continuing');
       }
 
-      const mockTokensUsed = 320;
-      const recordResult = await this.usageService.recordAPICall(userId, mockTokensUsed);
+      const recordResult = await this.usageService.recordAPICall(userId, tokensUsed);
       if (!recordResult.success) {
         log.warn(
           { userId, error: recordResult.error },
@@ -178,7 +205,7 @@ export class AIAssistantService {
         );
       }
 
-      log.info({ userId }, 'Financial insights generated successfully');
+      log.info({ userId, tokensUsed }, 'Financial insights generated successfully');
       return { success: true, data: insights };
     } catch (error) {
       log.error(error, 'Error generating financial insights');
