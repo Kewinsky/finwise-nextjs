@@ -1,6 +1,6 @@
 'use client';
 
-import { CreditCard, Settings as SettingsIcon, User, Bell, MessageCircle } from 'lucide-react';
+import { CreditCard, Settings as SettingsIcon, User, Bell, MessageCircle, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -17,6 +17,12 @@ export const settingsTabs = [
     href: '/settings/profile',
     icon: User,
     description: 'Update your personal information and profile details.',
+  },
+  {
+    name: 'Usage',
+    href: '/settings/usage',
+    icon: Zap,
+    description: 'Track your AI query usage and limits.',
   },
   {
     name: 'Billing & Plans',

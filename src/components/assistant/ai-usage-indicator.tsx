@@ -93,7 +93,7 @@ export function AIUsageIndicator({
           <div className="text-xs">Resets: {formatResetDate(resetDate)}</div>
           {isLimitReached && (
             <Button asChild size="sm" variant="secondary" className="w-full mt-2">
-              <Link href="/settings/billing">View Details</Link>
+              <Link href="/settings/usage">View Details</Link>
             </Button>
           )}
         </div>

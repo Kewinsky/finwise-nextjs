@@ -24,7 +24,6 @@ import { type User } from '@supabase/supabase-js';
 import { type Subscription, type SubscriptionStatusInfo } from '@/types/subscription.types';
 import type { PaymentMethod, Invoice } from '@/types/billing.types';
 import { SubscriptionBanner } from '@/components/subscription/subscription-banner';
-import { BillingUsageSection } from './billing-usage-section';
 
 /**
  * Client wrapper for billing page
@@ -135,14 +134,9 @@ export function BillingClientWrapper({
     }
   };
 
-  const currentPlanType = (subscription?.plan_type || 'free') as PlanType;
-
   return (
     <div className="space-y-6">
       <SubscriptionBanner subscriptionInfo={subscriptionInfo} />
-
-      {/* AI Usage Section */}
-      <BillingUsageSection currentPlanType={currentPlanType} />
 
       {/* Current Subscription */}
       <Card>
