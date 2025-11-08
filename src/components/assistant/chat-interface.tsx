@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Send, Bot, User, AlertCircle, XCircle, Clock, Sparkles } from 'lucide-react';
-import { UsageLimitModal } from './usage-limit-modal';
 import { askAIQuestion } from '@/lib/actions/finance-actions';
 import { notifyError } from '@/lib/notifications';
 import type { AIUsageData } from '@/hooks/use-ai-usage';
@@ -23,7 +22,6 @@ interface ChatMessage {
 interface ChatInterfaceProps {
   usage: AIUsageData | null;
   canMakeQuery: boolean;
-  isLimitReached: boolean;
   refetch: () => Promise<void>;
   planType?: PlanType;
 }
@@ -39,13 +37,7 @@ const SUGGESTED_QUESTIONS = [
   'Give me budgeting advice',
 ] as const;
 
-export function ChatInterface({
-  usage,
-  canMakeQuery,
-  isLimitReached,
-  refetch,
-  planType,
-}: ChatInterfaceProps) {
+export function ChatInterface({ canMakeQuery, refetch }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
@@ -57,7 +49,6 @@ export function ChatInterface({
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showLimitModal, setShowLimitModal] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const addErrorMessage = (errorType: 'limit' | 'service' | 'rate-limit') => {
@@ -98,12 +89,6 @@ export function ChatInterface({
     const messageToSend = messageOverride || inputMessage;
     if (!messageToSend.trim() || isLoading) return;
 
-    if (!canMakeQuery || isLimitReached) {
-      setShowLimitModal(true);
-      addErrorMessage('limit');
-      return;
-    }
-
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       type: 'user',
@@ -127,7 +112,6 @@ export function ChatInterface({
       if (!result.success) {
         if (result.error?.includes('limit')) {
           addErrorMessage('limit');
-          setShowLimitModal(true);
         } else if (result.error?.includes('rate limit')) {
           addErrorMessage('rate-limit');
         } else {
@@ -170,16 +154,6 @@ export function ChatInterface({
 
   return (
     <div className="flex flex-col h-full">
-      {usage && (
-        <UsageLimitModal
-          open={showLimitModal}
-          onOpenChange={setShowLimitModal}
-          queryCount={usage.queryCount}
-          limit={usage.limit}
-          currentPlan={planType || 'free'}
-        />
-      )}
-
       <ScrollArea className="flex-1 p-2">
         <div className="space-y-4">
           {messages.map((message) => {
@@ -202,16 +176,6 @@ export function ChatInterface({
                     <p className="text-sm break-words whitespace-pre-wrap text-destructive">
                       {message.content}
                     </p>
-                    {message.errorType === 'limit' && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="mt-2"
-                        onClick={() => setShowLimitModal(true)}
-                      >
-                        Upgrade Plan
-                      </Button>
-                    )}
                     {message.errorType === 'service' && (
                       <Button
                         variant="outline"

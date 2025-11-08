@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AreaChart, Area, XAxis, CartesianGrid } from 'recharts';
+import { AreaChart, Area, XAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { TrendingUp } from 'lucide-react';
 import { useAreaChart, type TimeRange, type SeriesType } from '@/hooks/use-area-chart';
@@ -68,25 +68,27 @@ export const FinancialTrendsChart = React.memo(function FinancialTrendsChart({
 
   return (
     <Card>
-      <CardHeader>
-        <div className="flex flex-col space-y-4 @sm:flex-row @sm:items-center @sm:justify-between @sm:space-y-0">
-          <div className="flex flex-col gap-2">
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Financial Trends
+      <CardHeader className="space-y-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex flex-col gap-2 min-w-0 flex-1">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <TrendingUp className="h-4 w-4 shrink-0" />
+              <span className="truncate">Financial Trends</span>
             </CardTitle>
-            <CardDescription>Track your financial performance over time</CardDescription>
+            <CardDescription className="text-sm">
+              Track your financial performance over time
+            </CardDescription>
           </div>
 
           {/* Time Range Buttons */}
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 sm:flex-nowrap sm:shrink-0">
             {(['1W', '1M', '3M', '6M', '1Y'] as const).map((range) => (
               <Button
                 key={range}
                 variant={selectedTimeRange === range ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setSelectedTimeRange(range)}
-                className="min-w-[40px]"
+                className="min-w-[44px] text-xs sm:text-sm"
               >
                 {range}
               </Button>
@@ -99,23 +101,34 @@ export const FinancialTrendsChart = React.memo(function FinancialTrendsChart({
           value={selectedSeries}
           onValueChange={(value) => setSelectedSeries(value as SeriesType)}
         >
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="balance">Total Balance</TabsTrigger>
-            <TabsTrigger value="income">Incomes</TabsTrigger>
-            <TabsTrigger value="expenses">Expenses</TabsTrigger>
-            <TabsTrigger value="savings">Savings</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4 h-auto sm:h-10">
+            <TabsTrigger value="balance" className="text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-1.5">
+              <span className="truncate">Balance</span>
+            </TabsTrigger>
+            <TabsTrigger value="income" className="text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-1.5">
+              <span className="truncate">Income</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="expenses"
+              className="text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-1.5"
+            >
+              <span className="truncate">Expenses</span>
+            </TabsTrigger>
+            <TabsTrigger value="savings" className="text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-1.5">
+              <span className="truncate">Savings</span>
+            </TabsTrigger>
           </TabsList>
         </Tabs>
       </CardHeader>
       <CardContent>
         {isLoadingAreaChart ? (
-          <Skeleton className="h-[400px] w-full" />
+          <Skeleton className="h-[300px] sm:h-[400px] w-full" />
         ) : areaChartError ? (
           <ErrorState
             title="Failed to load chart data"
             description={areaChartError}
             variant="inline"
-            className="h-[400px]"
+            className="h-[300px] sm:h-[400px]"
           />
         ) : areaChartData.length === 0 ? (
           <NoDataState
@@ -123,28 +136,34 @@ export const FinancialTrendsChart = React.memo(function FinancialTrendsChart({
             title="No chart data available"
             description="Chart will appear once you have transaction data for this period"
             variant="inline"
-            height="h-[400px]"
+            height="h-[300px] sm:h-[400px]"
           />
         ) : (
           <div className="overflow-x-auto">
-            <ChartContainer config={chartConfig} className="h-[400px] w-full min-w-[600px]">
-              <AreaChart
-                accessibilityLayer
-                data={areaChartData}
-                margin={{ top: 16, bottom: 16, left: 32, right: 32 }}
-              >
-                <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="label"
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={10}
-                  minTickGap={selectedTimeRange === '1M' ? 100 : 50}
-                  interval={selectedTimeRange === '1M' ? Math.floor(areaChartData.length / 15) : 0}
-                />
-                <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                <Area dataKey="value" stroke={chartColor} fill={chartColor} fillOpacity={0.3} />
-              </AreaChart>
+            <ChartContainer config={chartConfig} className="w-full h-[300px] sm:h-[400px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={areaChartData}
+                  margin={{ top: 16, bottom: 16, left: 16, right: 16 }}
+                >
+                  <CartesianGrid vertical={false} />
+                  <XAxis
+                    dataKey="label"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={10}
+                    minTickGap={selectedTimeRange === '1M' ? 60 : 30}
+                  />
+                  <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                  <Area
+                    dataKey="value"
+                    stroke={chartColor}
+                    fill={chartColor}
+                    fillOpacity={0.3}
+                    type="monotone"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </ChartContainer>
           </div>
         )}

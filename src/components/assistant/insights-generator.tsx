@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sparkles, Lightbulb, Target, AlertCircle, BarChart3 } from 'lucide-react';
 import type { FinancialInsights } from '@/types/finance.types';
-import { UsageLimitModal } from './usage-limit-modal';
 import { generateInsights, getLastInsights } from '@/lib/actions/finance-actions';
 import { notifyError } from '@/lib/notifications';
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
@@ -15,23 +14,15 @@ import type { PlanType } from '@/config/app';
 interface InsightsGeneratorProps {
   usage: AIUsageData | null;
   canMakeQuery: boolean;
-  isLimitReached: boolean;
   refetch: () => Promise<void>;
   planType?: PlanType;
 }
 
-export function InsightsGenerator({
-  usage,
-  canMakeQuery,
-  isLimitReached,
-  refetch,
-  planType,
-}: InsightsGeneratorProps) {
+export function InsightsGenerator({ canMakeQuery, refetch }: InsightsGeneratorProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [insights, setInsights] = useState<FinancialInsights | null>(null);
   const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
-  const [showLimitModal, setShowLimitModal] = useState(false);
 
   useEffect(() => {
     const loadLastInsights = async () => {
@@ -47,11 +38,6 @@ export function InsightsGenerator({
   }, []);
 
   const handleGenerate = async () => {
-    if (!canMakeQuery || isLimitReached) {
-      setShowLimitModal(true);
-      return;
-    }
-
     setIsGenerating(true);
 
     try {
@@ -91,17 +77,6 @@ export function InsightsGenerator({
   if (insights) {
     return (
       <div className="space-y-4">
-        {/* Limit Modal */}
-        {usage && (
-          <UsageLimitModal
-            open={showLimitModal}
-            onOpenChange={setShowLimitModal}
-            queryCount={usage.queryCount}
-            limit={usage.limit}
-            currentPlan={planType || 'free'}
-          />
-        )}
-
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-semibold">Generated Insights</h3>
@@ -115,7 +90,7 @@ export function InsightsGenerator({
             variant="outline"
             size="sm"
             onClick={() => setInsights(null)}
-            disabled={!canMakeQuery || isLimitReached}
+            disabled={!canMakeQuery}
           >
             Generate New
           </Button>
@@ -123,8 +98,8 @@ export function InsightsGenerator({
 
         <div className="space-y-4 overflow-y-auto">
           {/* Spending Insights */}
-          <Card>
-            <CardHeader className="pb-3">
+          <Card className="gap-2">
+            <CardHeader className="gap-0">
               <CardTitle className="text-sm flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
                 Spending Insights
@@ -142,8 +117,8 @@ export function InsightsGenerator({
           </Card>
 
           {/* Savings Tips */}
-          <Card>
-            <CardHeader className="pb-3">
+          <Card className="gap-2">
+            <CardHeader className="gap-0">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Lightbulb className="h-4 w-4" />
                 Savings Tips
@@ -161,8 +136,8 @@ export function InsightsGenerator({
           </Card>
 
           {/* Budget Optimization */}
-          <Card>
-            <CardHeader className="pb-3">
+          <Card className="gap-2">
+            <CardHeader className="gap-0">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Target className="h-4 w-4" />
                 Budget Optimization
@@ -181,8 +156,8 @@ export function InsightsGenerator({
 
           {/* Areas of Concern */}
           {insights.areasOfConcern.length > 0 && (
-            <Card>
-              <CardHeader className="pb-3">
+            <Card className="gap-2">
+              <CardHeader className="gap-0">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <AlertCircle className="h-4 w-4" />
                   Areas of Concern
@@ -207,8 +182,8 @@ export function InsightsGenerator({
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <Card>
-          <CardHeader>
+        <Card className="gap-2">
+          <CardHeader className="gap-0">
             <CardTitle className="text-sm flex items-center gap-2">
               <Sparkles className="h-4 w-4" />
               Generate Insights
@@ -227,19 +202,8 @@ export function InsightsGenerator({
 
   return (
     <div className="space-y-4">
-      {/* Limit Modal */}
-      {usage && (
-        <UsageLimitModal
-          open={showLimitModal}
-          onOpenChange={setShowLimitModal}
-          queryCount={usage.queryCount}
-          limit={usage.limit}
-          currentPlan={planType || 'free'}
-        />
-      )}
-
-      <Card>
-        <CardHeader>
+      <Card className="gap-2">
+        <CardHeader className="gap-0">
           <CardTitle className="text-sm flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
             Generate Insights

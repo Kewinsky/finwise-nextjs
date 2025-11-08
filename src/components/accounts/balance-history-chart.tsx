@@ -10,7 +10,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-import { LineChart, Line, CartesianGrid, XAxis } from 'recharts';
+import { LineChart, Line, CartesianGrid, XAxis, ResponsiveContainer } from 'recharts';
 import { useBalanceHistory } from '@/hooks/use-balance-history';
 import { BalanceHistoryFilters } from './balance-history-filters';
 import { ErrorState } from '@/components/common/error-state';
@@ -44,7 +44,7 @@ export function BalanceHistoryChartComponent({ accounts }: BalanceHistoryChartPr
   return (
     <Card className="w-full">
       <CardHeader>
-        <div className="flex flex-col @lg:flex-row items-stretch @lg:items-center justify-between gap-4">
+        <div className="flex flex-col @xl:flex-row items-stretch @xl:items-center justify-between gap-4">
           <div className="flex flex-col gap-2">
             <CardTitle className="flex items-center gap-2 text-lg @sm:text-xl">
               <AreaChart className="h-4 w-4 @sm:h-5 @sm:w-5" />
@@ -65,37 +65,42 @@ export function BalanceHistoryChartComponent({ accounts }: BalanceHistoryChartPr
         </div>
       </CardHeader>
       <CardContent>
-        <div className="w-full h-80">
-          {isLoading ? (
-            <div className="flex items-center justify-center h-full">
-              <LoadingSpinner message="Loading chart data..." />
-            </div>
-          ) : error ? (
-            <ErrorState
-              title="Failed to load balance history"
-              description={error}
-              variant="inline"
-              className="h-full"
-            />
-          ) : !hasChartData ? (
-            <NoDataState
-              icon={AreaChart}
-              title="No balance history data available"
-              description="Chart will appear once you have transaction data"
-              variant="inline"
-              height="h-full"
-            />
-          ) : (
-            <div className="overflow-x-auto">
-              <ChartContainer config={chartConfig} className="w-full h-full min-w-[600px]">
+        {isLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <LoadingSpinner message="Loading chart data..." />
+          </div>
+        ) : error ? (
+          <ErrorState
+            title="Failed to load balance history"
+            description={error}
+            variant="inline"
+            className="h-full"
+          />
+        ) : !hasChartData ? (
+          <NoDataState
+            icon={AreaChart}
+            title="No balance history data available"
+            description="Chart will appear once you have transaction data"
+            variant="inline"
+            height="h-full"
+          />
+        ) : (
+          <div className="overflow-x-auto">
+            <ChartContainer config={chartConfig} className="w-full h-full">
+              <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   accessibilityLayer
                   data={chartData}
-                  className="w-full h-full"
-                  margin={{ top: 16, bottom: 16, left: 32, right: 32 }}
+                  margin={{ top: 16, bottom: 16, left: 16, right: 16 }}
                 >
                   <CartesianGrid vertical={false} />
-                  <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={10} />
+                  <XAxis
+                    dataKey="month"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={10}
+                    minTickGap={20}
+                  />
                   <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                   {Array.from(selectedAccounts).map((accountId) => {
                     const account = accounts.find((acc) => acc.id === accountId);
@@ -105,16 +110,15 @@ export function BalanceHistoryChartComponent({ accounts }: BalanceHistoryChartPr
                       <Line
                         key={accountId}
                         dataKey={accountId}
-                        type="linear"
+                        type="monotone"
                         stroke={`var(--color-${accountId})`}
                         strokeWidth={2}
                         dot={{
                           fill: `var(--color-${accountId})`,
-                          strokeWidth: 2,
-                          r: 4,
+                          r: 3,
                         }}
                         activeDot={{
-                          r: 6,
+                          r: 5,
                           stroke: `var(--color-${accountId})`,
                           strokeWidth: 2,
                         }}
@@ -123,10 +127,10 @@ export function BalanceHistoryChartComponent({ accounts }: BalanceHistoryChartPr
                   })}
                   <ChartLegend content={<ChartLegendContent />} />
                 </LineChart>
-              </ChartContainer>
-            </div>
-          )}
-        </div>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

@@ -37,7 +37,7 @@ export function ChatSidebar() {
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState<'chat' | 'insights'>('chat');
   const { isMobile, isOpen, openMobile, setOpenMobile } = useChatSidebar();
-  const { usage, isLoading: isUsageLoading, refetch, canMakeQuery, isLimitReached } = useAIUsage();
+  const { usage, isLoading: isUsageLoading, refetch, canMakeQuery } = useAIUsage();
   const { planType } = useSubscription();
 
   // Only show sidebar on allowed pages
@@ -116,7 +116,6 @@ export function ChatSidebar() {
                     <ChatInterface
                       usage={usage}
                       canMakeQuery={canMakeQuery}
-                      isLimitReached={isLimitReached}
                       refetch={refetch}
                       planType={planType ?? undefined}
                     />
@@ -130,7 +129,6 @@ export function ChatSidebar() {
                   <InsightsGenerator
                     usage={usage}
                     canMakeQuery={canMakeQuery}
-                    isLimitReached={isLimitReached}
                     refetch={refetch}
                     planType={planType ?? undefined}
                   />
@@ -232,7 +230,6 @@ export function ChatSidebar() {
                   <ChatInterface
                     usage={usage}
                     canMakeQuery={canMakeQuery}
-                    isLimitReached={isLimitReached}
                     refetch={refetch}
                     planType={planType ?? undefined}
                   />
@@ -246,7 +243,6 @@ export function ChatSidebar() {
                 <InsightsGenerator
                   usage={usage}
                   canMakeQuery={canMakeQuery}
-                  isLimitReached={isLimitReached}
                   refetch={refetch}
                   planType={planType ?? undefined}
                 />
