@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/themes/theme-toggle';
 import { Menu, X } from 'lucide-react';
 import { Magnetic } from '../ui/magnetic';
+import { BrandLogo } from './brand-logo';
 import { appConfig } from '@/config/app';
 
 interface NavLink {
@@ -34,7 +35,7 @@ const defaultNavigationLinks: NavLink[] = [
 
 export function Navbar({
   brandName = appConfig.app.name,
-  logo = '🚀',
+  logo,
   navigationLinks = defaultNavigationLinks,
   signInText = 'Sign In',
   signInHref = '/login',
@@ -50,16 +51,13 @@ export function Navbar({
       <div className="relative container mx-auto grid h-16 max-w-screen-2xl grid-cols-[1fr_auto_auto] items-center lg:grid-cols-[auto_1fr_auto] px-4">
         {/* Logo and Brand */}
         <div className="col-start-1 col-end-2 row-start-1 row-end-2">
-          <Magnetic>
-            <Link href="/" className="flex items-center space-x-2 group">
-              <span className="text-2xl transition-transform duration-300 group-hover:scale-110">
-                {logo}
-              </span>
-              <span className="font-bold text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent group-hover:from-blue-700 group-hover:to-purple-700 transition-all duration-300">
-                {brandName}
-              </span>
-            </Link>
-          </Magnetic>
+          {logo ? (
+            <Magnetic>{logo as React.ReactElement}</Magnetic>
+          ) : (
+            <Magnetic>
+              <BrandLogo brandName={brandName} />
+            </Magnetic>
+          )}
         </div>
 
         {/* Desktop Navigation */}

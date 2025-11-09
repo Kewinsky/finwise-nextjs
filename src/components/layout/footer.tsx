@@ -1,4 +1,5 @@
 import { Github, Twitter, Linkedin, Mail } from 'lucide-react';
+import { BrandLogo } from './brand-logo';
 import { appConfig } from '@/config/app';
 
 interface FooterProps {
@@ -50,9 +51,8 @@ export function Footer({
         <div className="py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
           {/* Brand section */}
           <div className="lg:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="text-2xl">🚀</div>
-              <span className="font-bold text-xl">{brandName}</span>
+            <div className="mb-4">
+              <BrandLogo brandName={brandName} href="/" />
             </div>
             <p className="text-muted-foreground mb-6 max-w-sm">
               Build amazing SaaS applications with our modern, flexible template. Get started in

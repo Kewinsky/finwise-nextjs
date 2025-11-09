@@ -4,7 +4,6 @@ import * as React from 'react';
 import {
   IconDashboard,
   IconHelp,
-  IconInnerShadowTop,
   IconSearch,
   IconCreditCard,
   IconBuilding,
@@ -12,8 +11,8 @@ import {
 import { NavMain } from '@/components/layout/nav-main';
 import { NavSecondary } from '@/components/layout/nav-secondary';
 import { NavUser } from '@/components/layout/nav-user';
+import { BrandLogo } from '@/components/layout/brand-logo';
 import { User } from '@/types/user.types';
-import { appConfig } from '@/config/app';
 import {
   Sidebar,
   SidebarContent,
@@ -68,12 +67,12 @@ export function AppSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
-              <a href="#">
-                <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  {appConfig.app.name}
-                </span>
-              </a>
+              <BrandLogo
+                href="/dashboard"
+                iconClassName="!size-5"
+                textClassName="text-base font-semibold"
+                asChild
+              />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
