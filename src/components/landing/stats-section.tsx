@@ -6,27 +6,27 @@ import { motion } from 'motion/react';
 const stats = [
   {
     icon: Users,
-    value: '10K+',
-    label: 'Developers',
-    description: 'Trust our templates',
+    value: '50K+',
+    label: 'Active Users',
+    description: 'Trust Finwise',
   },
   {
     icon: Zap,
-    value: '99.9%',
-    label: 'Uptime',
-    description: 'Reliable infrastructure',
+    value: '$2M+',
+    label: 'Tracked',
+    description: 'In transactions',
   },
   {
     icon: Code,
-    value: '50+',
-    label: 'Components',
-    description: 'Ready to use',
+    value: '99.9%',
+    label: 'Uptime',
+    description: 'Reliable service',
   },
   {
     icon: Star,
     value: '4.9/5',
     label: 'Rating',
-    description: 'Community feedback',
+    description: 'User satisfaction',
   },
 ];
 
@@ -61,11 +61,12 @@ export const StatsSection = () => {
           <h2 id="stats-heading" className="text-4xl sm:text-5xl font-bold text-foreground mb-6">
             Trusted by{' '}
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Developers Worldwide
+              Thousands of Users
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Join thousands of developers who have launched successful SaaS applications
+            Join thousands of users who have transformed their financial health with smart tracking
+            and AI-powered insights
           </p>
         </motion.div>
 
@@ -82,13 +83,26 @@ export const StatsSection = () => {
                 className="text-center group"
               >
                 <motion.div
-                  className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mb-4 group-hover:scale-110 transition-transform duration-300"
+                  className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full mb-4 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg"
+                  whileHover={{ scale: 1.15, rotate: 12 }}
                   aria-hidden="true"
                 >
                   <Icon className="w-8 h-8 text-white" aria-label={`${stat.label} icon`} />
                 </motion.div>
-                <dt className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  {stat.value}
+                <dt className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent bg-[length:200%_auto]">
+                  <motion.span
+                    animate={{
+                      backgroundPosition: ['0% center', '200% center', '0% center'],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: 'linear',
+                    }}
+                    className="block"
+                  >
+                    {stat.value}
+                  </motion.span>
                 </dt>
                 <dd>
                   <div className="text-lg font-semibold text-foreground mb-1">{stat.label}</div>

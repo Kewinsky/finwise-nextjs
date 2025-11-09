@@ -7,26 +7,26 @@ import { motion } from 'motion/react';
 const testimonials = [
   {
     name: 'Sarah Chen',
-    role: 'Full Stack Developer',
-    company: 'TechCorp',
+    role: 'Financial Advisor',
+    company: 'Wealth Management Co.',
     content:
-      'This template saved me weeks of development time. The code quality is excellent and the documentation is comprehensive. Highly recommended!',
+      'Finwise has completely transformed how I track my finances. The AI insights are incredibly accurate and have helped me save thousands. The interface is beautiful and intuitive.',
     rating: 5,
   },
   {
     name: 'Mike Rodriguez',
-    role: 'Startup Founder',
-    company: 'InnovateLab',
+    role: 'Small Business Owner',
+    company: 'Rodriguez & Associates',
     content:
-      'Perfect for launching our MVP. The authentication system works flawlessly and the UI components are beautiful. Our users love the experience.',
+      'As a business owner, I needed a tool to track both personal and business expenses. Finwise makes it so easy, and the automated categorization saves me hours every month.',
     rating: 5,
   },
   {
     name: 'Emily Johnson',
-    role: 'Product Manager',
-    company: 'ScaleUp',
+    role: 'Freelance Designer',
+    company: 'Independent',
     content:
-      "The best SaaS template I've used. Everything is well-structured and the TypeScript support is fantastic. It's production-ready out of the box.",
+      "I've tried many budgeting apps, but Finwise is by far the best. The real-time sync with my accounts and the beautiful analytics dashboards make financial planning actually enjoyable.",
     rating: 5,
   },
 ];
@@ -65,13 +65,13 @@ export const TestimonialsSection = () => {
             className="text-4xl sm:text-5xl font-bold text-foreground mb-6"
           >
             What{' '}
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Developers Say
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Our Users Say
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Don&apos;t just take our word for it. Here&apos;s what developers are saying about our
-            template.
+            Don&apos;t just take our word for it. Here&apos;s what real users are saying about
+            Finwise.
           </p>
         </motion.div>
 
@@ -84,8 +84,11 @@ export const TestimonialsSection = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
             >
-              <Card className="bg-muted/80 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border-0 shadow-lg group h-full">
-                <CardContent className="p-6">
+              <Card className="bg-muted/80 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-border/50 hover:border-blue-600/30 dark:hover:border-purple-500/30 shadow-lg group h-full relative overflow-hidden">
+                {/* Gradient overlay on hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                <CardContent className="p-6 relative z-10">
                   <div
                     className="flex items-center gap-1 mb-4"
                     role="img"
@@ -94,22 +97,28 @@ export const TestimonialsSection = () => {
                     {[...Array(testimonial.rating)].map((_, i) => (
                       <Star
                         key={i}
-                        className="w-4 h-4 fill-yellow-400 text-yellow-400"
+                        className="w-4 h-4 fill-yellow-400 text-yellow-400 group-hover:scale-110 transition-transform duration-300"
+                        style={{ transitionDelay: `${i * 50}ms` }}
                         aria-hidden="true"
                       />
                     ))}
                   </div>
 
-                  <Quote className="w-8 h-8 text-purple-500 mb-4 opacity-50" aria-hidden="true" />
+                  <Quote
+                    className="w-8 h-8 text-blue-600 dark:text-purple-500 mb-4 opacity-50 group-hover:opacity-75 group-hover:scale-110 transition-all duration-300"
+                    aria-hidden="true"
+                  />
 
-                  <blockquote className="text-muted-foreground mb-6 leading-relaxed group-hover:text-muted-foreground/80 transition-colors duration-300">
+                  <blockquote className="text-muted-foreground mb-6 leading-relaxed group-hover:text-foreground/90 transition-colors duration-300">
                     &quot;{testimonial.content}&quot;
                   </blockquote>
 
-                  <div className="border-t pt-4">
+                  <div className="border-t border-border/50 pt-4">
                     <cite className="not-italic">
-                      <div className="font-semibold text-foreground">{testimonial.name}</div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="font-semibold text-foreground group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300">
+                        {testimonial.name}
+                      </div>
+                      <div className="text-sm text-muted-foreground group-hover:text-foreground/70 transition-colors duration-300">
                         {testimonial.role} at {testimonial.company}
                       </div>
                     </cite>

@@ -89,16 +89,23 @@ export const BenefitsSection = () => {
               className="flex items-start gap-4 group"
             >
               <div className="flex-shrink-0" aria-hidden="true">
-                <motion.div whileHover={{ scale: 1.1 }} transition={{ duration: 0.2 }}>
+                <motion.div
+                  whileHover={{ scale: 1.15, rotate: 5 }}
+                  transition={{ duration: 0.2 }}
+                  className="relative"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full blur-md opacity-50 group-hover:opacity-75 transition-opacity duration-300" />
                   <CheckCircle
-                    className="h-6 w-6 text-green-600 group-hover:scale-110 transition-transform duration-300"
+                    className="h-7 w-7 text-blue-600 dark:text-purple-500 relative z-10 group-hover:scale-110 transition-transform duration-300"
                     aria-label="Check mark"
                   />
                 </motion.div>
               </div>
               <div className="flex-1">
-                <h3 className="text-xl font-semibold mb-2">{benefit.title}</h3>
-                <p className="text-muted-foreground leading-relaxed group-hover:text-muted-foreground/80 transition-colors duration-300">
+                <h3 className="text-xl font-semibold mb-2 group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300">
+                  {benefit.title}
+                </h3>
+                <p className="text-muted-foreground leading-relaxed group-hover:text-foreground/90 transition-colors duration-300">
                   {benefit.description}
                 </p>
               </div>

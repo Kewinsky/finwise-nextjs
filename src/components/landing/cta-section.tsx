@@ -41,10 +41,19 @@ export const CTASection = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="mb-8"
           >
-            <div className="inline-flex items-center bg-blue-600/10 dark:bg-blue-400/10 backdrop-blur-sm border border-blue-600/20 dark:border-blue-400/20 rounded-full px-6 py-3 text-blue-700 dark:text-blue-300 font-medium">
-              <Rocket className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" />
+            <motion.div
+              className="inline-flex items-center bg-gradient-to-r from-blue-600/10 to-purple-600/10 dark:from-blue-400/10 dark:to-purple-400/10 backdrop-blur-sm border border-blue-600/20 dark:border-purple-500/20 rounded-full px-6 py-3 text-blue-700 dark:text-purple-300 font-medium shadow-lg"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            >
+              <motion.div
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+              >
+                <Rocket className="w-5 h-5 mr-2 text-blue-600 dark:text-purple-500" />
+              </motion.div>
               Ready to Get Started?
-            </div>
+            </motion.div>
           </motion.div>
 
           {/* Main heading */}
@@ -54,9 +63,22 @@ export const CTASection = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
             id="cta-heading"
-            className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-8 leading-tight"
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-8 leading-tight"
           >
-            Take Control of Your Finances Today
+            <span className="block">Take Control of Your</span>
+            <motion.span
+              className="block bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent bg-[length:200%_auto]"
+              animate={{
+                backgroundPosition: ['0% center', '200% center', '0% center'],
+              }}
+              transition={{
+                duration: 5,
+                repeat: Infinity,
+                ease: 'linear',
+              }}
+            >
+              Finances Today
+            </motion.span>
           </motion.h2>
 
           {/* Description */}
@@ -92,27 +114,13 @@ export const CTASection = () => {
             <Button
               variant="outline"
               size="lg"
-              className="border-2 border-border text-foreground hover:bg-muted hover:border-border/80 text-lg px-12 py-6 rounded-2xl bg-muted/50 backdrop-blur-sm transition-all duration-300 transform hover:-translate-y-1"
+              className="border-2 border-blue-600/20 dark:border-purple-500/20 text-foreground hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-950/20 dark:hover:to-purple-950/20 hover:border-blue-600/40 dark:hover:border-purple-500/40 text-lg px-12 py-6 rounded-2xl bg-muted/50 backdrop-blur-sm transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg"
               asChild
             >
-              <a href="#features" aria-label="View pricing plans">
+              <a href="/pricing" aria-label="View pricing plans">
                 View Plans
               </a>
             </Button>
-          </motion.div>
-
-          {/* Trust indicators */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-8 text-muted-foreground text-sm"
-          >
-            <div className="flex items-center">
-              <CheckCircle className="w-4 h-4 text-green-400 mr-2" />
-              No credit card required • Free to start • Cancel anytime
-            </div>
           </motion.div>
         </motion.div>
       </div>
