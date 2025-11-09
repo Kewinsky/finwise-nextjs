@@ -524,7 +524,11 @@ export function TransactionForm({
                 <X className="mr-2 h-4 w-4" />
                 Cancel
               </Button>
-              <Button type="submit" disabled={isLoading}>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+              >
                 <Save className="mr-2 h-4 w-4" />
                 {isLoading ? 'Saving...' : 'Save Transaction'}
               </Button>

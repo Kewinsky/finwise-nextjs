@@ -12,7 +12,10 @@ export function TransactionsHeader({ onAddTransaction }: TransactionsHeaderProps
         <h1 className="text-2xl @sm:text-3xl font-bold tracking-tight">Transactions</h1>
         <p className="text-muted-foreground">Track your income, expenses, and transfers</p>
       </div>
-      <Button onClick={onAddTransaction} className="w-full @sm:w-auto">
+      <Button
+        onClick={onAddTransaction}
+        className="w-full @sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+      >
         <Plus className="mr-2 h-4 w-4" />
         Add Transaction
       </Button>

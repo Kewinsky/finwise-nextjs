@@ -99,11 +99,14 @@ export default function AboutPage() {
       <div className="container mx-auto max-w-7xl px-4 py-16">
         {/* Header */}
         <div className="text-center mb-16">
-          <Badge variant="secondary" className="mb-4">
+          <Badge className="mb-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
             About Us
           </Badge>
           <h1 className="text-4xl font-bold tracking-tight mb-4">
-            Building the Future of Personal Finance
+            Building the Future of{' '}
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Personal Finance
+            </span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             We&apos;re a team of passionate developers, designers, and financial experts dedicated
@@ -116,7 +119,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <Target className="w-8 h-8 text-primary" />
+                <Target className="w-8 h-8 text-blue-600 dark:text-purple-500" />
                 <h2 className="text-3xl font-bold">Our Mission</h2>
               </div>
               <p className="text-lg text-muted-foreground mb-6">
@@ -135,19 +138,19 @@ export default function AboutPage() {
               <h3 className="text-xl font-semibold mb-4">What We Do</h3>
               <ul className="space-y-3">
                 <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-primary rounded-full" />
+                  <div className="w-2 h-2 bg-blue-600 dark:bg-purple-500 rounded-full" />
                   <span>Build intelligent financial tracking tools</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-primary rounded-full" />
+                  <div className="w-2 h-2 bg-blue-600 dark:bg-purple-500 rounded-full" />
                   <span>Provide AI-powered financial insights</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-primary rounded-full" />
+                  <div className="w-2 h-2 bg-blue-600 dark:bg-purple-500 rounded-full" />
                   <span>Offer secure and private data handling</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-primary rounded-full" />
+                  <div className="w-2 h-2 bg-blue-600 dark:bg-purple-500 rounded-full" />
                   <span>Build a community of financially empowered users</span>
                 </li>
               </ul>
@@ -164,8 +167,8 @@ export default function AboutPage() {
               return (
                 <Card key={value.title} className="text-center">
                   <CardHeader>
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                      <Icon className="w-6 h-6 text-primary" />
+                    <div className="w-12 h-12 bg-blue-50 dark:bg-blue-950/20 rounded-lg flex items-center justify-center mx-auto mb-4">
+                      <Icon className="w-6 h-6 text-blue-600 dark:text-purple-500" />
                     </div>
                     <CardTitle className="text-lg">{value.title}</CardTitle>
                   </CardHeader>
@@ -195,7 +198,7 @@ export default function AboutPage() {
                     </AvatarFallback>
                   </Avatar>
                   <CardTitle className="text-lg">{member.name}</CardTitle>
-                  <CardDescription className="font-medium text-primary">
+                  <CardDescription className="font-medium text-blue-600 dark:text-purple-500">
                     {member.role}
                   </CardDescription>
                 </CardHeader>
@@ -211,7 +214,7 @@ export default function AboutPage() {
         <div className="mb-16">
           <h2 className="text-3xl font-bold text-center mb-12">Our Journey</h2>
           <div className="relative">
-            <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-primary/20 rounded-full" />
+            <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 rounded-full opacity-30" />
             <div className="space-y-8">
               {milestones.map((milestone, index) => (
                 <div
@@ -231,7 +234,7 @@ export default function AboutPage() {
                       </CardContent>
                     </Card>
                   </div>
-                  <div className="w-4 h-4 bg-primary rounded-full border-4 border-background relative z-10" />
+                  <div className="w-4 h-4 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 rounded-full border-4 border-background relative z-10" />
                   <div className="w-1/2" />
                 </div>
               ))}
@@ -244,19 +247,27 @@ export default function AboutPage() {
           <h2 className="text-3xl font-bold text-center mb-12">By the Numbers</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">10,000+</div>
+              <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                10,000+
+              </div>
               <div className="text-muted-foreground">Active Users</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">$50M+</div>
+              <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                $50M+
+              </div>
               <div className="text-muted-foreground">Transactions Tracked</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">99.9%</div>
+              <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                99.9%
+              </div>
               <div className="text-muted-foreground">Uptime</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">24/7</div>
+              <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                24/7
+              </div>
               <div className="text-muted-foreground">Support</div>
             </div>
           </div>
@@ -270,7 +281,12 @@ export default function AboutPage() {
             tracking and AI insights.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg">Start Tracking Free</Button>
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+            >
+              Start Tracking Free
+            </Button>
             <Button variant="outline" size="lg">
               View Plans
             </Button>

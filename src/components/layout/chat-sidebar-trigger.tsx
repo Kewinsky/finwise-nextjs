@@ -26,7 +26,7 @@ export function ChatSidebarTrigger({ className }: { className?: string }) {
       variant="ghost"
       size="icon"
       onClick={handleToggle}
-      className={cn('size-7', className)}
+      className={cn('size-7 text-purple-500 hover:text-purple-500', className)}
       aria-label="Toggle AI Chat Sidebar"
     >
       <Bot className="h-4 w-4" />

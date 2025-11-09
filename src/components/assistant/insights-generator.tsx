@@ -91,6 +91,7 @@ export function InsightsGenerator({ canMakeQuery, refetch }: InsightsGeneratorPr
             size="sm"
             onClick={() => setInsights(null)}
             disabled={!canMakeQuery}
+            className="border-blue-600/20 dark:border-purple-500/20 hover:border-purple-500 hover:text-purple-500"
           >
             Generate New
           </Button>
@@ -224,10 +225,9 @@ export function InsightsGenerator({ canMakeQuery, refetch }: InsightsGeneratorPr
             <Button
               onClick={handleGenerate}
               disabled={!canMakeQuery}
-              className="w-full"
-              variant="outline"
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+              variant="default"
             >
-              <Sparkles className="mr-2 h-4 w-4" />
               Generate Insights
             </Button>
           )}

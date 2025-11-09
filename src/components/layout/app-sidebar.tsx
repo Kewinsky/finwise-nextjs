@@ -70,7 +70,9 @@ export function AppSidebar({
             <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
               <a href="#">
                 <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">{appConfig.app.name}</span>
+                <span className="text-base font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  {appConfig.app.name}
+                </span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

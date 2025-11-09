@@ -5,7 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useAIUsage } from '@/hooks/use-ai-usage';
 import { PLAN_LIMITS, type PlanType } from '@/config/app';
-import { Zap, TrendingUp, Clock, BarChart3, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Zap, Clock, BarChart3, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -208,37 +208,6 @@ export function UsageClientWrapper({ currentPlanType }: UsageClientWrapperProps)
               <div className="text-lg font-semibold">{daysRemaining}</div>
               <div className="text-xs text-muted-foreground">until reset</div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Current Plan Info */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
-            Current Plan
-          </CardTitle>
-          <CardDescription>
-            Your current plan includes {formatQueries(limit)} per month
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Zap className="h-5 w-5" />
-                <h3 className="text-lg font-semibold capitalize">{currentPlanType} Plan</h3>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {limit === Infinity ? 'Unlimited AI queries' : `${limit} AI queries per month`}
-              </p>
-            </div>
-            {(isWarning || isLimitReached) && (
-              <Button asChild variant="outline">
-                <Link href="/settings/billing">Upgrade Plan</Link>
-              </Button>
-            )}
           </div>
         </CardContent>
       </Card>

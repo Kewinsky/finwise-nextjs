@@ -104,10 +104,15 @@ export default function BlogPage() {
       <div className="container mx-auto max-w-7xl px-4 py-16">
         {/* Header */}
         <div className="text-center mb-16">
-          <Badge variant="secondary" className="mb-4">
+          <Badge className="mb-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
             Blog
           </Badge>
-          <h1 className="text-4xl font-bold tracking-tight mb-4">Latest Insights & Updates</h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-4">
+            Latest{' '}
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Insights & Updates
+            </span>
+          </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Stay informed with the latest trends, tutorials, and best practices in SaaS development
             and business.
@@ -125,7 +130,11 @@ export default function BlogPage() {
               <Badge
                 key={category}
                 variant={category === 'All' ? 'default' : 'outline'}
-                className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+                className={`cursor-pointer ${
+                  category === 'All'
+                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0'
+                    : 'hover:border-blue-600 dark:hover:border-purple-500'
+                }`}
               >
                 {category}
               </Badge>
@@ -164,7 +173,7 @@ export default function BlogPage() {
                       {featuredPost.readTime}
                     </div>
                   </div>
-                  <Button>
+                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
                     Read Article
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
@@ -215,7 +224,9 @@ export default function BlogPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
             <Input placeholder="Enter your email" type="email" className="flex-1" />
-            <Button>Subscribe</Button>
+            <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+              Subscribe
+            </Button>
           </div>
         </div>
       </div>

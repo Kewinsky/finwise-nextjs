@@ -12,7 +12,10 @@ export default function PaymentFailedPage() {
       description="There was an issue processing your payment. This could be due to insufficient funds, an incorrect card number, or your bank declining the transaction."
       additionalActions={
         <>
-          <Button asChild className="w-full">
+          <Button
+            asChild
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+          >
             <Link href="/pricing">
               <CreditCard className="w-4 h-4 mr-2" />
               Try Again

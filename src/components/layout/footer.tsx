@@ -69,7 +69,7 @@ export function Footer({
                     <a
                       key={social.name}
                       href={social.href}
-                      className="text-muted-foreground hover:text-foreground transition-colors"
+                      className="text-muted-foreground hover:text-purple-500 transition-colors"
                       aria-label={social.name}
                     >
                       <Icon className="w-5 h-5" />
@@ -139,7 +139,7 @@ export function Footer({
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="text-muted-foreground hover:text-foreground transition-colors text-sm"
+                    className="text-muted-foreground hover:text-purple-500 transition-colors text-sm"
                   >
                     {link.name}
                   </a>

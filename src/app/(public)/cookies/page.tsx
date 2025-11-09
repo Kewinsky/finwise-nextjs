@@ -94,17 +94,22 @@ export default function CookiePolicyPage() {
       <div className="container mx-auto max-w-4xl px-4 py-16">
         {/* Header */}
         <div className="text-center mb-16">
-          <Badge variant="secondary" className="mb-4">
+          <Badge className="mb-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
             Cookie Policy
           </Badge>
-          <h1 className="text-4xl font-bold tracking-tight mb-4">Cookie Policy</h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-4">
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Cookie
+            </span>{' '}
+            Policy
+          </h1>
           <p className="text-xl text-muted-foreground">Last updated: January 15, 2024</p>
         </div>
 
         {/* Cookie Overview */}
         <div className="mb-16">
           <div className="flex items-center gap-3 mb-8">
-            <Cookie className="w-8 h-8 text-primary" />
+            <Cookie className="w-8 h-8 text-blue-600 dark:text-purple-500" />
             <h2 className="text-2xl font-bold">What Are Cookies?</h2>
           </div>
           <Card>
@@ -252,7 +257,9 @@ export default function CookiePolicyPage() {
                   You can change your preferences at any time by clicking the cookie settings link
                   in our footer.
                 </p>
-                <Button>Manage Preferences</Button>
+                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+                  Manage Preferences
+                </Button>
               </CardContent>
             </Card>
           </div>
@@ -313,7 +320,7 @@ export default function CookiePolicyPage() {
                   Email:{' '}
                   <a
                     href={`mailto:${appConfig.contact.generalEmail}`}
-                    className="text-primary hover:underline"
+                    className="text-blue-600 dark:text-purple-500 hover:underline"
                   >
                     {appConfig.contact.generalEmail}
                   </a>
@@ -332,7 +339,12 @@ export default function CookiePolicyPage() {
             change your preferences at any time.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg">Accept All Cookies</Button>
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+            >
+              Accept All Cookies
+            </Button>
             <Button variant="outline" size="lg">
               Customize Settings
             </Button>

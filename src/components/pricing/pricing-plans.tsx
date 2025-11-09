@@ -55,11 +55,13 @@ export function PricingPlans() {
             <Card
               key={plan.name}
               className={`relative ${
-                plan.recommended ? 'border-primary shadow-lg scale-105' : 'border-border'
+                plan.recommended
+                  ? 'border-2 border-blue-600 dark:border-purple-500 shadow-lg scale-105 ring-2 ring-blue-600/20 dark:ring-purple-500/20'
+                  : 'border-border'
               }`}
             >
               {plan.recommended && (
-                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground">
+                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
                   Recommended
                 </Badge>
               )}
@@ -73,8 +75,12 @@ export function PricingPlans() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <Button
-                  className="w-full"
-                  variant={getButtonVariant()}
+                  className={`w-full ${
+                    plan.recommended
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white'
+                      : ''
+                  }`}
+                  variant={plan.recommended ? 'default' : getButtonVariant()}
                   size="lg"
                   onClick={() => handlePlanAction(plan.planType)}
                 >

@@ -11,7 +11,11 @@ export function PricingCTA() {
           Join thousands of users who have transformed their financial health with smart tracking
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button size="lg" asChild>
+          <Button
+            size="lg"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+            asChild
+          >
             <a href="/dashboard">Start Tracking Free</a>
           </Button>
           <Button variant="outline" size="lg" asChild>

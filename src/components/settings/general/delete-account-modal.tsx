@@ -68,12 +68,10 @@ export function DeleteAccountModal({
             <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
             Delete Account
           </DialogTitle>
-          <DialogDescription className="text-red-700 dark:text-red-300">
-            This action cannot be undone
-          </DialogDescription>
+          <DialogDescription>This action cannot be undone.</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="space-y-4">
           <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/50">
             <div className="flex items-start gap-3">
               <Trash2 className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5" />

@@ -116,7 +116,7 @@ export function SubscriptionBanner({
     switch (subscriptionInfo.bannerType) {
       case 'start_trial':
         return {
-          className: 'border-blue-500 bg-blue-50 dark:bg-blue-950/20',
+          className: 'border-blue-600 dark:border-purple-500 bg-blue-50 dark:bg-blue-950/20',
           titleColor: '',
           iconColor: '',
         };
@@ -155,7 +155,7 @@ export function SubscriptionBanner({
     const styles = getBannerStyles();
     switch (subscriptionInfo.bannerType) {
       case 'start_trial':
-        return <Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />;
+        return <Sparkles className="h-5 w-5 text-blue-600 dark:text-purple-500 mt-0.5" />;
       case 'trial_countdown':
         // Use AlertTriangle for last day, Clock for other days
         const isLastDay = subscriptionInfo.trialDaysLeft === 1;
@@ -178,7 +178,13 @@ export function SubscriptionBanner({
       case 'start_trial':
         return (
           <div className="flex gap-2">
-            <Button onClick={handleStartTrial} size="sm" variant="default" disabled={isLoading}>
+            <Button
+              onClick={handleStartTrial}
+              size="sm"
+              variant="default"
+              disabled={isLoading}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+            >
               {isLoading ? (
                 <LoadingSpinner message="Starting Trial..." inline />
               ) : (
@@ -210,6 +216,7 @@ export function SubscriptionBanner({
               size="sm"
               variant="default"
               disabled={upgradeLoading !== null}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
             >
               {upgradeLoading === 'pro' ? (
                 <LoadingSpinner message="Upgrading..." inline />
@@ -236,7 +243,13 @@ export function SubscriptionBanner({
         );
       case 'canceled_ends_soon':
         return (
-          <Button onClick={handleStartTrial} size="sm" variant="default" disabled={isLoading}>
+          <Button
+            onClick={handleStartTrial}
+            size="sm"
+            variant="default"
+            disabled={isLoading}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+          >
             {isLoading ? (
               <LoadingSpinner message="Reactivating..." inline />
             ) : (

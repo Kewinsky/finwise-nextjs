@@ -12,7 +12,10 @@ export default function PaymentSuccessPage() {
       description="Your subscription has been activated successfully. You now have access to all premium features."
       additionalActions={
         <>
-          <Button asChild className="w-full">
+          <Button
+            asChild
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+          >
             <Link href="/dashboard">
               <ArrowRight className="w-4 h-4 mr-2" />
               Go to Dashboard

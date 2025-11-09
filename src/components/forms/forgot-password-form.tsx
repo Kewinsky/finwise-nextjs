@@ -105,7 +105,11 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
           <FormError message={form.formState.errors.email?.message} />
         </div>
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button
+          type="submit"
+          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+          disabled={isLoading}
+        >
           {isLoading ? <LoadingSpinner message="Sending..." inline /> : 'Send reset link'}
         </Button>
       </form>

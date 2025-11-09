@@ -628,7 +628,7 @@ export function GeneralSettingsForm({
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Cookie className="h-5 w-5 text-orange-600" />
+              <Cookie className="h-5 w-5" />
               Cookie Preferences
             </DialogTitle>
             <DialogDescription>

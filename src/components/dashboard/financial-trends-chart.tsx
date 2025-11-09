@@ -88,7 +88,11 @@ export const FinancialTrendsChart = React.memo(function FinancialTrendsChart({
                 variant={selectedTimeRange === range ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setSelectedTimeRange(range)}
-                className="min-w-[44px] text-xs sm:text-sm"
+                className={`min-w-[44px] text-xs sm:text-sm ${
+                  selectedTimeRange === range
+                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white'
+                    : ''
+                }`}
               >
                 {range}
               </Button>

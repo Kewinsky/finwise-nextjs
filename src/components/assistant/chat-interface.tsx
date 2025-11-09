@@ -200,7 +200,7 @@ export function ChatInterface({ canMakeQuery, refetch }: ChatInterfaceProps) {
                 className={`flex gap-3 min-w-0 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {message.type === 'assistant' && (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground flex-shrink-0">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white flex-shrink-0">
                     <Bot className="h-4 w-4" />
                   </div>
                 )}
@@ -230,7 +230,7 @@ export function ChatInterface({ canMakeQuery, refetch }: ChatInterfaceProps) {
           })}
           {isLoading && (
             <div className="flex gap-3 justify-start">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground flex-shrink-0">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white flex-shrink-0">
                 <Bot className="h-4 w-4" />
               </div>
               <div className="bg-muted rounded-lg px-4 py-2">
@@ -298,6 +298,7 @@ export function ChatInterface({ canMakeQuery, refetch }: ChatInterfaceProps) {
             onClick={() => handleSendMessage()}
             disabled={!inputMessage.trim() || isLoading || !canMakeQuery}
             size="icon"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white disabled:opacity-50"
           >
             <Send className="h-4 w-4" />
           </Button>

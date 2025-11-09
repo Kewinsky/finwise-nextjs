@@ -334,7 +334,10 @@ export const MessageComponent = ({
 
           <div className="flex flex-col gap-2">
             {shouldShowRetry && reset && (
-              <Button onClick={reset} className="w-full">
+              <Button
+                onClick={reset}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+              >
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Try Again
               </Button>

@@ -10,22 +10,33 @@ interface WelcomeBannerProps {
 
 export function WelcomeBanner({ onDismiss }: WelcomeBannerProps) {
   return (
-    <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-primary/20">
+    <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-blue-600/20 dark:border-purple-500/20">
       <CardContent className="p-6">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <h2 className="text-xl font-bold mb-2">Welcome to Finwise! 🎉</h2>
+            <h2 className="text-xl font-bold mb-2">
+              Welcome to{' '}
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Finwise
+              </span>
+              ! 🎉
+            </h2>
             <p className="text-sm text-muted-foreground mb-4">
               We&apos;re excited to have you here! Get started by adding your first account and
               transaction to begin tracking your finances.
             </p>
             <div className="flex flex-wrap gap-2">
-              <Button size="sm" onClick={() => (window.location.href = '/accounts')}>
+              <Button
+                size="sm"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                onClick={() => (window.location.href = '/accounts')}
+              >
                 Add Account
               </Button>
               <Button
                 size="sm"
                 variant="outline"
+                className="border-blue-600/20 dark:border-purple-500/20 hover:border-blue-600 dark:hover:border-purple-500"
                 onClick={() => (window.location.href = '/transactions')}
               >
                 Add Transaction

@@ -35,7 +35,7 @@ export function NavMain({
             <SidebarMenuButton
               tooltip="Add Expense"
               onClick={handleQuickCreate}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white min-w-8 duration-200 ease-linear"
             >
               <IconCirclePlusFilled />
               <span>Add Expense</span>

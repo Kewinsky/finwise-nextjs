@@ -174,7 +174,11 @@ export function AuthForm({ className, ...props }: React.ComponentProps<'div'>) {
               <FormError message={magicLinkForm.formState.errors.email?.message} />
             </div>
 
-            <Button type="submit" className="w-full" disabled={isMagicLinkLoading}>
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+              disabled={isMagicLinkLoading}
+            >
               {isMagicLinkLoading ? (
                 <LoadingSpinner message="Sending magic link..." inline />
               ) : (
