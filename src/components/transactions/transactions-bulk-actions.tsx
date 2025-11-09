@@ -15,21 +15,25 @@ export function TransactionsBulkActions({
   onBulkDelete,
   children,
 }: TransactionsBulkActionsProps) {
-  if (selectedCount === 0) {
-    return <>{children}</>;
-  }
-
   return (
-    <div className="flex items-center gap-2">
-      {children}
-      <Button variant="destructive" size="sm" onClick={onBulkDelete} disabled={isDeleting}>
-        {isDeleting ? (
-          <LoadingSpinner size="sm" variant="default" message="" inline />
-        ) : (
-          <Trash2 className="mr-2 h-4 w-4" />
-        )}
-        Delete Selected ({selectedCount})
-      </Button>
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+      <div className="w-full sm:w-auto [&_button]:w-full [&_button]:sm:w-auto">{children}</div>
+      {selectedCount > 0 && (
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={onBulkDelete}
+          disabled={isDeleting}
+          className="w-full sm:w-auto"
+        >
+          {isDeleting ? (
+            <LoadingSpinner size="sm" variant="default" message="" inline />
+          ) : (
+            <Trash2 className="mr-2 h-4 w-4" />
+          )}
+          Delete Selected ({selectedCount})
+        </Button>
+      )}
     </div>
   );
 }

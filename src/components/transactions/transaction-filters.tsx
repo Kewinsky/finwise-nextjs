@@ -14,7 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { Label } from '@/components/ui/label';
 import { Filter, Calendar as CalendarIcon, DollarSign, Search, RotateCcw } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -157,7 +157,7 @@ export function TransactionFiltersComponent({
             <div className="grid grid-cols-1 gap-4 @lg:grid-cols-3">
               {/* Transaction Type */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Transaction Type</label>
+                <Label htmlFor="type">Transaction Type</Label>
                 <Select
                   value={filters.type || 'all'}
                   onValueChange={(value) =>
@@ -181,7 +181,7 @@ export function TransactionFiltersComponent({
 
               {/* Category */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Category</label>
+                <Label htmlFor="category">Category</Label>
                 <Select
                   value={filters.category || 'all'}
                   onValueChange={(value) =>
@@ -205,7 +205,7 @@ export function TransactionFiltersComponent({
 
               {/* Account */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Account</label>
+                <Label htmlFor="accountId">Account</Label>
                 <Select
                   value={filters.accountId || 'all'}
                   onValueChange={(value) =>
@@ -227,8 +227,6 @@ export function TransactionFiltersComponent({
                 </Select>
               </div>
             </div>
-
-            <Separator />
 
             {/* Date Range Row */}
             <div className="space-y-3">
@@ -293,8 +291,6 @@ export function TransactionFiltersComponent({
                 </div>
               </div>
             </div>
-
-            <Separator />
 
             {/* Amount Range Row */}
             <div className="space-y-3">

@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, CartesianGrid, XAxis, Cell, LabelList } from 'recharts';
-import { ChartContainer } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart3 } from 'lucide-react';
 import type { CategorySpending } from '@/hooks/use-category-spending';
 import { ErrorState } from '@/components/common/error-state';
@@ -99,6 +99,7 @@ export const TopCategoriesChart = React.memo(function TopCategoriesChart({
             <BarChart accessibilityLayer data={chartData}>
               <CartesianGrid vertical={false} />
               <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={10} />
+              <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
               <Bar dataKey="value" radius={8}>
                 <LabelList position="top" offset={12} className="fill-foreground" fontSize={12} />
                 {chartData.map((entry, index) => (

@@ -58,10 +58,10 @@ export function TransactionsTable({
   return (
     <Card>
       <CardHeader>
-        <div className="flex flex-col gap-4 @sm:flex-row @sm:items-center @sm:justify-between">
-          <div>
-            <CardTitle>Transactions</CardTitle>
-            <CardDescription>
+        <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0 flex-1">
+            <CardTitle className="text-lg sm:text-xl">Transactions</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
               {isLoading ? (
                 'Loading...'
               ) : (
@@ -71,13 +71,15 @@ export function TransactionsTable({
               )}
             </CardDescription>
           </div>
-          <TransactionsBulkActions
-            selectedCount={selectedRows.length}
-            isDeleting={isDeleting === 'bulk'}
-            onBulkDelete={onBulkDelete}
-          >
-            <TransactionsExportButton filters={filters} />
-          </TransactionsBulkActions>
+          <div className="shrink-0">
+            <TransactionsBulkActions
+              selectedCount={selectedRows.length}
+              isDeleting={isDeleting === 'bulk'}
+              onBulkDelete={onBulkDelete}
+            >
+              <TransactionsExportButton filters={filters} />
+            </TransactionsBulkActions>
+          </div>
         </div>
       </CardHeader>
       <CardContent>

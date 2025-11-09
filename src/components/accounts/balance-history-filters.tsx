@@ -25,19 +25,16 @@ export function BalanceHistoryFilters({
   onAccountsChange,
 }: BalanceHistoryFiltersProps) {
   return (
-    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
       <div className="flex items-center gap-2 min-w-0">
-        <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap shrink-0 hidden sm:inline">
+        <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap shrink-0">
           Year:
-        </span>
-        <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap shrink-0 sm:hidden">
-          Year
         </span>
         <Select
           value={selectedYear.toString()}
           onValueChange={(value) => onYearChange(parseInt(value))}
         >
-          <SelectTrigger className="w-full sm:w-24 shrink-0">
+          <SelectTrigger className="w-24 sm:w-28">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -50,11 +47,8 @@ export function BalanceHistoryFilters({
         </Select>
       </div>
       <div className="flex items-center gap-2 min-w-0 flex-1">
-        <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap shrink-0 hidden sm:inline">
+        <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap shrink-0">
           Accounts:
-        </span>
-        <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap shrink-0 sm:hidden">
-          Accounts
         </span>
         <Select
           value={selectedAccounts.size === accounts.length ? 'all' : 'custom'}
@@ -73,7 +67,7 @@ export function BalanceHistoryFilters({
             }
           }}
         >
-          <SelectTrigger className="w-full sm:w-40 min-w-0 flex-1">
+          <SelectTrigger className="w-full sm:w-40 min-w-0">
             <SelectValue>
               {selectedAccounts.size === accounts.length
                 ? 'All Accounts'
