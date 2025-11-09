@@ -62,18 +62,21 @@ export function SiteHeader({
 
   return (
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
-      <div className="flex w-full items-center gap-2 px-6">
-        <SidebarTrigger className="-ml-1" />
-        <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
-        <h1 className="text-base font-medium">{displayTitle}</h1>
-        <div className="ml-auto flex items-center gap-2">
+      <div className="flex w-full items-center gap-1 sm:gap-2 px-3 sm:px-6 min-w-0">
+        <SidebarTrigger className="-ml-1 shrink-0" />
+        <Separator
+          orientation="vertical"
+          className="mx-1 sm:mx-2 data-[orientation=vertical]:h-4 shrink-0"
+        />
+        <h1 className="text-sm sm:text-base font-medium truncate min-w-0 flex-1">{displayTitle}</h1>
+        <div className="ml-auto flex items-center gap-1 sm:gap-2 shrink-0">
           {showRefreshButton && (
             <Button
               variant="ghost"
               size="sm"
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="h-8 w-8 p-0"
+              className="h-8 w-8 p-0 shrink-0"
               title="Refresh page"
             >
               <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />

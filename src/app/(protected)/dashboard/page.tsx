@@ -67,9 +67,13 @@ export default function DashboardPage() {
   if (dashboardError) {
     return (
       <div className="flex-1 space-y-4 @sm:space-y-6 p-4 @sm:p-6">
-        <div>
-          <h1 className="text-2xl @sm:text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">Advanced financial insights and analytics.</p>
+        <div className="min-w-0 flex-1">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight truncate">
+            Dashboard
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground hidden sm:block">
+            Advanced financial insights and analytics.
+          </p>
         </div>
         <ErrorState
           title="Failed to load dashboard"
@@ -87,9 +91,13 @@ export default function DashboardPage() {
     <div className="flex-1 space-y-4 @sm:space-y-6 p-4 @sm:p-6">
       {showWelcome && <WelcomeBanner onDismiss={() => setShowWelcome(false)} />}
 
-      <div>
-        <h1 className="text-2xl @sm:text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">Advanced financial insights and analytics.</p>
+      <div className="min-w-0 flex-1">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight truncate">
+          Dashboard
+        </h1>
+        <p className="text-sm sm:text-base text-muted-foreground hidden sm:block">
+          Advanced financial insights and analytics.
+        </p>
       </div>
 
       {isLoadingDashboard ? (

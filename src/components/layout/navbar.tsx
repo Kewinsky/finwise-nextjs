@@ -44,7 +44,6 @@ export function Navbar({
   showThemeToggle = true,
 }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
-  const underlineOffset = 'underline-offset-7';
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 shadow-sm">
@@ -106,11 +105,9 @@ export function Navbar({
               variant="link"
               size="sm"
               asChild
-              className="text-muted-foreground hover:text-purple-500 transition-colors"
+              className="hover:text-purple-500 transition-colors"
             >
-              <Link className={underlineOffset} href={signInHref}>
-                {signInText}
-              </Link>
+              <Link href={signInHref}>{signInText}</Link>
             </Button>
             <Button
               size="sm"
@@ -148,11 +145,9 @@ export function Navbar({
                   variant="link"
                   size="sm"
                   asChild
-                  className="text-muted-foreground hover:text-purple-500 transition-colors duration-300 w-full"
+                  className="hover:text-purple-500 transition-colors duration-300 w-full"
                 >
-                  <Link className={underlineOffset} href={signInHref}>
-                    {signInText}
-                  </Link>
+                  <Link href={signInHref}>{signInText}</Link>
                 </Button>
                 <Button
                   size="sm"

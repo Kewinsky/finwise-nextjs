@@ -105,7 +105,7 @@ export const FinancialTrendsChart = React.memo(function FinancialTrendsChart({
           value={selectedSeries}
           onValueChange={(value) => setSelectedSeries(value as SeriesType)}
         >
-          <TabsList className="grid w-full grid-cols-4 h-auto sm:h-10">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto sm:h-10 gap-1 sm:gap-0">
             <TabsTrigger value="balance" className="text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-1.5">
               <span className="truncate">Balance</span>
             </TabsTrigger>

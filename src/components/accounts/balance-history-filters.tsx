@@ -25,14 +25,19 @@ export function BalanceHistoryFilters({
   onAccountsChange,
 }: BalanceHistoryFiltersProps) {
   return (
-    <div className="flex items-center gap-4">
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">Year:</span>
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+      <div className="flex items-center gap-2 min-w-0">
+        <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap shrink-0 hidden sm:inline">
+          Year:
+        </span>
+        <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap shrink-0 sm:hidden">
+          Year
+        </span>
         <Select
           value={selectedYear.toString()}
           onValueChange={(value) => onYearChange(parseInt(value))}
         >
-          <SelectTrigger className="w-24">
+          <SelectTrigger className="w-full sm:w-24 shrink-0">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -44,8 +49,13 @@ export function BalanceHistoryFilters({
           </SelectContent>
         </Select>
       </div>
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">Accounts:</span>
+      <div className="flex items-center gap-2 min-w-0 flex-1">
+        <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap shrink-0 hidden sm:inline">
+          Accounts:
+        </span>
+        <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap shrink-0 sm:hidden">
+          Accounts
+        </span>
         <Select
           value={selectedAccounts.size === accounts.length ? 'all' : 'custom'}
           onValueChange={(value) => {
@@ -63,7 +73,7 @@ export function BalanceHistoryFilters({
             }
           }}
         >
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-full sm:w-40 min-w-0 flex-1">
             <SelectValue>
               {selectedAccounts.size === accounts.length
                 ? 'All Accounts'
@@ -78,14 +88,14 @@ export function BalanceHistoryFilters({
                 <SelectItem key={account.id} value={account.id}>
                   <div className="flex items-center gap-2">
                     <div
-                      className={`w-3 h-3 rounded-full border ${
+                      className={`w-3 h-3 rounded-full border shrink-0 ${
                         isSelected ? '' : 'bg-transparent border-foreground dark:border-white'
                       }`}
                       style={
                         isSelected ? { backgroundColor: account.color || '#3B82F6' } : undefined
                       }
                     />
-                    {account.name}
+                    <span className="truncate">{account.name}</span>
                   </div>
                 </SelectItem>
               );
