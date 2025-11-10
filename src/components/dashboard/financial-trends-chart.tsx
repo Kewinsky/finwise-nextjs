@@ -4,6 +4,13 @@ import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { AreaChart, Area, XAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { TrendingUp } from 'lucide-react';
@@ -69,7 +76,7 @@ export const FinancialTrendsChart = React.memo(function FinancialTrendsChart({
   return (
     <Card>
       <CardHeader className="space-y-3 sm:space-y-4">
-        <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-2 min-w-0 flex-1">
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
@@ -77,62 +84,101 @@ export const FinancialTrendsChart = React.memo(function FinancialTrendsChart({
             </CardTitle>
             <CardDescription>Track your financial performance over time</CardDescription>
           </div>
+
+          {/* Time Range Buttons */}
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            {/* Mobile Select */}
+            <div className="w-full sm:hidden">
+              <Select
+                value={selectedTimeRange}
+                onValueChange={(value) => setSelectedTimeRange(value as TimeRange)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {(['1W', '1M', '3M', '6M', '1Y'] as const).map((range) => (
+                    <SelectItem key={range} value={range}>
+                      {range}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Desktop Buttons */}
+            <div className="hidden sm:flex gap-1.5 sm:gap-2">
+              {(['1W', '1M', '3M', '6M', '1Y'] as const).map((range) => (
+                <Button
+                  key={range}
+                  variant={selectedTimeRange === range ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedTimeRange(range)}
+                  className={`min-w-[48px] sm:min-w-[56px] text-xs sm:text-sm font-medium h-8 sm:h-9 transition-all ${
+                    selectedTimeRange === range
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-sm hover:shadow-md'
+                      : 'hover:bg-muted/80'
+                  }`}
+                >
+                  {range}
+                </Button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Series Tabs */}
+        {/* Mobile Select */}
+        <div className="w-full sm:hidden">
+          <Select
+            value={selectedSeries}
+            onValueChange={(value) => setSelectedSeries(value as SeriesType)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="balance">Balance</SelectItem>
+              <SelectItem value="income">Income</SelectItem>
+              <SelectItem value="expenses">Expenses</SelectItem>
+              <SelectItem value="savings">Savings</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Desktop Tabs */}
         <Tabs
           value={selectedSeries}
           onValueChange={(value) => setSelectedSeries(value as SeriesType)}
-          className="w-full"
+          className="hidden sm:block w-full"
         >
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto gap-2 p-1 bg-muted/50">
+          <TabsList className="grid grid-cols-2 sm:grid-cols-4 h-auto gap-2 p-1 bg-muted/50">
             <TabsTrigger
               value="balance"
-              className="text-xs sm:text-sm font-medium px-3 sm:px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+              className="border-none text-xs sm:text-sm font-medium px-3 sm:px-4 py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
             >
               Balance
             </TabsTrigger>
             <TabsTrigger
               value="income"
-              className="text-xs sm:text-sm font-medium px-3 sm:px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+              className="border-none text-xs sm:text-sm font-medium px-3 sm:px-4 py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
             >
               Income
             </TabsTrigger>
             <TabsTrigger
               value="expenses"
-              className="text-xs sm:text-sm font-medium px-3 sm:px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+              className="border-none text-xs sm:text-sm font-medium px-3 sm:px-4 py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
             >
               Expenses
             </TabsTrigger>
             <TabsTrigger
               value="savings"
-              className="text-xs sm:text-sm font-medium px-3 sm:px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+              className="border-none text-xs sm:text-sm font-medium px-3 sm:px-4 py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
             >
               Savings
             </TabsTrigger>
           </TabsList>
         </Tabs>
-
-        {/* Time Range Buttons */}
-        <div className="flex items-center justify-end gap-3">
-          <div className="flex gap-1.5 sm:gap-2">
-            {(['1W', '1M', '3M', '6M', '1Y'] as const).map((range) => (
-              <Button
-                key={range}
-                variant={selectedTimeRange === range ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedTimeRange(range)}
-                className={`min-w-[48px] sm:min-w-[56px] text-xs sm:text-sm font-medium h-8 sm:h-9 transition-all ${
-                  selectedTimeRange === range
-                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-sm hover:shadow-md'
-                    : 'hover:bg-muted/80'
-                }`}
-              >
-                {range}
-              </Button>
-            ))}
-          </div>
-        </div>
       </CardHeader>
       <CardContent>
         {isLoadingAreaChart ? (
