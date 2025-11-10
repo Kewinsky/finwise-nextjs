@@ -101,12 +101,7 @@ export function Navbar({
           {showThemeToggle && <ThemeToggle />}
 
           <div className="hidden md:flex items-center space-x-3">
-            <Button
-              variant="link"
-              size="sm"
-              asChild
-              className="hover:text-purple-500 transition-colors"
-            >
+            <Button variant="ghost" size="sm" asChild>
               <Link href={signInHref}>{signInText}</Link>
             </Button>
             <Button
@@ -141,12 +136,7 @@ export function Navbar({
                 </Link>
               ))}
               <div className="flex flex-col items-center space-y-2 w-full pt-2 border-t border-border/40">
-                <Button
-                  variant="link"
-                  size="sm"
-                  asChild
-                  className="hover:text-purple-500 transition-colors duration-300 w-full"
-                >
+                <Button variant="ghost" size="sm" asChild>
                   <Link href={signInHref}>{signInText}</Link>
                 </Button>
                 <Button
