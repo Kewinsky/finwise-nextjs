@@ -135,7 +135,7 @@ export function BillingClientWrapper({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <SubscriptionBanner subscriptionInfo={subscriptionInfo} />
 
       {/* Current Subscription */}
@@ -147,7 +147,7 @@ export function BillingClientWrapper({
           </CardTitle>
           <CardDescription>Manage your current plan and billing information</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 sm:space-y-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-2">
               <div className="flex items-center gap-2">

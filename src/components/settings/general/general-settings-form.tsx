@@ -274,7 +274,7 @@ export function GeneralSettingsForm({
 
   return (
     <>
-      <div className="grid gap-6">
+      <div className="grid gap-4 sm:gap-6">
         {/* Appearance Settings */}
         <Card>
           <CardHeader>

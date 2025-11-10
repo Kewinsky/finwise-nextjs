@@ -44,7 +44,7 @@ export function AccountCard({
               <IconComponent className="h-5 w-5 text-white" />
             </div>
             <div className="min-w-0 flex-1">
-              <h3 className="font-bold text-lg flex items-center gap-2 min-w-0">
+              <h3 className="font-bold text-base sm:text-lg flex items-center gap-2 min-w-0">
                 <span className="truncate">{account.name}</span>
               </h3>
               {account.is_mandatory && (
@@ -89,12 +89,12 @@ export function AccountCard({
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className="py-6">
-        <div className="space-y-4">
+      <CardContent className="py-4 sm:py-6">
+        <div className="space-y-3 sm:space-y-4">
           <div>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Current Balance</p>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Current Balance</p>
             <p
-              className={`text-2xl font-bold ${
+              className={`text-xl sm:text-2xl font-bold ${
                 account.balance >= 0
                   ? 'text-green-600 dark:text-green-400'
                   : 'text-red-600 dark:text-red-400'

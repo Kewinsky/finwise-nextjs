@@ -108,7 +108,7 @@ export const MetricCard = React.memo(function MetricCard({
         <Icon className={cn('h-4 w-4', iconColor)} />
       </CardHeader>
       <CardContent className="flex flex-col justify-end flex-1 mt-auto">
-        <div className={cn('text-2xl font-bold', valueColor)}>
+        <div className={cn('text-xl sm:text-2xl font-bold', valueColor)}>
           <NumberTicker
             value={value}
             decimalPlaces={decimalPlaces}

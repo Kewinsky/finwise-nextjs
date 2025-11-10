@@ -21,8 +21,10 @@ export function TotalBalanceCard({ totalBalance }: TotalBalanceCardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-muted-foreground mt-1">Across all your accounts</p>
-        <div className="text-3xl font-bold">{formatCurrency(totalBalance, baseCurrency)}</div>
+        <p className="text-xs sm:text-sm text-muted-foreground mt-1">Across all your accounts</p>
+        <div className="text-2xl sm:text-3xl font-bold">
+          {formatCurrency(totalBalance, baseCurrency)}
+        </div>
       </CardContent>
     </Card>
   );

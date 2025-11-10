@@ -111,25 +111,30 @@ export const RecentActivityCard = React.memo(function RecentActivityCard({
             height="h-[250px] @sm:h-[300px]"
           />
         ) : (
-          <div className="space-y-4 max-h-[600px] overflow-y-auto">
+          <div className="space-y-3 sm:space-y-4 max-h-[600px] overflow-y-auto">
             {recentTransactions.map((transaction) => {
               const Icon = getTransactionIcon(transaction.type);
               const styles = getTransactionStyles(transaction.type);
 
               return (
-                <div key={transaction.id} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
+                <div
+                  key={transaction.id}
+                  className="flex items-center justify-between gap-2 sm:gap-3"
+                >
+                  <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
                     <div className={`rounded-full p-2 ${styles.bg}`}>
                       <Icon className="h-4 w-4" />
                     </div>
-                    <div>
-                      <p className="text-sm font-medium">{transaction.description}</p>
-                      <p className="text-xs text-muted-foreground">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs sm:text-sm font-medium truncate">
+                        {transaction.description}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
                         {transaction.category} • {formatDisplayDate(transaction.date)}
                       </p>
                     </div>
                   </div>
-                  <div className={`text-sm font-medium ${styles.text}`}>
+                  <div className={`text-xs sm:text-sm font-medium shrink-0 ${styles.text}`}>
                     {styles.prefix}
                     {formatCurrency(transaction.amount, baseCurrency)}
                   </div>

@@ -68,8 +68,8 @@ export const FinancialTrendsChart = React.memo(function FinancialTrendsChart({
 
   return (
     <Card>
-      <CardHeader className="space-y-4">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <CardHeader className="space-y-3 sm:space-y-4">
+        <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex flex-col gap-2 min-w-0 flex-1">
             <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
               <TrendingUp className="h-4 w-4 shrink-0" />

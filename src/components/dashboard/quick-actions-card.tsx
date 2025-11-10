@@ -74,7 +74,7 @@ export function QuickActionsCard({ onAddTransaction }: QuickActionsCardProps) {
                 <action.icon className="w-4 h-4 text-white" />
               </div>
               <div className="text-center space-y-0.5">
-                <p className="font-medium text-md leading-tight">{action.label}</p>
+                <p className="font-medium text-sm sm:text-base leading-tight">{action.label}</p>
                 <p className="text-xs text-muted-foreground leading-tight">{action.description}</p>
               </div>
             </Button>

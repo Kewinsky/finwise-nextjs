@@ -107,7 +107,7 @@ export function NotificationsClientWrapper({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Email Notifications */}
       <Card>
         <CardHeader>
@@ -119,10 +119,10 @@ export function NotificationsClientWrapper({
             Choose which email notifications you&apos;d like to receive
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-2 sm:space-y-4">
           {NOTIFICATION_CATEGORIES.email.options.map((option, index) => (
             <div key={option.key}>
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <div className="space-y-1">
                   <Label className="text-sm font-medium">{option.label}</Label>
                   <p className="text-sm text-muted-foreground">{option.description}</p>
@@ -132,7 +132,9 @@ export function NotificationsClientWrapper({
                   onCheckedChange={(checked) => handleEmailPreferenceChange(option.key, checked)}
                 />
               </div>
-              {index < NOTIFICATION_CATEGORIES.email.options.length - 1 && <Separator />}
+              {index < NOTIFICATION_CATEGORIES.email.options.length - 1 && (
+                <Separator className="mt-2 sm:mt-4" />
+              )}
             </div>
           ))}
         </CardContent>
@@ -147,10 +149,10 @@ export function NotificationsClientWrapper({
           </CardTitle>
           <CardDescription>Configure mobile and desktop push notifications</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-2 sm:space-y-4">
           {NOTIFICATION_CATEGORIES.push.options.map((option, index) => (
             <div key={option.key}>
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <div className="space-y-1">
                   <Label className="text-sm font-medium">{option.label}</Label>
                   <p className="text-sm text-muted-foreground">{option.description}</p>
@@ -160,7 +162,9 @@ export function NotificationsClientWrapper({
                   onCheckedChange={(checked) => handlePushPreferenceChange(option.key, checked)}
                 />
               </div>
-              {index < NOTIFICATION_CATEGORIES.push.options.length - 1 && <Separator />}
+              {index < NOTIFICATION_CATEGORIES.push.options.length - 1 && (
+                <Separator className="mt-2 sm:mt-4" />
+              )}
             </div>
           ))}
         </CardContent>

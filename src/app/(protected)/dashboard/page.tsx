@@ -119,7 +119,7 @@ export default function DashboardPage() {
 
           <FinancialTrendsChart dashboardData={dashboardData} />
 
-          <div className="grid grid-cols-1 gap-6 @3xl:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 @3xl:grid-cols-2">
             <AccountDistributionChart />
             <TopCategoriesChart
               categorySpending={monthlyCategorySpending}
@@ -128,7 +128,7 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-6 @3xl:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 @3xl:grid-cols-2">
             <QuickActionsCard onAddTransaction={handleAddTransaction} />
             <RecentActivityCard recentTransactions={dashboardData.recentTransactions} />
           </div>

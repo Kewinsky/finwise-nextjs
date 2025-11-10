@@ -16,10 +16,10 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
 
   return (
     <>
-      <div className="flex flex-1 flex-col gap-6 overflow-hidden p-4 xl:p-6">
+      <div className="flex flex-1 flex-col gap-4 sm:gap-6 overflow-hidden p-4 xl:p-6">
         <SettingsHeader title={pageTitle} description={pageDescription} />
 
-        <div className="flex flex-1 flex-col gap-6 overflow-auto xl:flex-row xl:gap-8 xl:overflow-hidden">
+        <div className="flex flex-1 flex-col gap-4 sm:gap-6 overflow-auto xl:flex-row xl:gap-8 xl:overflow-hidden">
           {/* Mobile/Tablet dropdown */}
           <div className="xl:hidden">
             <Select
@@ -54,7 +54,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
           <main className="flex w-full overflow-y-auto xl:overflow-y-hidden">
             <div className="flex flex-1 flex-col min-w-0">
               <div className="flex-1 scroll-smooth xl:pb-16">
-                <div className="w-full max-w-none space-y-6">{children}</div>
+                <div className="w-full max-w-none space-y-4 sm:space-y-6">{children}</div>
               </div>
             </div>
           </main>
