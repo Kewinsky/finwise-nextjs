@@ -19,6 +19,7 @@ import { Filter, Calendar as CalendarIcon, DollarSign, Search, RotateCcw } from 
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import type { TransactionFilters, Account } from '@/types/finance.types';
+import { TRANSACTION_CATEGORIES } from '@/config/app';
 
 interface TransactionFiltersProps {
   accounts: Account[];
@@ -27,17 +28,11 @@ interface TransactionFiltersProps {
   isLoading?: boolean;
 }
 
-const mockCategories = [
-  'Food & Dining',
-  'Transportation',
-  'Shopping',
-  'Utilities',
-  'Entertainment',
-  'Healthcare',
-  'Salary',
-  'Freelance',
-  'Investment',
-  'Transfer',
+// Flatten all categories from TRANSACTION_CATEGORIES for the filter dropdown
+const allCategories = [
+  ...TRANSACTION_CATEGORIES.income.map((cat) => cat.name),
+  ...TRANSACTION_CATEGORIES.expense.map((cat) => cat.name),
+  ...TRANSACTION_CATEGORIES.transfer.map((cat) => cat.name),
 ];
 
 const transactionTypes = [
@@ -194,7 +189,7 @@ export function TransactionFiltersComponent({
                   </SelectTrigger>
                   <SelectContent className="w-full">
                     <SelectItem value="all">All categories</SelectItem>
-                    {mockCategories.map((category) => (
+                    {allCategories.map((category) => (
                       <SelectItem key={category} value={category}>
                         {category}
                       </SelectItem>

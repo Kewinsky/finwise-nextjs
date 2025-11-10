@@ -34,6 +34,7 @@ export const ERROR_MESSAGES = {
   DATA_NOT_FOUND: 'The requested data could not be found',
   INVALID_DATA: 'The provided data is invalid',
   DUPLICATE_ENTRY: 'This entry already exists',
+  INSUFFICIENT_FUNDS: 'Insufficient funds in account. Please check your balance and try again.',
 
   // System errors
   SERVICE_UNAVAILABLE: 'Service is temporarily unavailable',

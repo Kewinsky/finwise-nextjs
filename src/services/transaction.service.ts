@@ -187,6 +187,50 @@ export class TransactionService {
     try {
       log.info({ userId, type: input.type, amount: input.amount }, 'Creating transaction');
 
+      // Validate account balance before creating transaction
+      // For expense and transfer, check if from_account has sufficient funds
+      if (input.fromAccountId && (input.type === 'expense' || input.type === 'transfer')) {
+        const { data: account, error: accountError } = await this.supabase
+          .from('accounts')
+          .select('id, name, balance, type')
+          .eq('id', input.fromAccountId)
+          .eq('user_id', userId)
+          .single();
+
+        if (accountError) {
+          log.error(
+            { userId, accountId: input.fromAccountId, error: accountError.message },
+            'Failed to fetch account',
+          );
+          return { success: false, error: 'Account not found' };
+        }
+
+        if (!account) {
+          return { success: false, error: 'Account not found' };
+        }
+
+        // Check if account has sufficient balance
+        // Note: balance is numeric(12,2) in database, so we compare as numbers
+        const currentBalance = Number(account.balance);
+        const transactionAmount = Number(input.amount);
+
+        if (currentBalance < transactionAmount) {
+          log.warn(
+            {
+              userId,
+              accountId: input.fromAccountId,
+              balance: currentBalance,
+              amount: transactionAmount,
+            },
+            'Insufficient funds',
+          );
+          return {
+            success: false,
+            error: ERROR_MESSAGES.INSUFFICIENT_FUNDS,
+          };
+        }
+      }
+
       const transactionData = {
         user_id: userId,
         from_account_id: input.fromAccountId || null,
@@ -206,6 +250,11 @@ export class TransactionService {
         .single();
 
       if (error) {
+        // Check if error is due to balance constraint violation
+        if (error.message.includes('balance') || error.message.includes('check constraint')) {
+          log.error({ userId, error: error.message }, 'Balance constraint violation');
+          return { success: false, error: ERROR_MESSAGES.INSUFFICIENT_FUNDS };
+        }
         log.error({ userId, error: error.message }, 'Failed to create transaction');
         return { success: false, error: error.message };
       }
@@ -268,6 +317,63 @@ export class TransactionService {
         }
         if (finalFrom === finalTo) {
           return { success: false, error: 'From and to accounts must be different' };
+        }
+      }
+
+      // Validate account balance before updating transaction
+      // For expense and transfer, check if from_account has sufficient funds
+      // Note: The trigger will revert the old transaction first, then apply the new one
+      // So we need to check if the account has enough balance for the new transaction
+      if (finalFrom && (finalType === 'expense' || finalType === 'transfer')) {
+        const { data: account, error: accountError } = await this.supabase
+          .from('accounts')
+          .select('id, name, balance, type')
+          .eq('id', finalFrom)
+          .eq('user_id', userId)
+          .single();
+
+        if (accountError) {
+          log.error(
+            { userId, accountId: finalFrom, error: accountError.message },
+            'Failed to fetch account',
+          );
+          return { success: false, error: 'Account not found' };
+        }
+
+        if (!account) {
+          return { success: false, error: 'Account not found' };
+        }
+
+        // Calculate the effective balance after reverting the old transaction
+        // If the old transaction was an expense/transfer from the same account, we need to add it back
+        let effectiveBalance = Number(account.balance);
+        const oldAmount = Number(current.amount);
+        const newAmount = Number(input.amount ?? oldAmount);
+
+        // If old transaction was expense/transfer from the same account, add it back to balance
+        if (
+          currentFrom === finalFrom &&
+          (current.type === 'expense' || current.type === 'transfer')
+        ) {
+          effectiveBalance += oldAmount;
+        }
+
+        // Check if account has sufficient balance for the new transaction
+        if (effectiveBalance < newAmount) {
+          log.warn(
+            {
+              userId,
+              accountId: finalFrom,
+              effectiveBalance,
+              newAmount,
+              oldAmount,
+            },
+            'Insufficient funds for transaction update',
+          );
+          return {
+            success: false,
+            error: ERROR_MESSAGES.INSUFFICIENT_FUNDS,
+          };
         }
       }
 
