@@ -58,4 +58,6 @@
     ✔ improve preferences page to avoid overflow on dashboard @done(25-11-09 00:24)
     ✔ fix chart responsiveness (overflow issues) @done(25-11-09 00:24)
     ✔ update tiers @done(25-11-09 00:29)
-    ☐ update branding colors and logo
+    ✔ update branding colors and logo @done(25-11-10 23:53)
+    ☐ collaboration mode
+    ☐ time range for dashboard
