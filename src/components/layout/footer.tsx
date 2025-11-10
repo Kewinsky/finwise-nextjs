@@ -1,6 +1,7 @@
 import { Github, Twitter, Linkedin, Mail } from 'lucide-react';
 import { BrandLogo } from './brand-logo';
 import { appConfig } from '@/config/app';
+import Link from 'next/link';
 
 interface FooterProps {
   brandName?: string;
@@ -83,16 +84,15 @@ export function Footer({
           {/* Product links */}
           <div>
             <h3 className="font-semibold mb-4">Product</h3>
-            <ul className="space-y-3">
+            <ul className="flex flex-col gap-4">
               {footerLinks.product.map((link) => (
-                <li key={link.name}>
-                  <a
-                    href={link.href}
-                    className="text-muted-foreground hover:text-foreground transition-colors text-sm"
-                  >
-                    {link.name}
-                  </a>
-                </li>
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="text-muted-foreground hover:text-purple-500 transition-colors text-sm"
+                >
+                  {link.name}
+                </Link>
               ))}
             </ul>
           </div>
@@ -100,16 +100,15 @@ export function Footer({
           {/* Company links */}
           <div>
             <h3 className="font-semibold mb-4">Company</h3>
-            <ul className="space-y-3">
+            <ul className="flex flex-col gap-4">
               {footerLinks.company.map((link) => (
-                <li key={link.name}>
-                  <a
-                    href={link.href}
-                    className="text-muted-foreground hover:text-foreground transition-colors text-sm"
-                  >
-                    {link.name}
-                  </a>
-                </li>
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="text-muted-foreground hover:text-purple-500 transition-colors text-sm"
+                >
+                  {link.name}
+                </Link>
               ))}
             </ul>
           </div>
@@ -117,16 +116,15 @@ export function Footer({
           {/* Support links */}
           <div>
             <h3 className="font-semibold mb-4">Support</h3>
-            <ul className="space-y-3">
+            <ul className="flex flex-col gap-4">
               {footerLinks.support.map((link) => (
-                <li key={link.name}>
-                  <a
-                    href={link.href}
-                    className="text-muted-foreground hover:text-foreground transition-colors text-sm"
-                  >
-                    {link.name}
-                  </a>
-                </li>
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="text-muted-foreground hover:text-purple-500 transition-colors text-sm"
+                >
+                  {link.name}
+                </Link>
               ))}
             </ul>
           </div>
@@ -134,16 +132,15 @@ export function Footer({
           {/* Legal links */}
           <div>
             <h3 className="font-semibold mb-4">Legal</h3>
-            <ul className="space-y-3">
+            <ul className="flex flex-col gap-4">
               {footerLinks.legal.map((link) => (
-                <li key={link.name}>
-                  <a
-                    href={link.href}
-                    className="text-muted-foreground hover:text-purple-500 transition-colors text-sm"
-                  >
-                    {link.name}
-                  </a>
-                </li>
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="text-muted-foreground hover:text-purple-500 transition-colors text-sm"
+                >
+                  {link.name}
+                </Link>
               ))}
             </ul>
           </div>

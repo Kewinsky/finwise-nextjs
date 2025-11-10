@@ -4,7 +4,7 @@ import { Scale, Shield, AlertTriangle, FileText } from 'lucide-react';
 import { appConfig } from '@/config/app';
 
 export const metadata: Metadata = {
-  title: `Terms of Service | ${appConfig.app.name}`,
+  title: 'Terms of Service',
   description:
     'Read our terms of service to understand the rules and guidelines for using our SaaS platform and services.',
 };

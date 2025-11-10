@@ -7,7 +7,7 @@ import { Cookie, Settings, Shield, BarChart, Target } from 'lucide-react';
 import { appConfig } from '@/config/app';
 
 export const metadata: Metadata = {
-  title: `Cookie Policy | ${appConfig.app.name}`,
+  title: 'Cookie Policy',
   description:
     'Learn about how we use cookies and similar technologies to enhance your experience on our platform.',
 };

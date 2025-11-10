@@ -120,7 +120,9 @@ export const APP_URLS = {
     : 'http://localhost:3000/api',
 
   // Documentation
-  docs: 'http://localhost:3000/documentation',
+  docs: isProduction
+    ? `${process.env.NEXT_PUBLIC_APP_URL}/documentation`
+    : 'http://localhost:3000/documentation',
 
   // Social links
   social: {

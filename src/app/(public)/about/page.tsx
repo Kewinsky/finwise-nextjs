@@ -7,7 +7,7 @@ import { Users, Target, Award, Heart, Zap } from 'lucide-react';
 import { appConfig } from '@/config/app';
 
 export const metadata: Metadata = {
-  title: `About Us | ${appConfig.app.name}`,
+  title: 'About Us',
   description: `Learn about our mission, values, and the team behind ${appConfig.app.name} platform.`,
 };
 

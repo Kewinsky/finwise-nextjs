@@ -7,7 +7,7 @@ import { Calendar, Clock, User, Search, ArrowRight } from 'lucide-react';
 import { appConfig } from '@/config/app';
 
 export const metadata: Metadata = {
-  title: `Blog | ${appConfig.app.name}`,
+  title: 'Blog',
   description: `Stay updated with the latest insights, tutorials, and news from the ${appConfig.app.name} team.`,
 };
 

@@ -5,7 +5,7 @@ import { BookOpen, Code, Database, Zap, Shield, Users } from 'lucide-react';
 import { appConfig } from '@/config/app';
 
 export const metadata: Metadata = {
-  title: `Documentation | ${appConfig.app.name}`,
+  title: 'Documentation',
   description: `Complete documentation for ${appConfig.app.name} platform. Learn how to integrate, customize, and extend our services.`,
 };
 

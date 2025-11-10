@@ -11,7 +11,7 @@ import { appConfig } from '@/config/app';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: `Pricing | ${appConfig.app.name}`,
+  title: 'Pricing',
   description: `Choose the perfect plan for your needs. ${appConfig.app.name} offers flexible pricing options to scale with your business.`,
 };
 

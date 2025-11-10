@@ -4,7 +4,7 @@ import { Shield, Eye, Lock, Users } from 'lucide-react';
 import { appConfig } from '@/config/app';
 
 export const metadata: Metadata = {
-  title: `Privacy Policy | ${appConfig.app.name}`,
+  title: 'Privacy Policy',
   description:
     'Learn how we collect, use, and protect your personal information. Our commitment to your privacy and data security.',
 };
