@@ -45,19 +45,19 @@ export const RecentActivityCard = React.memo(function RecentActivityCard({
       switch (type) {
         case 'income':
           return {
-            bg: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
+            bg: 'bg-green-50 dark:bg-green-950/40 border border-green-200/50 dark:border-green-800/30 text-green-700 dark:text-green-300',
             text: 'text-green-600 dark:text-green-400',
             prefix: '+',
           };
         case 'expense':
           return {
-            bg: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
+            bg: 'bg-red-50 dark:bg-red-950/40 border border-red-200/50 dark:border-red-800/30 text-red-700 dark:text-red-300',
             text: 'text-red-600 dark:text-red-400',
             prefix: '-',
           };
         default:
           return {
-            bg: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
+            bg: 'bg-blue-50 dark:bg-blue-950/40 border border-blue-200/50 dark:border-blue-800/30 text-blue-700 dark:text-blue-300',
             text: 'text-blue-600 dark:text-blue-400',
             prefix: '',
           };
@@ -67,7 +67,7 @@ export const RecentActivityCard = React.memo(function RecentActivityCard({
   );
 
   return (
-    <Card>
+    <Card className="flex flex-col h-full">
       <CardHeader className="flex flex-row items-center justify-between">
         <div className="flex flex-col gap-2">
           <CardTitle className="flex items-center gap-2">
@@ -81,17 +81,20 @@ export const RecentActivityCard = React.memo(function RecentActivityCard({
           <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1 flex flex-col min-h-0">
         {isLoading ? (
-          <div className="space-y-4">
+          <div className="space-y-0">
             {Array.from({ length: 5 }).map((_, index) => (
-              <div key={index} className="flex items-center gap-4">
-                <Skeleton className="h-10 w-10 rounded-full" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-3 w-1/2" />
+              <div
+                key={index}
+                className="flex items-center gap-3 sm:gap-4 py-3 sm:py-4 border-b border-border/50 last:border-0"
+              >
+                <Skeleton className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl flex-shrink-0" />
+                <div className="flex-1 space-y-2 min-w-0">
+                  <Skeleton className="h-4 sm:h-5 w-3/4" />
+                  <Skeleton className="h-3 sm:h-4 w-1/2" />
                 </div>
-                <Skeleton className="h-5 w-20" />
+                <Skeleton className="h-5 sm:h-6 w-20 sm:w-24 shrink-0" />
               </div>
             ))}
           </div>
@@ -100,7 +103,7 @@ export const RecentActivityCard = React.memo(function RecentActivityCard({
             title="Failed to load recent activity"
             description={error}
             variant="inline"
-            className="h-[250px] @sm:h-[300px]"
+            className="h-full min-h-[250px] @sm:min-h-[300px]"
           />
         ) : recentTransactions.length === 0 ? (
           <NoDataState
@@ -108,39 +111,56 @@ export const RecentActivityCard = React.memo(function RecentActivityCard({
             title="No recent transactions"
             description="Start tracking your finances by adding your first transaction"
             variant="inline"
-            height="h-[250px] @sm:h-[300px]"
+            height="h-full min-h-[250px] @sm:min-h-[300px]"
           />
         ) : (
-          <div className="space-y-3 sm:space-y-4 max-h-[600px] overflow-y-auto">
-            {recentTransactions.map((transaction) => {
-              const Icon = getTransactionIcon(transaction.type);
-              const styles = getTransactionStyles(transaction.type);
+          <div className="flex-1 overflow-y-auto -mx-6 px-6">
+            <div className="space-y-0">
+              {recentTransactions.map((transaction, index) => {
+                const Icon = getTransactionIcon(transaction.type);
+                const styles = getTransactionStyles(transaction.type);
+                const isLast = index === recentTransactions.length - 1;
 
-              return (
-                <div
-                  key={transaction.id}
-                  className="flex items-center justify-between gap-2 sm:gap-3"
-                >
-                  <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-                    <div className={`rounded-full p-2 ${styles.bg}`}>
-                      <Icon className="h-4 w-4" />
+                return (
+                  <div
+                    key={transaction.id}
+                    className="group relative flex items-center justify-between gap-3 sm:gap-4 py-3 sm:py-4 transition-colors hover:bg-muted/50 rounded-lg -mx-2 px-2"
+                  >
+                    {/* Separator line */}
+                    {!isLast && (
+                      <div className="absolute bottom-0 left-2 right-2 h-px bg-border/50" />
+                    )}
+
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                      {/* Icon with better styling */}
+                      <div
+                        className={`rounded-xl p-2.5 sm:p-3 ${styles.bg} flex-shrink-0 shadow-sm group-hover:shadow-md transition-all duration-200 group-hover:scale-105`}
+                      >
+                        <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
+                      </div>
+
+                      {/* Transaction details */}
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <p className="text-sm sm:text-base font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                          {transaction.description}
+                        </p>
+                        <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+                          <span className="font-medium">{transaction.category}</span>
+                          <span className="text-muted-foreground/60">•</span>
+                          <span>{formatDisplayDate(transaction.date)}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs sm:text-sm font-medium truncate">
-                        {transaction.description}
-                      </p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {transaction.category} • {formatDisplayDate(transaction.date)}
-                      </p>
+
+                    {/* Amount with better styling */}
+                    <div className={`text-sm sm:text-base shrink-0 ${styles.text} tabular-nums`}>
+                      {styles.prefix}
+                      {formatCurrency(transaction.amount, baseCurrency)}
                     </div>
                   </div>
-                  <div className={`text-xs sm:text-sm font-medium shrink-0 ${styles.text}`}>
-                    {styles.prefix}
-                    {formatCurrency(transaction.amount, baseCurrency)}
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         )}
       </CardContent>

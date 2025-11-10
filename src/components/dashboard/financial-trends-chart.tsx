@@ -71,32 +71,11 @@ export const FinancialTrendsChart = React.memo(function FinancialTrendsChart({
       <CardHeader className="space-y-3 sm:space-y-4">
         <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex flex-col gap-2 min-w-0 flex-1">
-            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-              <TrendingUp className="h-4 w-4 shrink-0" />
-              <span className="truncate">Financial Trends</span>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Financial Trends
             </CardTitle>
-            <CardDescription className="text-sm">
-              Track your financial performance over time
-            </CardDescription>
-          </div>
-
-          {/* Time Range Buttons */}
-          <div className="flex flex-wrap gap-2 sm:flex-nowrap sm:shrink-0">
-            {(['1W', '1M', '3M', '6M', '1Y'] as const).map((range) => (
-              <Button
-                key={range}
-                variant={selectedTimeRange === range ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedTimeRange(range)}
-                className={`min-w-[44px] text-xs sm:text-sm ${
-                  selectedTimeRange === range
-                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white'
-                    : ''
-                }`}
-              >
-                {range}
-              </Button>
-            ))}
+            <CardDescription>Track your financial performance over time</CardDescription>
           </div>
         </div>
 
@@ -104,25 +83,56 @@ export const FinancialTrendsChart = React.memo(function FinancialTrendsChart({
         <Tabs
           value={selectedSeries}
           onValueChange={(value) => setSelectedSeries(value as SeriesType)}
+          className="w-full"
         >
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto sm:h-10 gap-1 sm:gap-0">
-            <TabsTrigger value="balance" className="text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-1.5">
-              <span className="truncate">Balance</span>
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto gap-2 p-1 bg-muted/50">
+            <TabsTrigger
+              value="balance"
+              className="text-xs sm:text-sm font-medium px-3 sm:px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+            >
+              Balance
             </TabsTrigger>
-            <TabsTrigger value="income" className="text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-1.5">
-              <span className="truncate">Income</span>
+            <TabsTrigger
+              value="income"
+              className="text-xs sm:text-sm font-medium px-3 sm:px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+            >
+              Income
             </TabsTrigger>
             <TabsTrigger
               value="expenses"
-              className="text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-1.5"
+              className="text-xs sm:text-sm font-medium px-3 sm:px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
             >
-              <span className="truncate">Expenses</span>
+              Expenses
             </TabsTrigger>
-            <TabsTrigger value="savings" className="text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-1.5">
-              <span className="truncate">Savings</span>
+            <TabsTrigger
+              value="savings"
+              className="text-xs sm:text-sm font-medium px-3 sm:px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+            >
+              Savings
             </TabsTrigger>
           </TabsList>
         </Tabs>
+
+        {/* Time Range Buttons */}
+        <div className="flex items-center justify-end gap-3">
+          <div className="flex gap-1.5 sm:gap-2">
+            {(['1W', '1M', '3M', '6M', '1Y'] as const).map((range) => (
+              <Button
+                key={range}
+                variant={selectedTimeRange === range ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setSelectedTimeRange(range)}
+                className={`min-w-[48px] sm:min-w-[56px] text-xs sm:text-sm font-medium h-8 sm:h-9 transition-all ${
+                  selectedTimeRange === range
+                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-sm hover:shadow-md'
+                    : 'hover:bg-muted/80'
+                }`}
+              >
+                {range}
+              </Button>
+            ))}
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         {isLoadingAreaChart ? (

@@ -129,8 +129,12 @@ export default function DashboardPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:gap-6 @3xl:grid-cols-2">
-            <QuickActionsCard onAddTransaction={handleAddTransaction} />
-            <RecentActivityCard recentTransactions={dashboardData.recentTransactions} />
+            <div className="order-1 @3xl:order-2">
+              <RecentActivityCard recentTransactions={dashboardData.recentTransactions} />
+            </div>
+            <div className="order-2 @3xl:order-1">
+              <QuickActionsCard onAddTransaction={handleAddTransaction} />
+            </div>
           </div>
         </>
       )}
