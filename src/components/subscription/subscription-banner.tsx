@@ -155,7 +155,7 @@ export function SubscriptionBanner({
     const styles = getBannerStyles();
     switch (subscriptionInfo.bannerType) {
       case 'start_trial':
-        return <Sparkles className="h-5 w-5 text-blue-600 dark:text-purple-500 mt-0.5" />;
+        return <Sparkles className="h-5 w-5 text-purple-500 mt-0.5" />;
       case 'trial_countdown':
         // Use AlertTriangle for last day, Clock for other days
         const isLastDay = subscriptionInfo.trialDaysLeft === 1;

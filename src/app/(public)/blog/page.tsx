@@ -104,9 +104,6 @@ export default function BlogPage() {
       <div className="container mx-auto max-w-7xl px-4 py-16">
         {/* Header */}
         <div className="text-center mb-16">
-          <Badge className="mb-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
-            Blog
-          </Badge>
           <h1 className="text-4xl font-bold tracking-tight mb-4">
             Latest{' '}
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">

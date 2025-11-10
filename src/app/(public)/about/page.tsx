@@ -99,9 +99,6 @@ export default function AboutPage() {
       <div className="container mx-auto max-w-7xl px-4 py-16">
         {/* Header */}
         <div className="text-center mb-16">
-          <Badge className="mb-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
-            About Us
-          </Badge>
           <h1 className="text-4xl font-bold tracking-tight mb-4">
             Building the Future of{' '}
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -119,7 +116,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <Target className="w-8 h-8 text-blue-600 dark:text-purple-500" />
+                <Target className="w-8 h-8 text-purple-500" />
                 <h2 className="text-3xl font-bold">Our Mission</h2>
               </div>
               <p className="text-lg text-muted-foreground mb-6">
@@ -168,7 +165,7 @@ export default function AboutPage() {
                 <Card key={value.title} className="text-center">
                   <CardHeader>
                     <div className="w-12 h-12 bg-blue-50 dark:bg-blue-950/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                      <Icon className="w-6 h-6 text-blue-600 dark:text-purple-500" />
+                      <Icon className="w-6 h-6 text-purple-500" />
                     </div>
                     <CardTitle className="text-lg">{value.title}</CardTitle>
                   </CardHeader>
@@ -198,7 +195,7 @@ export default function AboutPage() {
                     </AvatarFallback>
                   </Avatar>
                   <CardTitle className="text-lg">{member.name}</CardTitle>
-                  <CardDescription className="font-medium text-blue-600 dark:text-purple-500">
+                  <CardDescription className="font-medium text-purple-500">
                     {member.role}
                   </CardDescription>
                 </CardHeader>

@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Shield, Eye, Lock, Users } from 'lucide-react';
 import { appConfig } from '@/config/app';
 
@@ -39,14 +38,8 @@ export default function PrivacyPolicyPage() {
       <div className="container mx-auto max-w-4xl px-4 py-16">
         {/* Header */}
         <div className="text-center mb-16">
-          <Badge className="mb-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
+          <h1 className="text-4xl font-bold tracking-tight mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Privacy Policy
-          </Badge>
-          <h1 className="text-4xl font-bold tracking-tight mb-4">
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Privacy
-            </span>{' '}
-            Policy
           </h1>
           <p className="text-xl text-muted-foreground">Last updated: January 15, 2024</p>
         </div>
@@ -61,7 +54,7 @@ export default function PrivacyPolicyPage() {
                 <Card key={principle.title}>
                   <CardHeader>
                     <div className="flex items-center gap-3">
-                      <Icon className="w-6 h-6 text-blue-600 dark:text-purple-500" />
+                      <Icon className="w-6 h-6 text-purple-500" />
                       <CardTitle className="text-lg">{principle.title}</CardTitle>
                     </div>
                   </CardHeader>
@@ -191,7 +184,7 @@ export default function PrivacyPolicyPage() {
                 To exercise these rights, please contact us at{' '}
                 <a
                   href={`mailto:${appConfig.contact.generalEmail}`}
-                  className="text-blue-600 dark:text-purple-500 hover:underline"
+                  className="text-purple-500 hover:underline"
                 >
                   {appConfig.contact.generalEmail}
                 </a>
@@ -269,7 +262,7 @@ export default function PrivacyPolicyPage() {
                   Email:{' '}
                   <a
                     href={`mailto:${appConfig.contact.generalEmail}`}
-                    className="text-blue-600 dark:text-purple-500 hover:underline"
+                    className="text-purple-500 hover:underline"
                   >
                     {appConfig.contact.generalEmail}
                   </a>

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -130,14 +129,8 @@ export default function ContactPage() {
       <div className="container mx-auto max-w-7xl px-4 py-16">
         {/* Header */}
         <div className="text-center mb-16">
-          <Badge className="mb-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
-            Contact Us
-          </Badge>
-          <h1 className="text-4xl font-bold tracking-tight mb-4">
-            Get in{' '}
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Touch
-            </span>
+          <h1 className="text-4xl font-bold tracking-tight mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Get in Touch
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Have questions? Need support? Want to partner with us? We&apos;re here to help and would
@@ -153,7 +146,7 @@ export default function ContactPage() {
               <Card key={method.title} className="text-center">
                 <CardHeader>
                   <div className="w-12 h-12 bg-blue-50 dark:bg-blue-950/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <Icon className="w-6 h-6 text-blue-600 dark:text-purple-500" />
+                    <Icon className="w-6 h-6 text-purple-500" />
                   </div>
                   <CardTitle className="text-lg">{method.title}</CardTitle>
                   <CardDescription>{method.description}</CardDescription>
@@ -265,7 +258,7 @@ export default function ContactPage() {
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
                       <div className="w-10 h-10 bg-blue-50 dark:bg-blue-950/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <MapPin className="w-5 h-5 text-blue-600 dark:text-purple-500" />
+                        <MapPin className="w-5 h-5 text-purple-500" />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-lg mb-2">{office.city}</h3>

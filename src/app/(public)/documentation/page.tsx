@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { BookOpen, Code, Database, Zap, Shield, Users } from 'lucide-react';
 import { appConfig } from '@/config/app';
@@ -79,14 +78,8 @@ export default function DocumentationPage() {
       <div className="container mx-auto max-w-7xl px-4 py-16">
         {/* Header */}
         <div className="text-center mb-16">
-          <Badge className="mb-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
-            Documentation
-          </Badge>
-          <h1 className="text-4xl font-bold tracking-tight mb-4">
-            Complete{' '}
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Documentation
-            </span>
+          <h1 className="text-4xl font-bold tracking-tight mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Complete Documentation
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Everything you need to know to build amazing applications with our platform. From quick
@@ -114,7 +107,7 @@ export default function DocumentationPage() {
               <Card key={section.title} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex items-center gap-3 mb-2">
-                    <Icon className="w-6 h-6 text-blue-600 dark:text-purple-500" />
+                    <Icon className="w-6 h-6 text-purple-500" />
                     <CardTitle className="text-lg">{section.title}</CardTitle>
                   </div>
                   <CardDescription>{section.description}</CardDescription>

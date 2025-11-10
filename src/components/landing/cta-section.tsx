@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Rocket, CheckCircle } from 'lucide-react';
+import { ArrowRight, Rocket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'motion/react';
 
@@ -50,7 +50,7 @@ export const CTASection = () => {
                 animate={{ rotate: [0, 10, -10, 0] }}
                 transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
               >
-                <Rocket className="w-5 h-5 mr-2 text-blue-600 dark:text-purple-500" />
+                <Rocket className="w-5 h-5 mr-2 text-purple-500" />
               </motion.div>
               Ready to Get Started?
             </motion.div>

@@ -94,14 +94,8 @@ export default function CookiePolicyPage() {
       <div className="container mx-auto max-w-4xl px-4 py-16">
         {/* Header */}
         <div className="text-center mb-16">
-          <Badge className="mb-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
+          <h1 className="text-4xl font-bold tracking-tight mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Cookie Policy
-          </Badge>
-          <h1 className="text-4xl font-bold tracking-tight mb-4">
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Cookie
-            </span>{' '}
-            Policy
           </h1>
           <p className="text-xl text-muted-foreground">Last updated: January 15, 2024</p>
         </div>
@@ -109,7 +103,7 @@ export default function CookiePolicyPage() {
         {/* Cookie Overview */}
         <div className="mb-16">
           <div className="flex items-center gap-3 mb-8">
-            <Cookie className="w-8 h-8 text-blue-600 dark:text-purple-500" />
+            <Cookie className="w-8 h-8 text-purple-500" />
             <h2 className="text-2xl font-bold">What Are Cookies?</h2>
           </div>
           <Card>
@@ -320,7 +314,7 @@ export default function CookiePolicyPage() {
                   Email:{' '}
                   <a
                     href={`mailto:${appConfig.contact.generalEmail}`}
-                    className="text-blue-600 dark:text-purple-500 hover:underline"
+                    className="text-purple-500 hover:underline"
                   >
                     {appConfig.contact.generalEmail}
                   </a>

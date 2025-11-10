@@ -96,7 +96,7 @@ export const BenefitsSection = () => {
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full blur-md opacity-50 group-hover:opacity-75 transition-opacity duration-300" />
                   <CheckCircle
-                    className="h-7 w-7 text-blue-600 dark:text-purple-500 relative z-10 group-hover:scale-110 transition-transform duration-300"
+                    className="h-7 w-7 text-purple-500 relative z-10 group-hover:scale-110 transition-transform duration-300"
                     aria-label="Check mark"
                   />
                 </motion.div>

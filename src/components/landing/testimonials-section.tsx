@@ -105,7 +105,7 @@ export const TestimonialsSection = () => {
                   </div>
 
                   <Quote
-                    className="w-8 h-8 text-blue-600 dark:text-purple-500 mb-4 opacity-50 group-hover:opacity-75 group-hover:scale-110 transition-all duration-300"
+                    className="w-8 h-8 text-purple-500 mb-4 opacity-50 group-hover:opacity-75 group-hover:scale-110 transition-all duration-300"
                     aria-hidden="true"
                   />
 

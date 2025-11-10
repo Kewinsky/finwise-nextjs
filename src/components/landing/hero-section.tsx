@@ -1,7 +1,6 @@
 'use client';
 
 import { ArrowRight, Sparkles, Zap } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { motion } from 'motion/react';
 
@@ -22,7 +21,6 @@ interface HeroSectionProps {
 }
 
 export const HeroSection = ({
-  badge = '💰 Smart Financial Tracking',
   heading = 'Take Control of Your Finances',
   description = 'Track expenses, analyze income, and get AI-powered insights to make smarter financial decisions. Simple, secure, and designed for modern life.',
   buttons = {
@@ -119,24 +117,6 @@ export const HeroSection = ({
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
         >
-          {/* Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.1, type: 'spring', stiffness: 200 }}
-            className="mb-8"
-          >
-            <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0 px-5 py-2.5 text-sm font-medium shadow-lg hover:shadow-xl transition-shadow duration-300 inline-flex items-center gap-2">
-              <motion.span
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-              >
-                {badge.split(' ')[0]}
-              </motion.span>
-              <span>{badge.split(' ').slice(1).join(' ')}</span>
-            </Badge>
-          </motion.div>
-
           {/* Main heading */}
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
@@ -217,7 +197,7 @@ export const HeroSection = ({
               {
                 icon: Sparkles,
                 text: 'AI-Powered Insights',
-                color: 'text-blue-600 dark:text-purple-500',
+                color: 'text-purple-500',
                 bg: 'bg-blue-500/10 dark:bg-purple-500/10',
               },
               {
