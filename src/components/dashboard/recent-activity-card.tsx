@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRightLeft, ArrowRight, TrendingUp, TrendingDown } from 'lucide-react';
-import { formatCurrency, formatDisplayDate } from '@/lib/utils';
+import { formatCurrency, formatDisplayDate, capitalizeFirst } from '@/lib/utils';
 import { useBaseCurrency } from '@/hooks/use-base-currency';
 import { ErrorState } from '@/components/common/error-state';
 import { NoDataState } from '@/components/common/no-data-state';
@@ -145,7 +145,9 @@ export const RecentActivityCard = React.memo(function RecentActivityCard({
                           {transaction.description}
                         </p>
                         <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
-                          <span className="font-medium">{transaction.category}</span>
+                          <span className="font-medium">
+                            {capitalizeFirst(transaction.category)}
+                          </span>
                           <span className="text-muted-foreground/60">•</span>
                           <span>{formatDisplayDate(transaction.date)}</span>
                         </div>

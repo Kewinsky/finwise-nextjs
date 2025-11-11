@@ -13,7 +13,7 @@ import {
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Edit, Trash2, MoreHorizontal } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/custom-spinner';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, capitalizeFirst } from '@/lib/utils';
 import { useBaseCurrency } from '@/hooks/use-base-currency';
 import {
   getTypeBadgeClassName,
@@ -57,7 +57,7 @@ export function TransactionsTableRow({
         </Badge>
       </TableCell>
       <TableCell className="font-medium">{transaction.description}</TableCell>
-      <TableCell>{transaction.category}</TableCell>
+      <TableCell>{capitalizeFirst(transaction.category)}</TableCell>
       <TableCell>{getAccountName(transaction, accounts)}</TableCell>
       <TableCell>{format(new Date(transaction.date), 'MMM dd, yyyy')}</TableCell>
       <TableCell className={`text-right font-medium ${getAmountClassName(transaction.type)}`}>

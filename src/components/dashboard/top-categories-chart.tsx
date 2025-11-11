@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { capitalizeFirst } from '@/lib/utils';
 import { BarChart, Bar, CartesianGrid, XAxis, Cell, LabelList } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart3 } from 'lucide-react';
@@ -39,7 +40,7 @@ function prepareBarChartData(
   }
 
   const chartData = topCategories.map((category, index) => ({
-    name: category.category,
+    name: capitalizeFirst(category.category),
     value: category.amount,
     fill: colors[index % colors.length],
   }));

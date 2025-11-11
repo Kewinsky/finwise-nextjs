@@ -52,3 +52,11 @@ export function formatDisplayDate(dateString: string): string {
     day: 'numeric',
   });
 }
+
+/**
+ * Capitalize first letter of a string
+ */
+export function capitalizeFirst(str: string): string {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}

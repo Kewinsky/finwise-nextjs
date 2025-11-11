@@ -17,7 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Filter, Calendar as CalendarIcon, DollarSign, Search, RotateCcw } from 'lucide-react';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { cn, capitalizeFirst } from '@/lib/utils';
 import type { TransactionFilters, Account } from '@/types/finance.types';
 import { TRANSACTION_CATEGORIES } from '@/config/app';
 
@@ -191,7 +191,7 @@ export function TransactionFiltersComponent({
                     <SelectItem value="all">All categories</SelectItem>
                     {allCategories.map((category) => (
                       <SelectItem key={category} value={category}>
-                        {category}
+                        {capitalizeFirst(category)}
                       </SelectItem>
                     ))}
                   </SelectContent>
