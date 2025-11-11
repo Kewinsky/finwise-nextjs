@@ -57,7 +57,7 @@ export function ProfileForm({ initialData, isLoading = false, onSubmit, user }: 
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 @md:space-y-6">
       {/* Profile Avatar & Personal Information */}
       <Card>
         <CardHeader>
@@ -67,7 +67,7 @@ export function ProfileForm({ initialData, isLoading = false, onSubmit, user }: 
           </CardTitle>
           <CardDescription>Update your personal details and profile information</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 @md:space-y-6">
           {/* Avatar Section */}
           <div className="flex items-center gap-6">
             <div className="relative">
@@ -93,7 +93,7 @@ export function ProfileForm({ initialData, isLoading = false, onSubmit, user }: 
           <Separator />
 
           {/* Full Name */}
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-2 @md:flex-row @md:items-center @md:justify-between">
             <div className="space-y-1">
               <Label htmlFor="fullName" className="text-sm font-medium">
                 Full Name
@@ -102,7 +102,7 @@ export function ProfileForm({ initialData, isLoading = false, onSubmit, user }: 
                 Your display name as it appears to others
               </p>
             </div>
-            <div className="w-full sm:w-64 space-y-2">
+            <div className="w-full @md:w-64 space-y-2">
               <Input
                 id="fullName"
                 placeholder="John Doe"

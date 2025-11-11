@@ -90,7 +90,7 @@ export function AccountCard({
         </div>
       </CardHeader>
       <CardContent className="py-4 sm:py-6">
-        <div className="space-y-3 sm:space-y-4">
+        <div className="space-y-3 @md:space-y-4">
           <div>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Current Balance</p>
             <p

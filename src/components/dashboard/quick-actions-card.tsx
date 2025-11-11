@@ -70,7 +70,7 @@ export function QuickActionsCard({ onAddTransaction }: QuickActionsCardProps) {
         <CardDescription>Common tasks at your fingertips</CardDescription>
       </CardHeader>
       <CardContent className="flex-1">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 @sm:gap-4 @lg:gap-5 h-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 @md:gap-4 @lg:gap-5 h-full">
           {actions.map((action) => (
             <Button
               key={action.label}

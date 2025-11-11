@@ -24,7 +24,7 @@ export const MetricsGrid = React.memo(function MetricsGrid({ data }: MetricsGrid
   );
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:gap-6 @2xl:grid-cols-2 @3xl:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 @md:gap-6 @md:grid-cols-2 @4xl:grid-cols-4">
       <MetricCard
         title="My Balance"
         value={data.totalBalance}

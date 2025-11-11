@@ -168,7 +168,7 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="flex-1 space-y-4 @sm:space-y-6 p-4 @sm:p-6">
+    <div className="flex-1 space-y-4 @md:space-y-6 p-4 @md:p-6">
       <TransactionsHeader onAddTransaction={() => setShowForm(true)} />
 
       <TransactionFiltersComponent

@@ -100,9 +100,9 @@ export function TransactionFiltersComponent({
   const activeFiltersCount = getActiveFiltersCount();
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 @md:space-y-6">
       {/* Search Bar and Toggle Button */}
-      <div className="flex flex-col space-y-3 @sm:flex-row @sm:items-center @sm:space-y-0 @sm:space-x-2">
+      <div className="flex flex-col space-y-3 @md:flex-row @md:items-center @md:space-y-0 @md:space-x-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -147,7 +147,7 @@ export function TransactionFiltersComponent({
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="space-y-3 sm:space-y-4">
+          <CardContent className="space-y-3 @md:space-y-4">
             {/* Basic Filters Row */}
             <div className="grid grid-cols-1 gap-4 @lg:grid-cols-3">
               {/* Transaction Type */}

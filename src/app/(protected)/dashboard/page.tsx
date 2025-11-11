@@ -66,7 +66,7 @@ export default function DashboardPage() {
 
   if (dashboardError) {
     return (
-      <div className="flex-1 space-y-4 @sm:space-y-6 p-4 @sm:p-6">
+      <div className="flex-1 space-y-4 @md:space-y-6 p-4 @md:p-6">
         <div className="min-w-0 flex-1">
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight truncate">
             Dashboard
@@ -88,7 +88,7 @@ export default function DashboardPage() {
   const isLoadingDashboard = !dashboardData;
 
   return (
-    <div className="flex-1 space-y-4 @sm:space-y-6 p-4 @sm:p-6">
+    <div className="flex-1 space-y-4 @md:space-y-6 p-4 @md:p-6">
       {showWelcome && <WelcomeBanner onDismiss={() => setShowWelcome(false)} />}
 
       <div className="min-w-0 flex-1">
@@ -104,11 +104,11 @@ export default function DashboardPage() {
         <>
           <MetricsGridSkeleton />
           <ChartSkeleton showTabs height="h-[400px]" />
-          <div className="grid grid-cols-1 gap-4 @md:grid-cols-2 @sm:gap-6">
-            <ChartSkeleton height="h-[250px] @sm:h-[300px]" />
-            <ChartSkeleton height="h-[250px] @sm:h-[300px]" />
+          <div className="grid grid-cols-1 gap-4 @md:grid-cols-2 @md:gap-6">
+            <ChartSkeleton height="h-[250px] @md:h-[300px]" />
+            <ChartSkeleton height="h-[250px] @md:h-[300px]" />
           </div>
-          <div className="grid grid-cols-1 gap-4 @md:grid-cols-2 @sm:gap-6">
+          <div className="grid grid-cols-1 gap-4 @md:grid-cols-2 @md:gap-6">
             <AISuggestionsSkeleton />
             <RecentActivitySkeleton />
           </div>
@@ -119,7 +119,7 @@ export default function DashboardPage() {
 
           <FinancialTrendsChart dashboardData={dashboardData} />
 
-          <div className="grid grid-cols-1 gap-4 sm:gap-6 @3xl:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 @md:gap-6 @3xl:grid-cols-2">
             <AccountDistributionChart />
             <TopCategoriesChart
               categorySpending={monthlyCategorySpending}
@@ -128,7 +128,7 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:gap-6 @3xl:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 @md:gap-6 @3xl:grid-cols-2">
             <div className="order-1 @3xl:order-2">
               <RecentActivityCard recentTransactions={dashboardData.recentTransactions} />
             </div>

@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 function HeaderSkeleton() {
   return (
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b">
-      <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
+      <div className="flex w-full items-center gap-1 @lg:gap-2 px-4 @lg:px-6">
         <div className="h-8 w-8 animate-pulse rounded-md bg-muted" />
         <div className="mx-2 h-4 w-px bg-border" />
         <Skeleton className="h-5 w-32" />

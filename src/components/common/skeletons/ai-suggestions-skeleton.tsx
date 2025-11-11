@@ -9,7 +9,7 @@ export function AISuggestionsSkeleton() {
         <Skeleton className="h-4 w-48" />
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 gap-2 @sm:gap-3 @lg:gap-4">
+        <div className="grid grid-cols-2 gap-2 @md:gap-3 @lg:gap-4">
           {Array.from({ length: 4 }).map((_, index) => (
             <div
               key={index}

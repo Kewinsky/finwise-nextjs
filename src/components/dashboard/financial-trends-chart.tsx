@@ -75,8 +75,8 @@ export const FinancialTrendsChart = React.memo(function FinancialTrendsChart({
 
   return (
     <Card>
-      <CardHeader className="space-y-3 sm:space-y-4">
-        <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <CardHeader className="space-y-3 @md:space-y-4">
+        <div className="flex flex-col gap-3 @md:gap-4 @md:flex-row @md:items-center @md:justify-between">
           <div className="flex flex-col gap-2 min-w-0 flex-1">
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
@@ -86,9 +86,9 @@ export const FinancialTrendsChart = React.memo(function FinancialTrendsChart({
           </div>
 
           {/* Time Range Buttons */}
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex flex-row items-center gap-3 w-full @md:w-auto">
             {/* Mobile Select */}
-            <div className="w-full sm:hidden">
+            <div className="w-full @md:hidden">
               <Select
                 value={selectedTimeRange}
                 onValueChange={(value) => setSelectedTimeRange(value as TimeRange)}
@@ -107,7 +107,7 @@ export const FinancialTrendsChart = React.memo(function FinancialTrendsChart({
             </div>
 
             {/* Desktop Buttons */}
-            <div className="hidden sm:flex gap-1.5 sm:gap-2">
+            <div className="hidden @md:flex gap-1.5 @md:gap-2">
               {(['1W', '1M', '3M', '6M', '1Y'] as const).map((range) => (
                 <Button
                   key={range}
@@ -155,25 +155,25 @@ export const FinancialTrendsChart = React.memo(function FinancialTrendsChart({
           <TabsList className="grid grid-cols-2 sm:grid-cols-4 h-auto gap-2 p-1 bg-muted/50">
             <TabsTrigger
               value="balance"
-              className="border-none text-xs sm:text-sm font-medium px-3 sm:px-4 py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
+              className="border-none text-xs sm:text-sm font-medium px-3 @md:px-4 py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
             >
               Balance
             </TabsTrigger>
             <TabsTrigger
               value="income"
-              className="border-none text-xs sm:text-sm font-medium px-3 sm:px-4 py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
+              className="border-none text-xs sm:text-sm font-medium px-3 @md:px-4 py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
             >
               Income
             </TabsTrigger>
             <TabsTrigger
               value="expenses"
-              className="border-none text-xs sm:text-sm font-medium px-3 sm:px-4 py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
+              className="border-none text-xs sm:text-sm font-medium px-3 @md:px-4 py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
             >
               Expenses
             </TabsTrigger>
             <TabsTrigger
               value="savings"
-              className="border-none text-xs sm:text-sm font-medium px-3 sm:px-4 py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
+              className="border-none text-xs sm:text-sm font-medium px-3 @md:px-4 py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
             >
               Savings
             </TabsTrigger>

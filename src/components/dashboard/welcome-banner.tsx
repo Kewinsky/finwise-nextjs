@@ -11,8 +11,8 @@ interface WelcomeBannerProps {
 export function WelcomeBanner({ onDismiss }: WelcomeBannerProps) {
   return (
     <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-blue-600/20 dark:border-purple-500/20">
-      <CardContent className="p-4 sm:p-6">
-        <div className="flex items-start justify-between gap-3 sm:gap-4">
+      <CardContent className="p-4 @md:p-6">
+        <div className="flex items-start justify-between gap-3 @md:gap-4">
           <div className="flex-1 min-w-0">
             <h2 className="text-lg sm:text-xl font-bold mb-2">
               Welcome to{' '}
@@ -25,7 +25,7 @@ export function WelcomeBanner({ onDismiss }: WelcomeBannerProps) {
               We&apos;re excited to have you here! Get started by adding your first account and
               transaction to begin tracking your finances.
             </p>
-            <div className="flex flex-wrap gap-2 sm:gap-3">
+            <div className="flex flex-wrap gap-2 @md:gap-3">
               <Button
                 size="sm"
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"

@@ -87,7 +87,7 @@ export const RecentActivityCard = React.memo(function RecentActivityCard({
             {Array.from({ length: 5 }).map((_, index) => (
               <div
                 key={index}
-                className="flex items-center gap-3 sm:gap-4 py-3 sm:py-4 border-b border-border/50 last:border-0"
+                className="flex items-center gap-3 @md:gap-4 py-3 @md:py-4 border-b border-border/50 last:border-0"
               >
                 <Skeleton className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl flex-shrink-0" />
                 <div className="flex-1 space-y-2 min-w-0">
@@ -124,17 +124,17 @@ export const RecentActivityCard = React.memo(function RecentActivityCard({
                 return (
                   <div
                     key={transaction.id}
-                    className="group relative flex items-center justify-between gap-3 sm:gap-4 py-3 sm:py-4 transition-colors hover:bg-muted/50 rounded-lg -mx-2 px-2"
+                    className="group relative flex items-center justify-between gap-3 @md:gap-4 py-3 @md:py-4 transition-colors hover:bg-muted/50 rounded-lg -mx-2 px-2"
                   >
                     {/* Separator line */}
                     {!isLast && (
                       <div className="absolute bottom-0 left-2 right-2 h-px bg-border/50" />
                     )}
 
-                    <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                    <div className="flex items-center gap-3 @md:gap-4 min-w-0 flex-1">
                       {/* Icon with better styling */}
                       <div
-                        className={`rounded-xl p-2.5 sm:p-3 ${styles.bg} flex-shrink-0 shadow-sm group-hover:shadow-md transition-all duration-200 group-hover:scale-105`}
+                        className={`rounded-xl p-2.5 @md:p-3 ${styles.bg} flex-shrink-0 shadow-sm group-hover:shadow-md transition-all duration-200 group-hover:scale-105`}
                       >
                         <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
                       </div>
