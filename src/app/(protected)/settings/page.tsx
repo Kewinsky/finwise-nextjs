@@ -72,7 +72,7 @@ async function SettingsContent() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 @md:space-y-6">
       <SettingsClientWrapper
         isPasswordAuthenticated={isPasswordAuthenticated}
         userEmail={userEmail}

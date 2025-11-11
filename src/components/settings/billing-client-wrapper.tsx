@@ -135,7 +135,7 @@ export function BillingClientWrapper({
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 @md:space-y-6">
       <SubscriptionBanner subscriptionInfo={subscriptionInfo} />
 
       {/* Current Subscription */}
@@ -147,8 +147,8 @@ export function BillingClientWrapper({
           </CardTitle>
           <CardDescription>Manage your current plan and billing information</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4 sm:space-y-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <CardContent className="space-y-4 @md:space-y-6">
+          <div className="flex flex-col gap-4 @md:flex-row @md:items-center @md:justify-between">
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 {getPlanIcon(subscription?.plan_type || 'free')}
@@ -188,15 +188,15 @@ export function BillingClientWrapper({
 
       {/* Available Plans */}
       <Card>
-        <CardHeader className="px-4 sm:px-6">
+        <CardHeader className="px-4 @md:px-6">
           <CardTitle className="flex items-center gap-2">
             <Crown className="h-5 w-5 flex-shrink-0" />
             Available Plans
           </CardTitle>
           <CardDescription>Choose the plan that best fits your needs</CardDescription>
         </CardHeader>
-        <CardContent className="px-4 sm:px-6">
-          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <CardContent className="px-4 @md:px-6">
+          <div className="grid gap-3 @md:gap-4 grid-cols-1 @md:grid-cols-2 @lg:grid-cols-3">
             {Object.entries(SUBSCRIPTION_PLANS).map(([key, plan]) => {
               const isCurrentPlan = subscription?.plan_type === key;
               const isPopular = key === 'pro';
@@ -204,7 +204,7 @@ export function BillingClientWrapper({
               return (
                 <div
                   key={key}
-                  className={`relative flex flex-col rounded-lg border p-4 sm:p-6 transition-all hover:shadow-md ${
+                  className={`relative flex flex-col rounded-lg border p-4 @md:p-6 transition-all hover:shadow-md ${
                     isCurrentPlan ? 'border-primary' : 'border-border'
                   }`}
                 >
@@ -215,7 +215,7 @@ export function BillingClientWrapper({
                     </Badge>
                   )}
 
-                  <div className="space-y-3 sm:space-y-4 flex-1">
+                  <div className="space-y-3 @md:space-y-4 flex-1">
                     <div className="flex items-center gap-2">
                       {getPlanIcon(key)}
                       <h3 className="text-lg font-semibold truncate">{plan.name}</h3>
@@ -246,7 +246,7 @@ export function BillingClientWrapper({
                   {/* Only show button if not current plan */}
                   {!isCurrentPlan && (
                     <Button
-                      className="w-full mt-4 sm:mt-6"
+                      className="w-full mt-4 @md:mt-6"
                       variant={isPopular ? 'default' : 'outline'}
                       disabled={isLoading === plan.name}
                       onClick={() => handleUpgrade(plan.name)}

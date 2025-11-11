@@ -39,7 +39,7 @@ async function NotificationsContent() {
   const preferences = await NotificationsData();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 @md:space-y-6">
       <NotificationsClientWrapper preferences={preferences} />
     </div>
   );

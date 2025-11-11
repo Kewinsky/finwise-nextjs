@@ -116,12 +116,12 @@ export function DeleteAccountModal({
           </div>
         </div>
 
-        <DialogFooter className="flex-col sm:flex-row gap-2">
+        <DialogFooter className="flex-col @md:flex-row gap-2">
           <Button
             variant="outline"
             onClick={handleClose}
             disabled={isDeleting}
-            className="w-full sm:w-auto"
+            className="w-full @md:w-auto"
           >
             Cancel
           </Button>
@@ -129,7 +129,7 @@ export function DeleteAccountModal({
             variant="destructive"
             onClick={handleConfirm}
             disabled={isDisabled}
-            className="w-full sm:w-auto"
+            className="w-full @md:w-auto"
           >
             {isDeleting ? (
               <LoadingSpinner message="Deleting Account..." inline />

@@ -25,7 +25,7 @@ export function ExportDataCard({ onExportData }: ExportDataCardProps) {
 
   return (
     <>
-      <Card className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/50">
+      <Card className="gap-4 @md:gap-6 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-blue-800 dark:text-blue-200">
             <FileText className="h-5 w-5" />
@@ -36,12 +36,12 @@ export function ExportDataCard({ onExportData }: ExportDataCardProps) {
             preferences, subscription information, and notification settings.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex justify-start md:justify-end md:flex-shrink-0">
+        <CardContent className="flex justify-start @md:justify-end @md:flex-shrink-0">
           <Button
             variant="outline"
             size="sm"
             onClick={handleExportClick}
-            className="w-full sm:w-auto border-blue-300 text-blue-800 hover:bg-blue-100 dark:border-blue-700 dark:text-blue-200 dark:hover:bg-blue-900/50"
+            className="w-full @md:w-auto border-blue-300 text-blue-800 hover:bg-blue-100 dark:border-blue-700 dark:text-blue-200 dark:hover:bg-blue-900/50"
           >
             <Download className="h-4 w-4 mr-2" />
             Export Data

@@ -212,7 +212,7 @@ export default function ConnectedAppsPage() {
   );
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 @md:space-y-6">
       {/* Connected Apps */}
       <Card>
         <CardHeader>
@@ -226,14 +226,14 @@ export default function ConnectedAppsPage() {
         </CardHeader>
         <CardContent>
           {connectedApps.length > 0 ? (
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-3 @md:space-y-4">
               {connectedApps.map((app) => (
                 <div
                   key={app.id}
                   className="flex items-center justify-between rounded-lg border p-4"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-muted text-xl sm:text-2xl">
+                    <div className="flex h-10 w-10 @md:h-12 @md:w-12 items-center justify-center rounded-lg bg-muted text-xl @md:text-2xl">
                       {app.icon}
                     </div>
                     <div className="space-y-1">
@@ -334,11 +334,11 @@ export default function ConnectedAppsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4 sm:space-y-6">
+          <div className="space-y-4 @md:space-y-6">
             {Object.entries(groupedApps).map(([category, apps]) => (
-              <div key={category} className="space-y-3 sm:space-y-4">
-                <h3 className="text-base sm:text-lg font-semibold">{category}</h3>
-                <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div key={category} className="space-y-3 @md:space-y-4">
+                <h3 className="text-base @md:text-lg font-semibold">{category}</h3>
+                <div className="grid gap-3 @md:gap-4 @md:grid-cols-2 @lg:grid-cols-3">
                   {apps.map((app) => (
                     <div
                       key={app.id}

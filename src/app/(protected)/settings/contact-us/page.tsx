@@ -62,7 +62,7 @@ export default function ContactUsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 @md:space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -74,7 +74,7 @@ export default function ContactUsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 @md:space-y-6">
             {/* Reason Field */}
             <div className="space-y-2">
               <Label htmlFor="reason">Reason for contacting</Label>
@@ -126,7 +126,7 @@ export default function ContactUsPage() {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full sm:w-auto sm:min-w-[200px]"
+                className="w-full @md:w-auto @md:min-w-[200px]"
               >
                 {isSubmitting ? (
                   <LoadingSpinner message="Sending..." inline />

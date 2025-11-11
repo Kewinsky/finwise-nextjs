@@ -58,16 +58,16 @@ export function ExportDataModal({ isOpen, onClose, onConfirm }: ExportDataModalP
             <p>The file will be downloaded automatically once ready.</p>
           </div>
         </div>
-        <DialogFooter className="flex-col sm:flex-row gap-2">
+        <DialogFooter className="flex-col @md:flex-row gap-2">
           <Button
             variant="outline"
             onClick={onClose}
             disabled={isLoading}
-            className="w-full sm:w-auto"
+            className="w-full @md:w-auto"
           >
             Cancel
           </Button>
-          <Button onClick={handleConfirm} disabled={isLoading} className="w-full sm:w-auto">
+          <Button onClick={handleConfirm} disabled={isLoading} className="w-full @md:w-auto">
             {isLoading ? (
               <LoadingSpinner message="Preparing Export..." inline />
             ) : (

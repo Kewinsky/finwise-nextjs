@@ -66,7 +66,7 @@ export function UsageClientWrapper({ currentPlanType }: UsageClientWrapperProps)
   const remainingQueries = limit === Infinity ? Infinity : limit - usageData.queryCount;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 @md:space-y-6">
       {/* Main Usage Overview */}
       <Card>
         <CardHeader>
@@ -76,7 +76,7 @@ export function UsageClientWrapper({ currentPlanType }: UsageClientWrapperProps)
           </CardTitle>
           <CardDescription>Track your AI query usage and limits</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 @md:space-y-6">
           {/* Progress Bar */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
@@ -173,7 +173,7 @@ export function UsageClientWrapper({ currentPlanType }: UsageClientWrapperProps)
           <CardDescription>Detailed breakdown of your AI usage</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 @md:grid-cols-2 @lg:grid-cols-4 gap-4">
             {/* Average Queries Per Day */}
             <div className="space-y-1">
               <div className="text-sm text-muted-foreground">Average Per Day</div>

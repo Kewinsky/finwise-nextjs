@@ -37,7 +37,7 @@ async function ProfileContent() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 @md:space-y-6">
       <ProfileClientWrapper user={user} initialFormData={initialFormData} />
     </div>
   );

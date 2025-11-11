@@ -107,7 +107,7 @@ export function NotificationsClientWrapper({
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 @md:space-y-6">
       {/* Email Notifications */}
       <Card>
         <CardHeader>
@@ -119,7 +119,7 @@ export function NotificationsClientWrapper({
             Choose which email notifications you&apos;d like to receive
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-2 sm:space-y-4">
+        <CardContent className="space-y-2 @md:space-y-4">
           {NOTIFICATION_CATEGORIES.email.options.map((option, index) => (
             <div key={option.key}>
               <div className="flex items-center justify-between gap-2">
@@ -133,7 +133,7 @@ export function NotificationsClientWrapper({
                 />
               </div>
               {index < NOTIFICATION_CATEGORIES.email.options.length - 1 && (
-                <Separator className="mt-2 sm:mt-4" />
+                <Separator className="mt-2 @md:mt-4" />
               )}
             </div>
           ))}
@@ -149,7 +149,7 @@ export function NotificationsClientWrapper({
           </CardTitle>
           <CardDescription>Configure mobile and desktop push notifications</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-2 sm:space-y-4">
+        <CardContent className="space-y-2 @md:space-y-4">
           {NOTIFICATION_CATEGORIES.push.options.map((option, index) => (
             <div key={option.key}>
               <div className="flex items-center justify-between gap-2">
@@ -163,7 +163,7 @@ export function NotificationsClientWrapper({
                 />
               </div>
               {index < NOTIFICATION_CATEGORIES.push.options.length - 1 && (
-                <Separator className="mt-2 sm:mt-4" />
+                <Separator className="mt-2 @md:mt-4" />
               )}
             </div>
           ))}
@@ -171,7 +171,7 @@ export function NotificationsClientWrapper({
       </Card>
 
       {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-end">
+      <div className="flex flex-col @md:flex-row gap-3 justify-end">
         <Button variant="outline" onClick={handleResetToDefaults}>
           Reset to Defaults
         </Button>

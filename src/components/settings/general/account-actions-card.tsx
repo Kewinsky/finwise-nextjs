@@ -36,12 +36,12 @@ export function AccountActionsCard({ onDeleteAccount, userEmail }: AccountAction
             Permanently delete your account and all associated data. This action cannot be undone.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex justify-start md:justify-end md:flex-shrink-0">
+        <CardContent className="flex justify-start @md:justify-end @md:flex-shrink-0">
           <Button
             variant="destructive"
             size="sm"
             onClick={handleDeleteClick}
-            className="w-full sm:w-auto"
+            className="w-full @md:w-auto"
           >
             Delete Account
           </Button>

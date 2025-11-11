@@ -274,7 +274,7 @@ export function GeneralSettingsForm({
 
   return (
     <>
-      <div className="grid gap-4 sm:gap-6">
+      <div className="grid gap-4 @md:gap-6">
         {/* Appearance Settings */}
         <Card>
           <CardHeader>
@@ -284,9 +284,9 @@ export function GeneralSettingsForm({
             </CardTitle>
             <CardDescription>Customize how the application looks and feels</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4 @md:space-y-6">
             {/* System Font */}
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-2 @md:flex-row @md:items-center @md:justify-between">
               <div className="space-y-1">
                 <Label htmlFor="system_font" className="text-sm font-medium">
                   System Font
@@ -316,7 +316,7 @@ export function GeneralSettingsForm({
             <Separator />
 
             {/* Font Size */}
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-2 @md:flex-row @md:items-center @md:justify-between">
               <div className="space-y-1">
                 <Label className="text-sm font-medium">Font Size</Label>
                 <p className="text-sm text-muted-foreground">
@@ -343,7 +343,7 @@ export function GeneralSettingsForm({
             <Separator />
 
             {/* Language */}
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-2 @md:flex-row @md:items-center @md:justify-between">
               <div className="space-y-1">
                 <Label htmlFor="language" className="text-sm font-medium">
                   Language
@@ -371,7 +371,7 @@ export function GeneralSettingsForm({
             <Separator />
 
             {/* Header Title Preference */}
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-2 @md:flex-row @md:items-center @md:justify-between">
               <div className="space-y-1">
                 <Label htmlFor="header_title" className="text-sm font-medium">
                   Header Title Style
@@ -409,7 +409,7 @@ export function GeneralSettingsForm({
             <Separator />
 
             {/* Base Currency */}
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-2 @md:flex-row @md:items-center @md:justify-between">
               <div className="space-y-1">
                 <Label htmlFor="base_currency" className="text-sm font-medium">
                   Base Currency
@@ -436,7 +436,7 @@ export function GeneralSettingsForm({
               </Select>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-start md:justify-end md:flex-shrink-0 gap-2">
+          <CardFooter className="flex justify-start @md:justify-end @md:flex-shrink-0 gap-2">
             {/* Reset Button */}
             <Button variant="outline" onClick={handleResetPreferences} disabled={isSaving}>
               Reset to Defaults
@@ -459,7 +459,7 @@ export function GeneralSettingsForm({
             <CardDescription>Manage your privacy preferences and cookie settings</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-2 @md:flex-row @md:items-center @md:justify-between">
               <div className="space-y-1">
                 <Label className="text-sm font-medium">Cookie Preferences</Label>
                 <p className="text-sm text-muted-foreground">
@@ -474,7 +474,7 @@ export function GeneralSettingsForm({
                   setShowCookieDialog(true);
                 }}
                 disabled={isLoading}
-                className="w-full sm:w-auto"
+                className="w-full @md:w-auto"
               >
                 <Settings className="w-4 h-4 mr-2" />
                 Manage Cookies
@@ -497,14 +497,14 @@ export function GeneralSettingsForm({
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Password Security */}
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col gap-2 @md:flex-row @md:items-center @md:justify-between">
                 <div className="space-y-1">
                   <Label className="text-sm font-medium">Password</Label>
                   <p className="text-sm text-muted-foreground">Change your account password</p>
                 </div>
                 <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
                   <DialogTrigger asChild>
-                    <Button variant="outline" className="w-full sm:w-auto">
+                    <Button variant="outline" className="w-full @md:w-auto">
                       Change Password
                     </Button>
                   </DialogTrigger>
@@ -593,7 +593,7 @@ export function GeneralSettingsForm({
               <Separator />
 
               {/* Two-Factor Authentication */}
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col gap-2 @md:flex-row @md:items-center @md:justify-between">
                 <div className="space-y-1">
                   <Label className="text-sm font-medium">2FA Status</Label>
                   <p className="text-sm text-muted-foreground">
@@ -612,7 +612,7 @@ export function GeneralSettingsForm({
                   <Button
                     variant={twoFactorEnabled ? 'destructive' : 'default'}
                     onClick={handleTwoFactorToggle}
-                    className="w-full sm:w-auto"
+                    className="w-full @md:w-auto"
                   >
                     {twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA'}
                   </Button>
@@ -661,7 +661,7 @@ export function GeneralSettingsForm({
             ))}
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+          <div className="flex flex-col @md:flex-row gap-3 pt-4">
             <Button
               onClick={handleSaveCookiePreferences}
               className="flex-1"
