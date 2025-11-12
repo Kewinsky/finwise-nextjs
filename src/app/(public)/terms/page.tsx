@@ -1,311 +1,195 @@
 import { Metadata } from 'next';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Scale, Shield, AlertTriangle, FileText } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { appConfig } from '@/config/app';
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
-  description:
-    'Read our terms of service to understand the rules and guidelines for using our SaaS platform and services.',
+  description: 'Terms of service for using Finwise expense tracking platform.',
 };
-
-const termsSections = [
-  {
-    title: 'Acceptance of Terms',
-    icon: Scale,
-    description: 'By using our services, you agree to these terms',
-  },
-  {
-    title: 'Service Description',
-    icon: FileText,
-    description: 'What we provide and how our services work',
-  },
-  {
-    title: 'User Responsibilities',
-    icon: Shield,
-    description: 'Your obligations when using our platform',
-  },
-  {
-    title: 'Prohibited Uses',
-    icon: AlertTriangle,
-    description: 'Activities that are not allowed on our platform',
-  },
-];
 
 export default function TermsOfServicePage() {
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto max-w-4xl px-4 py-16">
+      <div className="container mx-auto max-w-4xl px-4 py-16 md:py-24">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold tracking-tight mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Terms of Service
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Terms of Service
+            </span>
           </h1>
-          <p className="text-xl text-muted-foreground">Last updated: January 15, 2024</p>
-        </div>
-
-        {/* Terms Overview */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-bold mb-8">Terms Overview</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {termsSections.map((section) => {
-              const Icon = section.icon;
-              return (
-                <Card key={section.title}>
-                  <CardHeader>
-                    <div className="flex items-center gap-3">
-                      <Icon className="w-6 h-6 text-purple-500" />
-                      <CardTitle className="text-lg">{section.title}</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription>{section.description}</CardDescription>
-                  </CardContent>
-                </Card>
-              );
+          <p className="text-muted-foreground">
+            Last updated:{' '}
+            {new Date().toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
             })}
-          </div>
+          </p>
         </div>
 
         {/* Terms Content */}
-        <div className="prose prose-gray max-w-none">
-          <Card className="mb-8">
+        <div className="space-y-6">
+          <Card>
             <CardHeader>
               <CardTitle>1. Acceptance of Terms</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                By accessing and using Your SaaS (&quot;the Service&quot;), you accept and agree to
-                be bound by the terms and provision of this agreement. If you do not agree to abide
-                by the above, please do not use this service.
-              </p>
-              <p className="text-muted-foreground">
-                These Terms of Service (&quot;Terms&quot;) govern your use of our website and
-                services operated by Your SaaS (&quot;us&quot;, &quot;we&quot;, or &quot;our&quot;).
+            <CardContent>
+              <p className="text-muted-foreground leading-relaxed">
+                By accessing and using {appConfig.app.name} (&quot;the Service&quot;), you accept
+                and agree to be bound by these Terms of Service. If you do not agree to these terms,
+                please do not use the service.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="mb-8">
+          <Card>
             <CardHeader>
               <CardTitle>2. Service Description</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                Your SaaS provides a platform for building and managing SaaS applications. Our
-                services include:
+            <CardContent>
+              <p className="text-muted-foreground leading-relaxed mb-4">
+                {appConfig.app.name} provides a platform for tracking expenses and income, analyzing
+                financial data, and receiving AI-powered financial insights. Our services include:
               </p>
-              <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                <li>Web-based application development tools</li>
-                <li>Database management and hosting services</li>
-                <li>API access and integration tools</li>
-                <li>User authentication and management</li>
-                <li>Billing and subscription management</li>
-                <li>Technical support and documentation</li>
+              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                <li>Expense and income tracking</li>
+                <li>Financial analytics and reporting</li>
+                <li>AI-powered financial insights</li>
+                <li>Account management</li>
+                <li>Data export capabilities</li>
               </ul>
             </CardContent>
           </Card>
 
-          <Card className="mb-8">
+          <Card>
             <CardHeader>
-              <CardTitle>3. User Accounts and Registration</CardTitle>
+              <CardTitle>3. User Accounts</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                To access certain features of our service, you must register for an account. You
-                agree to:
+            <CardContent>
+              <p className="text-muted-foreground leading-relaxed mb-4">
+                To access our service, you must register for an account. You agree to:
               </p>
-              <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                <li>Provide accurate, current, and complete information</li>
-                <li>Maintain and update your account information</li>
-                <li>Keep your password secure and confidential</li>
+              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                <li>Provide accurate and complete information</li>
+                <li>Maintain the security of your account</li>
                 <li>Accept responsibility for all activities under your account</li>
                 <li>Notify us immediately of any unauthorized use</li>
               </ul>
             </CardContent>
           </Card>
 
-          <Card className="mb-8">
+          <Card>
             <CardHeader>
-              <CardTitle>4. Acceptable Use Policy</CardTitle>
+              <CardTitle>4. Acceptable Use</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                You agree to use our service only for lawful purposes and in accordance with these
-                Terms. You agree not to use the service:
+            <CardContent>
+              <p className="text-muted-foreground leading-relaxed">
+                You agree to use our service only for lawful purposes. You may not use the service
+                to violate any laws, infringe on intellectual property rights, or engage in any
+                harmful or fraudulent activities.
               </p>
-              <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                <li>For any unlawful purpose or to solicit others to perform unlawful acts</li>
-                <li>
-                  To violate any international, federal, provincial, or state regulations, rules,
-                  laws, or local ordinances
-                </li>
-                <li>
-                  To infringe upon or violate our intellectual property rights or the intellectual
-                  property rights of others
-                </li>
-                <li>
-                  To harass, abuse, insult, harm, defame, slander, disparage, intimidate, or
-                  discriminate
-                </li>
-                <li>To submit false or misleading information</li>
-                <li>To upload or transmit viruses or any other type of malicious code</li>
-                <li>To spam, phish, pharm, pretext, spider, crawl, or scrape</li>
-                <li>For any obscene or immoral purpose</li>
-                <li>To interfere with or circumvent the security features of the service</li>
-              </ul>
             </CardContent>
           </Card>
 
-          <Card className="mb-8">
+          <Card>
             <CardHeader>
               <CardTitle>5. Payment Terms</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                Our service is offered on a subscription basis. Payment terms include:
-              </p>
-              <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                <li>Subscription fees are billed in advance on a monthly or annual basis</li>
-                <li>All fees are non-refundable except as required by law</li>
-                <li>We may change our pricing with 30 days&apos; notice</li>
-                <li>You are responsible for all taxes associated with your use of the service</li>
-                <li>Failure to pay may result in service suspension or termination</li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>6. Intellectual Property Rights</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                The service and its original content, features, and functionality are and will
-                remain the exclusive property of Your SaaS and its licensors. The service is
-                protected by copyright, trademark, and other laws.
-              </p>
-              <p className="text-muted-foreground">
-                You retain ownership of any content you create using our service, subject to our
-                right to use such content as necessary to provide the service.
+            <CardContent>
+              <p className="text-muted-foreground leading-relaxed">
+                Our service is offered on a subscription basis. Subscription fees are billed in
+                advance. All fees are non-refundable except as required by law. We may change our
+                pricing with 30 days&apos; notice.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="mb-8">
+          <Card>
             <CardHeader>
-              <CardTitle>7. Privacy Policy</CardTitle>
+              <CardTitle>6. Intellectual Property</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                Your privacy is important to us. Please review our Privacy Policy, which also
-                governs your use of the service, to understand our practices.
+            <CardContent>
+              <p className="text-muted-foreground leading-relaxed">
+                The service and its content are protected by copyright, trademark, and other laws.
+                You retain ownership of your data, subject to our right to use it as necessary to
+                provide the service.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="mb-8">
+          <Card>
             <CardHeader>
-              <CardTitle>8. Service Availability</CardTitle>
+              <CardTitle>7. Privacy</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                We strive to maintain high service availability but do not guarantee uninterrupted
-                access. We may:
-              </p>
-              <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                <li>Perform scheduled maintenance with advance notice</li>
-                <li>Experience unscheduled downtime due to technical issues</li>
-                <li>Modify or discontinue features with reasonable notice</li>
-                <li>Suspend service for violations of these Terms</li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>9. Limitation of Liability</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                In no event shall Your SaaS, nor its directors, employees, partners, agents,
-                suppliers, or affiliates, be liable for any indirect, incidental, special,
-                consequential, or punitive damages, including without limitation, loss of profits,
-                data, use, goodwill, or other intangible losses, resulting from your use of the
-                service.
+            <CardContent>
+              <p className="text-muted-foreground leading-relaxed">
+                Your privacy is important to us. Please review our{' '}
+                <a href="/privacy" className="text-blue-600 dark:text-purple-400 hover:underline">
+                  Privacy Policy
+                </a>{' '}
+                to understand how we handle your data.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="mb-8">
+          <Card>
             <CardHeader>
-              <CardTitle>10. Termination</CardTitle>
+              <CardTitle>8. Limitation of Liability</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                We may terminate or suspend your account and bar access to the service immediately,
-                without prior notice or liability, under our sole discretion, for any reason
-                whatsoever and without limitation, including but not limited to a breach of the
-                Terms.
-              </p>
-              <p className="text-muted-foreground">
-                You may terminate your account at any time by contacting us or using the account
-                termination features in your dashboard.
+            <CardContent>
+              <p className="text-muted-foreground leading-relaxed">
+                {appConfig.app.name} shall not be liable for any indirect, incidental, special,
+                consequential, or punitive damages resulting from your use of the service.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="mb-8">
+          <Card>
             <CardHeader>
-              <CardTitle>11. Governing Law</CardTitle>
+              <CardTitle>9. Termination</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                These Terms shall be interpreted and governed by the laws of the State of
-                California, without regard to its conflict of law provisions. Our failure to enforce
-                any right or provision of these Terms will not be considered a waiver of those
-                rights.
+            <CardContent>
+              <p className="text-muted-foreground leading-relaxed">
+                We may terminate or suspend your account at any time for violations of these Terms.
+                You may terminate your account at any time through your account settings or by
+                contacting us.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="mb-8">
+          <Card>
             <CardHeader>
-              <CardTitle>12. Changes to Terms</CardTitle>
+              <CardTitle>10. Changes to Terms</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                We reserve the right, at our sole discretion, to modify or replace these Terms at
-                any time. If a revision is material, we will provide at least 30 days&apos; notice
-                prior to any new terms taking effect.
-              </p>
-              <p className="text-muted-foreground">
-                By continuing to access or use our service after those revisions become effective,
-                you agree to be bound by the revised terms.
+            <CardContent>
+              <p className="text-muted-foreground leading-relaxed">
+                We reserve the right to modify these Terms at any time. Material changes will be
+                communicated with at least 30 days&apos; notice. Continued use of the service after
+                changes constitutes acceptance of the revised terms.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="mb-8">
+          <Card>
             <CardHeader>
-              <CardTitle>13. Contact Information</CardTitle>
+              <CardTitle>11. Contact Us</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                If you have any questions about these Terms of Service, please contact us at:
+            <CardContent>
+              <p className="text-muted-foreground leading-relaxed mb-4">
+                If you have any questions about these Terms, please contact us:
               </p>
               <div className="bg-muted/50 p-4 rounded-lg">
-                <p className="font-medium">{appConfig.app.name} Legal Team</p>
+                <p className="font-medium mb-2">{appConfig.app.name}</p>
                 <p>
                   Email:{' '}
                   <a
-                    href={`mailto:${appConfig.contact.generalEmail}`}
-                    className="text-purple-500 hover:underline"
+                    href={`mailto:${appConfig.contact.email}`}
+                    className="text-blue-600 dark:text-purple-400 hover:underline"
                   >
-                    {appConfig.contact.generalEmail}
+                    {appConfig.contact.email}
                   </a>
                 </p>
-                <p>Address: 123 Market Street, Suite 100, San Francisco, CA 94105</p>
               </div>
             </CardContent>
           </Card>

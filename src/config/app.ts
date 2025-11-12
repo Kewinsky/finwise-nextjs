@@ -146,7 +146,8 @@ export const APP_URLS = {
 export const CONTACT_INFO = {
   supportEmail: 'support@finwise.app',
   salesEmail: 'sales@finwise.app',
-  generalEmail: 'hello@finwise.app',
+  generalEmail: 'hi@finwise.com',
+  email: 'hi@finwise.com', // Primary contact email
   phone: '+1 (555) 123-4567',
 } as const;
 

@@ -30,7 +30,8 @@ const defaultNavigationLinks: NavLink[] = [
   { href: '/', label: 'Home' },
   { href: '#features', label: 'Features' },
   { href: '/pricing', label: 'Pricing' },
-  { href: '/about', label: 'About Us' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
 ];
 
 export function Navbar({

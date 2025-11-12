@@ -12,16 +12,10 @@ const footerLinks = {
   product: [
     { name: 'Features', href: '#features' },
     { name: 'Pricing', href: '/pricing' },
-    { name: 'Documentation', href: appConfig.urls.docs },
   ],
   company: [
     { name: 'About Us', href: '/about' },
-    { name: 'Blog', href: '/blog' },
-    { name: 'Help', href: '/help' },
-  ],
-  support: [
-    { name: 'Help Center', href: '/help' },
-    { name: 'Contact', href: `mailto:${appConfig.contact.supportEmail}` },
+    { name: 'Contact', href: '/contact' },
   ],
   legal: [
     { name: 'Privacy Policy', href: appConfig.urls.legal.privacy },
@@ -49,15 +43,15 @@ export function Footer({
     <footer className="border-t bg-background">
       <div className="container mx-auto max-w-screen-2xl px-4">
         {/* Main footer content */}
-        <div className="py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
+        <div className="py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand section */}
           <div className="lg:col-span-2">
             <div className="mb-4">
               <BrandLogo brandName={brandName} href="/" />
             </div>
             <p className="text-muted-foreground mb-6 max-w-sm">
-              Build amazing SaaS applications with our modern, flexible template. Get started in
-              minutes and focus on what matters most.
+              AI-powered expense and income tracking for smarter financial decisions. Simple,
+              secure, and designed for modern life.
             </p>
 
             {/* Social links */}
@@ -102,22 +96,6 @@ export function Footer({
             <h3 className="font-semibold mb-4">Company</h3>
             <ul className="flex flex-col gap-4">
               {footerLinks.company.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className="text-muted-foreground hover:text-purple-500 transition-colors text-sm"
-                >
-                  {link.name}
-                </Link>
-              ))}
-            </ul>
-          </div>
-
-          {/* Support links */}
-          <div>
-            <h3 className="font-semibold mb-4">Support</h3>
-            <ul className="flex flex-col gap-4">
-              {footerLinks.support.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
