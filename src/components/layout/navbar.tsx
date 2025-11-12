@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/themes/theme-toggle';
 import { Menu, X } from 'lucide-react';
@@ -29,9 +30,9 @@ interface NavbarProps {
 const defaultNavigationLinks: NavLink[] = [
   { href: '/', label: 'Home' },
   { href: '#features', label: 'Features' },
-  { href: '/pricing', label: 'Pricing' },
-  { href: '/about', label: 'About' },
-  { href: '/contact', label: 'Contact' },
+  { href: '#how-it-works', label: 'How It Works' },
+  { href: '#pricing', label: 'Pricing' },
+  { href: '#faq', label: 'FAQ' },
 ];
 
 export function Navbar({
@@ -45,6 +46,16 @@ export function Navbar({
   showThemeToggle = true,
 }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const pathname = usePathname();
+  const isHomePage = pathname === '/';
+
+  // Helper function to get the correct href (add / if not on home page for hash links)
+  const getLinkHref = (href: string) => {
+    if (href.startsWith('#')) {
+      return isHomePage ? href : `/${href}`;
+    }
+    return href;
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 shadow-sm">
@@ -67,7 +78,7 @@ export function Navbar({
               {navigationLinks.map((link) => (
                 <Link
                   key={link.href}
-                  href={link.href}
+                  href={getLinkHref(link.href)}
                   className="text-sm font-medium text-foreground hover:text-purple-500 px-4 py-2 rounded-full transition-all duration-300 relative group"
                 >
                   {link.label}
@@ -127,7 +138,7 @@ export function Navbar({
               {navigationLinks.map((link, index) => (
                 <Link
                   key={link.href}
-                  href={link.href}
+                  href={getLinkHref(link.href)}
                   className={`text-sm font-medium px-4 py-2 rounded-lg w-full text-center transition-all duration-300 text-foreground hover:text-purple-500 hover:bg-muted ${
                     index === navigationLinks.length - 1 ? 'mb-2' : ''
                   }`}

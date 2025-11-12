@@ -21,7 +21,6 @@ interface HeroSectionProps {
 }
 
 export const HeroSection = ({
-  heading = 'Take Control of Your Finances',
   description = 'Track expenses, analyze income, and get AI-powered insights to make smarter financial decisions. Simple, secure, and designed for modern life.',
   buttons = {
     primary: {
@@ -125,20 +124,10 @@ export const HeroSection = ({
             id="hero-heading"
             className="text-5xl lg:text-6xl xl:text-7xl font-bold mb-8 leading-tight"
           >
-            <span className="block">{heading.split(' ').slice(0, -1).join(' ')} </span>
-            <motion.span
-              className="block bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent bg-[length:200%_auto]"
-              animate={{
-                backgroundPosition: ['0% center', '200% center', '0% center'],
-              }}
-              transition={{
-                duration: 5,
-                repeat: Infinity,
-                ease: 'linear',
-              }}
-            >
-              {heading.split(' ').slice(-1)[0]}
-            </motion.span>
+            <span className="block">Take Control of Your </span>
+            <span className="block bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+              Finances
+            </span>
           </motion.h1>
 
           {/* Subheading */}

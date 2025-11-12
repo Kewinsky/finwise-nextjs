@@ -1,10 +1,13 @@
 import { Footer } from '@/components/layout/footer';
 import { Navbar } from '@/components/layout/navbar';
 import { HeroSection } from '@/components/landing/hero-section';
+import { ProblemSection } from '@/components/landing/problem-section';
+import { SolutionSection } from '@/components/landing/solution-section';
+import { HowItWorksSection } from '@/components/landing/how-it-works-section';
 import { FeaturesSection } from '@/components/landing/features-section';
-import { StatsSection } from '@/components/landing/stats-section';
-import { BenefitsSection } from '@/components/landing/benefits-section';
 import { TestimonialsSection } from '@/components/landing/testimonials-section';
+import { PricingSection } from '@/components/landing/pricing-section';
+import { FAQSection } from '@/components/landing/faq-section';
 import { CTASection } from '@/components/landing/cta-section';
 
 export default function Home() {
@@ -13,10 +16,13 @@ export default function Home() {
       <Navbar />
       <main id="main-content" className="flex-1">
         <HeroSection />
+        <ProblemSection />
+        <SolutionSection />
+        <HowItWorksSection />
         <FeaturesSection />
-        <StatsSection />
-        <BenefitsSection />
         <TestimonialsSection />
+        <PricingSection />
+        <FAQSection />
         <CTASection />
       </main>
       <Footer />

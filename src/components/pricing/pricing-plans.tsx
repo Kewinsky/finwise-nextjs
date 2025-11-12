@@ -32,11 +32,7 @@ export function PricingPlans() {
     }
   };
 
-  const getButtonVariant = () => {
-    return 'default' as const;
-  };
-
-  // Convert plans to pricing format
+  // Convert plans to pricing format using appConfig
   const pricingPlans = Object.entries(appConfig.subscription.plans).map(([key, plan]) => ({
     name: plan.name,
     price: plan.price === 0 ? 'Free' : `${appConfig.settings.currencySymbol}${plan.price}`,
@@ -80,7 +76,7 @@ export function PricingPlans() {
                       ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white'
                       : ''
                   }`}
-                  variant={plan.recommended ? 'default' : getButtonVariant()}
+                  variant={plan.recommended ? 'default' : 'outline'}
                   size="lg"
                   onClick={() => handlePlanAction(plan.planType)}
                 >

@@ -7,6 +7,7 @@ import { motion } from 'motion/react';
 export const CTASection = () => {
   return (
     <section
+      id="get-started"
       className="py-24 bg-gradient-to-br from-background via-muted/20 to-blue-50/30 dark:from-background dark:via-muted/10 dark:to-blue-950/5 relative overflow-hidden"
       aria-labelledby="cta-heading"
     >

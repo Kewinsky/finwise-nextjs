@@ -59,11 +59,15 @@ export const FeaturesSection = () => {
   return (
     <section
       id="features"
-      className="py-24 bg-gradient-to-br from-background via-muted/10 to-blue-50/20 dark:from-background dark:via-muted/5 dark:to-blue-950/10"
+      className="py-24 bg-gradient-to-br from-background via-muted/20 to-blue-50/30 dark:from-background dark:via-muted/10 dark:to-blue-950/5 relative overflow-hidden"
       aria-labelledby="features-heading"
     >
       {/* Modern background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Radial gradient overlays */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.1),transparent_50%)] dark:bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.15),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.1),transparent_50%)] dark:bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.15),transparent_50%)]" />
+
         {/* Animated floating orbs */}
         <motion.div
           className="absolute top-20 right-20 w-32 h-32 bg-gradient-to-r from-blue-500/8 to-purple-500/8 dark:from-blue-400/12 dark:to-purple-400/12 rounded-full blur-2xl"
@@ -104,10 +108,6 @@ export const FeaturesSection = () => {
             delay: 0.5,
           }}
         />
-
-        {/* Mesh gradient overlay */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.08),transparent_50%)] dark:bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.12),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(147,51,234,0.08),transparent_50%)] dark:bg-[radial-gradient(circle_at_80%_70%,rgba(147,51,234,0.12),transparent_50%)]" />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
