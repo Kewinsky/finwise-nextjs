@@ -60,7 +60,7 @@ export const TestimonialsSection = () => {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-4 md:gap-6">
           {testimonials.map((testimonial, index) => (
             <motion.div
               key={index}
@@ -69,7 +69,7 @@ export const TestimonialsSection = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
             >
-              <Card className="bg-muted/80 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-border/50 hover:border-blue-600/30 dark:hover:border-purple-500/30 shadow-lg group h-full relative overflow-hidden">
+              <Card className="bg-muted/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-border/50 hover:border-blue-600/30 dark:hover:border-purple-500/30 shadow-lg group h-full relative overflow-hidden">
                 {/* Gradient overlay on hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 

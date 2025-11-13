@@ -1,6 +1,6 @@
 'use client';
 
-import { Zap, Shield, Users, Code, Smartphone, Palette } from 'lucide-react';
+import { Zap, Shield, Code, Palette } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'motion/react';
 
@@ -10,48 +10,24 @@ const features = [
     title: 'Smart AI Insights',
     description:
       'Get personalized financial insights powered by AI. Understand your spending patterns and discover opportunities to save.',
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50 dark:bg-blue-950/20',
-  },
-  {
-    icon: Shield,
-    title: 'Bank-Level Security',
-    description:
-      'Your financial data is protected with enterprise-grade security. End-to-end encryption and secure cloud storage.',
-    color: 'text-green-600',
-    bgColor: 'bg-green-50 dark:bg-green-950/20',
-  },
-  {
-    icon: Users,
-    title: 'Team Collaboration',
-    description:
-      'Share financial insights with family or business partners. Collaborate on budgets and financial goals together.',
-    color: 'text-purple-600',
-    bgColor: 'bg-purple-50 dark:bg-purple-950/20',
   },
   {
     icon: Code,
     title: 'Automated Tracking',
     description:
       'Connect your bank accounts and credit cards for automatic transaction import. No more manual data entry.',
-    color: 'text-orange-600',
-    bgColor: 'bg-orange-50 dark:bg-orange-950/20',
   },
   {
-    icon: Smartphone,
-    title: 'Mobile Optimized',
+    icon: Shield,
+    title: 'Bank-Level Security',
     description:
-      'Track expenses on the go with our mobile-first design. Add transactions instantly, anywhere, anytime.',
-    color: 'text-pink-600',
-    bgColor: 'bg-pink-50 dark:bg-pink-950/20',
+      'Your financial data is protected with enterprise-grade security. End-to-end encryption and secure cloud storage.',
   },
   {
     icon: Palette,
     title: 'Beautiful Analytics',
     description:
       'Visualize your financial health with intuitive charts and reports. Make data-driven decisions with confidence.',
-    color: 'text-indigo-600',
-    bgColor: 'bg-indigo-50 dark:bg-indigo-950/20',
   },
 ];
 
@@ -130,7 +106,7 @@ export const FeaturesSection = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 max-w-4xl mx-auto">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
@@ -141,19 +117,27 @@ export const FeaturesSection = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
               >
-                <Card className="bg-muted/80 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-border/50 hover:border-blue-600/30 dark:hover:border-purple-500/30 shadow-lg group h-full relative overflow-hidden">
+                <Card className="bg-muted/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-border/50 hover:border-blue-600/30 dark:hover:border-purple-500/30 shadow-lg group h-full relative overflow-hidden">
                   {/* Gradient overlay on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+                  {/* Decorative corner accent */}
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-600/10 to-purple-600/10 rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                   <CardHeader className="pb-4 relative z-10">
                     <motion.div
-                      className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg"
+                      className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg relative"
                       whileHover={{ scale: 1.15, rotate: 5 }}
                       aria-hidden="true"
                     >
-                      <Icon className="h-7 w-7 text-white" aria-label={`${feature.title} icon`} />
+                      {/* Glow effect */}
+                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 opacity-0 group-hover:opacity-30 blur-xl transition-opacity duration-300" />
+                      <Icon
+                        className="h-8 w-8 text-white relative z-10"
+                        aria-label={`${feature.title} icon`}
+                      />
                     </motion.div>
-                    <CardTitle className="text-xl font-semibold group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300">
+                    <CardTitle className="text-xl font-semibold mb-2 group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300">
                       {feature.title}
                     </CardTitle>
                   </CardHeader>

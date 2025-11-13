@@ -74,7 +74,7 @@ export const PricingSection = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           {plans.map((plan, index) => (
             <motion.div
               key={plan.name}
@@ -84,10 +84,10 @@ export const PricingSection = () => {
               transition={{ duration: 0.6, delay: index * 0.1 }}
             >
               <Card
-                className={`relative h-full ${
+                className={`relative h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
                   plan.popular
-                    ? 'border-2 border-blue-600 dark:border-purple-500 shadow-xl scale-105 ring-2 ring-blue-600/20 dark:ring-purple-500/20'
-                    : 'border-border'
+                    ? 'border-2 border-blue-600 dark:border-purple-500 shadow-xl md:scale-105 ring-2 ring-blue-600/20 dark:ring-purple-500/20'
+                    : 'border-border hover:border-blue-600/30 dark:hover:border-purple-500/30'
                 }`}
               >
                 {plan.popular && (

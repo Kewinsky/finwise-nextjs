@@ -60,7 +60,7 @@ export const ProblemSection = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {problems.map((problem, index) => {
             const Icon = problem.icon;
             return (
@@ -72,7 +72,7 @@ export const ProblemSection = () => {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 className="relative"
               >
-                <div className="bg-muted/50 backdrop-blur-sm rounded-2xl p-8 border border-border/50 hover:border-red-500/30 dark:hover:border-orange-500/30 transition-all duration-300 hover:shadow-lg h-full">
+                <div className="rounded-2xl p-4 md:p-6">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500/10 to-orange-500/10 dark:from-red-500/20 dark:to-orange-500/20 flex items-center justify-center flex-shrink-0">
                       <Icon className="w-6 h-6 text-red-600 dark:text-orange-500" />

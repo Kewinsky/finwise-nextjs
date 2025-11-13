@@ -61,7 +61,7 @@ export const SolutionSection = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {solutions.map((solution, index) => {
             const Icon = solution.icon;
             return (
@@ -71,18 +71,18 @@ export const SolutionSection = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="relative group"
+                className="relative"
               >
-                <div className="bg-muted/80 backdrop-blur-sm rounded-2xl p-8 border border-border/50 hover:border-blue-600/30 dark:hover:border-purple-500/30 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full">
+                <div className="rounded-2xl p-4 md:p-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                      <Icon className="w-6 h-6 text-white" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20 flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-6 h-6 text-blue-600 dark:text-purple-500" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-xl font-semibold text-foreground mb-3 group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300">
+                      <h3 className="text-xl font-semibold text-foreground mb-3">
                         {solution.title}
                       </h3>
-                      <p className="text-muted-foreground leading-relaxed group-hover:text-foreground/90 transition-colors duration-300">
+                      <p className="text-muted-foreground leading-relaxed">
                         {solution.description}
                       </p>
                     </div>
