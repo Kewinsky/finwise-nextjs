@@ -2,7 +2,7 @@
 <b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography"
            xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography">
 
-  <!-- Dokumentacje (InternetSite) -->
+  <!-- Dokumentacje -->
 
   <b:Source>
     <b:Tag>NextJS</b:Tag>
@@ -10,6 +10,7 @@
     <b:Author><b:Corporate>Next.js Team</b:Corporate></b:Author>
     <b:Title>Next.js Documentation</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-NextJS}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -18,6 +19,7 @@
     <b:Author><b:Corporate>Supabase</b:Corporate></b:Author>
     <b:Title>Supabase Documentation</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-Supabase}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -26,6 +28,7 @@
     <b:Author><b:Corporate>Stripe</b:Corporate></b:Author>
     <b:Title>Stripe Documentation</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-Stripe}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -34,6 +37,7 @@
     <b:Author><b:Corporate>OpenAI</b:Corporate></b:Author>
     <b:Title>OpenAI API Documentation</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-OpenAI}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -42,6 +46,7 @@
     <b:Author><b:Corporate>Microsoft TypeScript Team</b:Corporate></b:Author>
     <b:Title>TypeScript Documentation</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-TypeScript}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -50,6 +55,7 @@
     <b:Author><b:Corporate>React Team</b:Corporate></b:Author>
     <b:Title>React Documentation</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-React}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -58,6 +64,7 @@
     <b:Author><b:Corporate>Tailwind Labs</b:Corporate></b:Author>
     <b:Title>Tailwind CSS Documentation</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-TailwindCSS}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -66,6 +73,7 @@
     <b:Author><b:Corporate>PostgreSQL Global Development Group</b:Corporate></b:Author>
     <b:Title>PostgreSQL Documentation</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-PostgreSQL}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -74,6 +82,7 @@
     <b:Author><b:Corporate>Vercel</b:Corporate></b:Author>
     <b:Title>Vercel Documentation</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-Vercel}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -82,6 +91,7 @@
     <b:Author><b:Corporate>Upstash</b:Corporate></b:Author>
     <b:Title>Upstash Documentation</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-Upstash}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -90,6 +100,7 @@
     <b:Author><b:Corporate>Pino Team</b:Corporate></b:Author>
     <b:Title>Pino Logger Documentation</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-Pino}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -98,6 +109,7 @@
     <b:Author><b:Corporate>Sentry</b:Corporate></b:Author>
     <b:Title>Sentry Documentation</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-Sentry}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -106,6 +118,7 @@
     <b:Author><b:Corporate>shadcn</b:Corporate></b:Author>
     <b:Title>shadcn/ui Documentation</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-Shadcn}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -114,6 +127,7 @@
     <b:Author><b:Corporate>Zod</b:Corporate></b:Author>
     <b:Title>Zod Documentation</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-Zod}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -122,6 +136,7 @@
     <b:Author><b:Corporate>Vitest</b:Corporate></b:Author>
     <b:Title>Vitest Documentation</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-Vitest}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -130,6 +145,7 @@
     <b:Author><b:Corporate>Microsoft</b:Corporate></b:Author>
     <b:Title>Playwright Documentation</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-Playwright}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -138,6 +154,7 @@
     <b:Author><b:Corporate>Google Developers</b:Corporate></b:Author>
     <b:Title>OAuth 2.0 Documentation</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-OAuth2Doc}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -146,6 +163,7 @@
     <b:Author><b:Corporate>Cursor</b:Corporate></b:Author>
     <b:Title>Cursor Documentation</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-Cursor}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -154,6 +172,7 @@
     <b:Author><b:Corporate>W3C</b:Corporate></b:Author>
     <b:Title>WCAG 2.1 Guidelines</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-WCAG}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -162,6 +181,7 @@
     <b:Author><b:Corporate>OWASP</b:Corporate></b:Author>
     <b:Title>OWASP Top 10</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-OWASP}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -170,6 +190,7 @@
     <b:Author><b:Corporate>IETF</b:Corporate></b:Author>
     <b:Title>JWT RFC 7519</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-JWTDoc}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -178,6 +199,7 @@
     <b:Author><b:Corporate>Mozilla</b:Corporate></b:Author>
     <b:Title>MDN Web Security Documentation</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-MDNWebSec}</b:Guid>
   </b:Source>
 
   <!-- Książki & artykuły naukowe -->
@@ -192,6 +214,7 @@
     </b:Author>
     <b:Title>Clean Architecture: A Craftsman's Guide to Software Structure and Design</b:Title>
     <b:Year>2017</b:Year>
+    <b:Guid>{GUID-CleanArch}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -204,6 +227,7 @@
     </b:Author>
     <b:Title>Finanse gospodarstw domowych i finanse osobiste</b:Title>
     <b:Year>2011</b:Year>
+    <b:Guid>{GUID-Beskid2011}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -216,6 +240,7 @@
     </b:Author>
     <b:Title>Zmiany świadomości ekonomicznej w polskich gospodarstwach domowych</b:Title>
     <b:Year>2012</b:Year>
+    <b:Guid>{GUID-Sztuczka2012}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -228,6 +253,7 @@
     </b:Author>
     <b:Title>Model SaaS jako forma zdalnej eksploatacji aplikacji dla przedsiębiorstw</b:Title>
     <b:Year>2010</b:Year>
+    <b:Guid>{GUID-Dziembek2010}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -238,8 +264,9 @@
         <b:Person><b:Last>Małyszko</b:Last><b:First>Michał</b:First></b:Person>
       </b:NameList>
     </b:Author>
-    <b:Title>SaaS jako metoda świadczenia e-usług</b:Title>
+    <b:Title>Saas jako metoda świadczenia e-usług</b:Title>
     <b:Year>2008</b:Year>
+    <b:Guid>{GUID-Malyszko2008}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -254,6 +281,7 @@
     </b:Author>
     <b:Title>Financial Intelligence</b:Title>
     <b:Year>2013</b:Year>
+    <b:Guid>{GUID-FinInt2013}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -267,6 +295,7 @@
     </b:Author>
     <b:Title>Modern Front End Web Architectures with React.Js and Next.Js</b:Title>
     <b:Year>2022</b:Year>
+    <b:Guid>{GUID-Lazuardy2022}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -280,6 +309,7 @@
     </b:Author>
     <b:Title>The FinTech Book</b:Title>
     <b:Year>2016</b:Year>
+    <b:Guid>{GUID-FinTechBook2016}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -294,6 +324,7 @@
     </b:Author>
     <b:Title>Data Science and AI in FinTech</b:Title>
     <b:Year>2021</b:Year>
+    <b:Guid>{GUID-CaoYangYu2021Book}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -307,6 +338,7 @@
     </b:Author>
     <b:Title>How AI-driven Robo-Advisors Impact Investment Decision-making and Portfolio Performance in the Financial Sector</b:Title>
     <b:Year>2024</b:Year>
+    <b:Guid>{GUID-SyedJanamolla2024}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -319,6 +351,7 @@
     </b:Author>
     <b:Title>AI in Finance: Challenges, Techniques, and Opportunities</b:Title>
     <b:Year>2021</b:Year>
+    <b:Guid>{GUID-CaoAIinFinance2021}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -332,6 +365,7 @@
     </b:Author>
     <b:Title>Artificial Intelligence In Personal Finance Management: Opportunities And Challenges</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-GoraiMaurya2025}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -346,6 +380,7 @@
     </b:Author>
     <b:Title>Artificial Intelligence in Financial Forecasting: Accuracy and Limitations</b:Title>
     <b:Year>2025</b:Year>
+    <b:Guid>{GUID-WasiuEtAl2025}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -358,6 +393,7 @@
     </b:Author>
     <b:Title>Data Visualization: A Practical Introduction</b:Title>
     <b:Year>2019</b:Year>
+    <b:Guid>{GUID-Healy2019}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -371,6 +407,7 @@
     </b:Author>
     <b:Title>Nudge: Improving Decisions About Health, Wealth, and Happiness</b:Title>
     <b:Year>2008</b:Year>
+    <b:Guid>{GUID-ThalerSunstein2008}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -383,6 +420,7 @@
     </b:Author>
     <b:Title>Designing Data-Intensive Applications</b:Title>
     <b:Year>2017</b:Year>
+    <b:Guid>{GUID-Kleppmann2017}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -396,6 +434,7 @@
     </b:Author>
     <b:Title>Data Science for Business</b:Title>
     <b:Year>2013</b:Year>
+    <b:Guid>{GUID-ProvostFawcett2013}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -410,6 +449,7 @@
     </b:Author>
     <b:Title>Cloud Computing: Concepts, Technology &amp; Architecture</b:Title>
     <b:Year>2013</b:Year>
+    <b:Guid>{GUID-Erl2013}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -422,6 +462,7 @@
     </b:Author>
     <b:Title>Ethics of Artificial Intelligence</b:Title>
     <b:Year>2020</b:Year>
+    <b:Guid>{GUID-Muller2020}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -434,6 +475,7 @@
     </b:Author>
     <b:Title>FinTech Adoption and Consumer Behavior</b:Title>
     <b:Year>2018</b:Year>
+    <b:Guid>{GUID-Jung2018}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -446,6 +488,7 @@
     </b:Author>
     <b:Title>Personalization, Data Analytics and User Engagement in Financial Applications</b:Title>
     <b:Year>2021</b:Year>
+    <b:Guid>{GUID-Hendershott2021}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -460,6 +503,7 @@
     </b:Author>
     <b:Title>Predictive Analytics for Personal Finance</b:Title>
     <b:Year>2020</b:Year>
+    <b:Guid>{GUID-CaoYangYu2020}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -472,6 +516,7 @@
     </b:Author>
     <b:Title>Behavioral Biases in Personal Financial Decision-Making</b:Title>
     <b:Year>2019</b:Year>
+    <b:Guid>{GUID-Lim2019}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -484,6 +529,7 @@
     </b:Author>
     <b:Title>The Design of Everyday Things (Revised Edition)</b:Title>
     <b:Year>2013</b:Year>
+    <b:Guid>{GUID-Norman2013}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -496,6 +542,7 @@
     </b:Author>
     <b:Title>The Elements of User Experience: User-Centered Design for the Web and Beyond</b:Title>
     <b:Year>2010</b:Year>
+    <b:Guid>{GUID-Garrett2010}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -504,6 +551,7 @@
     <b:Author><b:Corporate>European Banking Authority</b:Corporate></b:Author>
     <b:Title>Guidelines on ICT and security risk management</b:Title>
     <b:Year>2020</b:Year>
+    <b:Guid>{GUID-EBA2020}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -517,6 +565,7 @@
     </b:Author>
     <b:Title>Security in Computing</b:Title>
     <b:Year>2015</b:Year>
+    <b:Guid>{GUID-Pfleeger2015}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -529,6 +578,7 @@
     </b:Author>
     <b:Title>Security Engineering: A Guide to Building Dependable Distributed Systems</b:Title>
     <b:Year>2020</b:Year>
+    <b:Guid>{GUID-Anderson2020}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -542,6 +592,7 @@
     </b:Author>
     <b:Title>The Future of Finance: The Impact of FinTech, AI, and Crypto on Financial Services</b:Title>
     <b:Year>2020</b:Year>
+    <b:Guid>{GUID-ArslanianFischer2020}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -550,6 +601,7 @@
     <b:Author><b:Corporate>IETF</b:Corporate></b:Author>
     <b:Title>The OAuth 2.0 Authorization Framework (RFC 6749)</b:Title>
     <b:Year>2012</b:Year>
+    <b:Guid>{GUID-OAuth2RFC6749}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -562,6 +614,7 @@
     </b:Author>
     <b:Title>Monetization Models and Consumer Behavior in Digital Services</b:Title>
     <b:Year>2017</b:Year>
+    <b:Guid>{GUID-Leong2017}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -574,6 +627,7 @@
     </b:Author>
     <b:Title>Pricing Transparency and Trust in Financial Platforms</b:Title>
     <b:Year>2019</b:Year>
+    <b:Guid>{GUID-Hua2019}</b:Guid>
   </b:Source>
 
 </b:Sources>
