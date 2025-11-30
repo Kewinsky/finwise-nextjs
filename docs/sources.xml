@@ -1,2 +1,580 @@
 <?xml version="1.0"?>
-<b:Sources SelectedStyle="" xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography"><b:Source><b:Tag>NextJS</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>Next.js Team</b:Corporate></b:Author><b:Title>Next.js Documentation</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>Supabase</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>Supabase</b:Corporate></b:Author><b:Title>Supabase Documentation</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>Stripe</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>Stripe</b:Corporate></b:Author><b:Title>Stripe Documentation</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>OpenAI</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>OpenAI</b:Corporate></b:Author><b:Title>OpenAI API Documentation</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>TypeScript</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>Microsoft TypeScript Team</b:Corporate></b:Author><b:Title>TypeScript Documentation</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>React</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>React Team</b:Corporate></b:Author><b:Title>React Documentation</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>Tailwind</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>Tailwind Labs</b:Corporate></b:Author><b:Title>Tailwind CSS Documentation</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>PostgreSQL</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>PostgreSQL Global Development Group</b:Corporate></b:Author><b:Title>PostgreSQL Documentation</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>Vercel</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>Vercel</b:Corporate></b:Author><b:Title>Vercel Documentation</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>Upstash</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>Upstash</b:Corporate></b:Author><b:Title>Upstash Documentation</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>Pino</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>Pino Team</b:Corporate></b:Author><b:Title>Pino Logger Documentation</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>Sentry</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>Sentry</b:Corporate></b:Author><b:Title>Sentry Documentation</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>Shadcn</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>shadcn</b:Corporate></b:Author><b:Title>shadcn/ui Documentation</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>Zod</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>Zod</b:Corporate></b:Author><b:Title>Zod Documentation</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>Vitest</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>Vitest</b:Corporate></b:Author><b:Title>Vitest Documentation</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>Playwright</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>Microsoft</b:Corporate></b:Author><b:Title>Playwright Documentation</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>OAuth2</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>Google Developers</b:Corporate></b:Author><b:Title>OAuth 2.0 Documentation</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>Cursor</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>Cursor</b:Corporate></b:Author><b:Title>Cursor Documentation</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>WCAG</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>W3C</b:Corporate></b:Author><b:Title>WCAG 2.1 Guidelines</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>OWASP</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>OWASP</b:Corporate></b:Author><b:Title>OWASP Top 10</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>JWT</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>IETF</b:Corporate></b:Author><b:Title>JWT RFC 7519</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>MDN</b:Tag><b:SourceType>InternetSite</b:SourceType><b:Author><b:Corporate>Mozilla</b:Corporate></b:Author><b:Title>MDN Web Security Documentation</b:Title><b:Year>2025</b:Year></b:Source><b:Source><b:Tag>FinTechBook</b:Tag><b:SourceType>Book</b:SourceType><b:Author><b:NameList><b:Person><b:Last>Chishti</b:Last><b:First>Susanne</b:First></b:Person></b:NameList><b:Author><b:NameList><b:Person><b:Last>Barberis</b:Last><b:First>Jonas</b:First></b:Person><b:Person><b:Last>Chishti</b:Last><b:First>Susanne</b:First></b:Person></b:NameList></b:Author></b:Author><b:Title>The FinTech Book</b:Title><b:Year>2016</b:Year><b:Guid>{E62503EE-723B-424A-B2A8-1CCBA9A1FD36}</b:Guid></b:Source><b:Source><b:Tag>AIFinance</b:Tag><b:SourceType>JournalArticle</b:SourceType><b:Author><b:NameList><b:Person><b:Last>Cao</b:Last><b:First>Longbing</b:First></b:Person></b:NameList><b:Author><b:NameList><b:Person><b:Last>Cao</b:Last><b:First>Longbing</b:First></b:Person></b:NameList></b:Author></b:Author><b:Title>AI in Finance: Challenges, Techniques and Opportunities</b:Title><b:Year>2021</b:Year><b:JournalName>AI in Finance</b:JournalName><b:Volume>1</b:Volume><b:Issue>1</b:Issue><b:Guid>{20950968-5AF8-4ABE-9CB2-C221C6008F64}</b:Guid></b:Source><b:Source><b:Tag>AIForecasting</b:Tag><b:SourceType>JournalArticle</b:SourceType><b:Author><b:NameList><b:Person><b:First>Wasiu</b:First><b:Middle>Eyinade</b:Middle></b:Person><b:Person><b:Last>Ezeilo</b:Last><b:First>Onyinye Jacqueline</b:First></b:Person><b:Person><b:Last>Ogundeji</b:Last><b:First>Ibidapo</b:First><b:Middle>Abiodun</b:Middle></b:Person></b:NameList><b:Author><b:NameList><b:Person><b:Last>Eyinade</b:Last><b:First>Wasiu</b:First></b:Person><b:Person><b:Last>Ezeilo</b:Last><b:Middle>Onyinye</b:Middle><b:First>Jacqueline</b:First></b:Person><b:Person><b:Last>Ogundeji</b:Last><b:Middle>Ibidapo</b:Middle><b:First>Abiodun</b:First></b:Person></b:NameList></b:Author></b:Author><b:Title>Artificial Intelligence in Financial Forecasting: Accuracy and Limitations</b:Title><b:Year>2025</b:Year><b:JournalName>World Journal of Finance and Investment Research</b:JournalName><b:Volume>9</b:Volume><b:Issue>4</b:Issue><b:Guid>{54CE79E7-FF91-4C71-9A22-2EDEBD8C26D4}</b:Guid></b:Source><b:Source><b:Tag>PFinAI</b:Tag><b:SourceType>Report</b:SourceType><b:Author><b:NameList><b:Person><b:Last>Gorai</b:Last><b:First>S.K.</b:First></b:Person><b:Person><b:Last>Maurya</b:Last><b:First>Amar</b:First></b:Person></b:NameList><b:Author><b:NameList><b:Person><b:Last>Gorai</b:Last><b:First>S.K.</b:First></b:Person><b:Person><b:Last>Maurya</b:Last><b:First>Amar</b:First></b:Person></b:NameList></b:Author></b:Author><b:Title>Artificial Intelligence In Personal Finance Management: Opportunities And Challenges</b:Title><b:Year>2025</b:Year><b:Publisher>IOSR Journals</b:Publisher><b:Pages>07-17</b:Pages><b:Guid>{23C8D4EC-6240-43A7-9576-F2425DD12022}</b:Guid></b:Source><b:Source><b:Tag>SaaSBook</b:Tag><b:SourceType>Report</b:SourceType><b:Title>Budowa i wdrożenie aplikacji Saas</b:Title><b:Year>2023</b:Year><b:Guid>{174F2C5F-C1C1-492D-AD3E-4E535CA9E133}</b:Guid><b:Author><b:Author><b:NameList><b:Person><b:Last>Szczudło</b:Last><b:First>Arkadiusz</b:First></b:Person><b:Person><b:Last>Skrzypecka</b:Last><b:First>Paula</b:First></b:Person></b:NameList></b:Author></b:Author></b:Source><b:Source><b:Tag>CleanArch</b:Tag><b:SourceType>Book</b:SourceType><b:Author><b:NameList><b:Person><b:Last>Martin</b:Last><b:First>Robert</b:First><b:Middle>C.</b:Middle></b:Person></b:NameList><b:Author><b:NameList><b:Person><b:Last>Martin</b:Last><b:First>Robert C.</b:First></b:Person></b:NameList></b:Author></b:Author><b:Title>Clean Architecture: A Craftsman's Guide to Software Structure and Design</b:Title><b:Year>2017</b:Year><b:Publisher>Prentice Hall</b:Publisher><b:Guid>{176F769C-8A09-4FEF-8795-8736D7A068FB}</b:Guid></b:Source><b:Source><b:Tag>DataScienceAI</b:Tag><b:SourceType>Report</b:SourceType><b:Author><b:NameList><b:Person><b:Last>Cao</b:Last><b:First>Longbing</b:First></b:Person><b:Person><b:Last>Yang</b:Last><b:First>Qiang</b:First></b:Person><b:Person><b:Last>Yu</b:Last><b:First>Philip S.</b:First></b:Person></b:NameList><b:Author><b:NameList><b:Person><b:Last>Cao</b:Last><b:First>Longbing</b:First></b:Person><b:Person><b:Last>Yang</b:Last><b:First>Qiang</b:First></b:Person><b:Person><b:Last>Yu</b:Last><b:First>Philip S.</b:First></b:Person></b:NameList></b:Author></b:Author><b:Title>Data Science and AI in FinTech</b:Title><b:Year>2021</b:Year><b:Publisher>Springer</b:Publisher><b:Guid>{7C54BFC0-E507-4686-B4CA-2E35F5FA8B54}</b:Guid></b:Source><b:Source><b:Tag>DataViz</b:Tag><b:SourceType>Book</b:SourceType><b:Author><b:NameList><b:Person><b:Last>Healy</b:Last><b:First>Kieran</b:First></b:Person></b:NameList><b:Author><b:NameList><b:Person><b:Last>Healy</b:Last><b:First>Kieran</b:First></b:Person></b:NameList></b:Author></b:Author><b:Title>Data Visualization - A Practical Introduction</b:Title><b:Year>2019</b:Year><b:Publisher>Princeton University Press</b:Publisher><b:Guid>{449D2ED7-EF38-4164-B1A0-E27C67484B33}</b:Guid></b:Source><b:Source><b:Tag>FinInt</b:Tag><b:SourceType>Book</b:SourceType><b:Author><b:NameList><b:Person><b:Last>Berman</b:Last><b:First>Karen</b:First></b:Person><b:Person><b:Last>Knight</b:Last><b:First>Joe</b:First></b:Person><b:Person><b:Last>Case</b:Last><b:First>John</b:First></b:Person></b:NameList><b:Author><b:NameList><b:Person><b:Last>Berman</b:Last><b:First>Karen</b:First></b:Person><b:Person><b:Last>Knight</b:Last><b:First>Joe</b:First></b:Person></b:NameList></b:Author></b:Author><b:Title>Financial Intelligence</b:Title><b:Year>2013</b:Year><b:Publisher>Harvard Business Review Press</b:Publisher><b:Guid>{ED5DCD99-F8A9-4D55-97CC-DC207E1E0B6F}</b:Guid></b:Source><b:Source><b:Tag>RoboAI</b:Tag><b:SourceType>JournalArticle</b:SourceType><b:Title>How AI-driven Robo-Advisors Impact Investment Decision-making and Portfolio Performance in the Financial Sector</b:Title><b:Year>2024</b:Year><b:JournalName>International Research Journal of Engineering and Technology</b:JournalName><b:Volume>11</b:Volume><b:Issue>07</b:Issue><b:Guid>{6A649107-9D91-4932-81E0-40E15DF34631}</b:Guid><b:Author><b:Author><b:NameList><b:Person><b:Last>Syed</b:Last><b:Middle>Khadri</b:Middle><b:First>Waheeduddin</b:First></b:Person><b:Person><b:Last>Janamolla</b:Last><b:Middle>Kavitha</b:Middle><b:First>Reddy</b:First></b:Person></b:NameList></b:Author></b:Author></b:Source><b:Source><b:Tag>Subasri</b:Tag><b:SourceType>Report</b:SourceType><b:Author><b:NameList><b:Person><b:Last>et.al</b:Last><b:First>N.Subasri</b:First></b:Person></b:NameList><b:Author><b:NameList><b:Person><b:Last>Subasri</b:Last><b:First>Ms.N.</b:First></b:Person><b:Person><b:Last>Gokul</b:Last><b:First>M.</b:First></b:Person><b:Person><b:Last>Pradeep</b:Last><b:First>S.</b:First></b:Person><b:Person><b:Last>Sriram</b:Last><b:First>E.</b:First></b:Person><b:Person><b:Last>Tharun</b:Last><b:First>Kumar</b:First></b:Person></b:NameList></b:Author></b:Author><b:Title>AI Powered Personal Finance Management System</b:Title><b:Year>2025</b:Year><b:JournalName>Journal of Science Technology and Research</b:JournalName><b:Volume>6</b:Volume><b:Issue>1</b:Issue><b:Pages>8</b:Pages><b:Guid>{F5A255BC-97A9-422B-BFC4-8C624224FE00}</b:Guid><b:Publisher>JSTAR</b:Publisher></b:Source><b:Source><b:Tag>ModernReactNext</b:Tag><b:SourceType>JournalArticle</b:SourceType><b:Author><b:NameList><b:Person><b:Last>Lazuardy</b:Last><b:First>Mochammad Fariz Syah</b:First></b:Person><b:Person><b:Last>Anggraini</b:Last><b:First>Dyah</b:First></b:Person></b:NameList><b:Author><b:NameList><b:Person><b:Last>Lazuardy</b:Last><b:Middle>Fariz</b:Middle><b:First>Mochammad</b:First></b:Person><b:Person><b:Last>Anggraini</b:Last><b:First>Dyah</b:First></b:Person></b:NameList></b:Author></b:Author><b:Title>Modern Front End Web Architectures with React.Js and Next.Js</b:Title><b:Year>2022</b:Year><b:JournalName>International Research Journal of Advanced Engineering and Science</b:JournalName><b:Volume>7</b:Volume><b:Issue>1</b:Issue><b:Pages>132-141</b:Pages><b:Guid>{839FBC65-B746-448A-B749-FE8C405C9EEB}</b:Guid></b:Source><b:Source><b:Tag>Konsumpcja</b:Tag><b:SourceType>JournalArticle</b:SourceType><b:Author><b:NameList><b:Person><b:Last>Beskid</b:Last><b:First>L.</b:First></b:Person></b:NameList><b:Author><b:NameList><b:Person><b:Last>Świecka</b:Last><b:First>Beata</b:First></b:Person></b:NameList></b:Author></b:Author><b:Title>Finanse gospodarstw domowych i finanse osobiste – nowe wyzwania teorii</b:Title><b:Year>2011</b:Year><b:Publisher>Uniwersytet Szczeciński</b:Publisher><b:Guid>{DF3488E5-47D8-4828-9C37-849BE46E8D8F}</b:Guid><b:JournalName>Uniwersytet Szczeciński</b:JournalName></b:Source><b:Source><b:Tag>Dziembek2010</b:Tag><b:SourceType>JournalArticle</b:SourceType><b:Author><b:NameList><b:Person><b:Last>Dziembek</b:Last><b:First>Damian</b:First></b:Person></b:NameList><b:Author><b:NameList><b:Person><b:Last>Dziembek</b:Last><b:First>Damian</b:First></b:Person></b:NameList></b:Author></b:Author><b:Title>Model SaaS jako forma zdalnej eksploatacji aplikacji dla przedsiębiorstw</b:Title><b:Year>2010</b:Year><b:JournalName>Politechnika Częstochowska</b:JournalName><b:Volume>17</b:Volume><b:Guid>{492E42CC-7E3F-4375-A059-221EB3502841}</b:Guid></b:Source><b:Source><b:Tag>Sztuczka2012</b:Tag><b:SourceType>JournalArticle</b:SourceType><b:Author><b:NameList><b:Person><b:Last>Sztuczka</b:Last><b:First>Paweł</b:First></b:Person></b:NameList><b:Author><b:NameList><b:Person><b:Last>Sztuczka</b:Last><b:First>Paweł</b:First></b:Person></b:NameList></b:Author></b:Author><b:Title>Zmiany świadomości ekonomicznej w polskich gospodarstwach domowych</b:Title><b:Year>2012</b:Year><b:JournalName>Muzeum Historii Polski</b:JournalName><b:Volume>27</b:Volume><b:Guid>{9BAED11F-A2A4-4AC1-9F4D-083ACDA8586F}</b:Guid></b:Source><b:Source><b:Tag>Tsai2014</b:Tag><b:SourceType>JournalArticle</b:SourceType><b:Author><b:NameList><b:Person><b:Last>Tsai</b:Last><b:First>WeiTek</b:First></b:Person><b:Person><b:Last>Bai</b:Last><b:First>XiaoYing</b:First></b:Person><b:Person><b:Last>Huang</b:Last><b:First>Yu</b:First></b:Person></b:NameList><b:Author><b:NameList><b:Person><b:Last>Tsai</b:Last><b:First>W. T.</b:First></b:Person><b:Person><b:Last>Bai</b:Last><b:First>X. Y.</b:First></b:Person><b:Person><b:Last>Huang</b:Last><b:First>Y.</b:First></b:Person></b:NameList></b:Author></b:Author><b:Title>Software-as-a-service (SaaS): perspectives and challenges</b:Title><b:Year>2014</b:Year><b:Publisher>Science China Press and Springer-Verlag Berlin Heidelberg</b:Publisher><b:JournalName>Science China Information Sciences</b:JournalName><b:Volume>57</b:Volume><b:Issue>051101</b:Issue><b:Guid>{FE05E60A-85B3-4DDD-9794-07E32944F896}</b:Guid></b:Source><b:Source><b:Tag>PARP2008</b:Tag><b:SourceType>Report</b:SourceType><b:Title>SaaS jako metoda świadczenia e-usług</b:Title><b:Year>2008</b:Year><b:Publisher>Polska Agencja Rozwoju Przedsiębiorczości</b:Publisher><b:Pages>1-18</b:Pages><b:Guid>{1DF8B364-7A91-43DB-AFCE-428E2DD05E7A}</b:Guid><b:Author><b:Author><b:NameList><b:Person><b:Last>Małyszko</b:Last><b:First>Michał</b:First></b:Person></b:NameList></b:Author></b:Author></b:Source><b:Source><b:Tag>FintechOpp</b:Tag><b:SourceType>Report</b:SourceType><b:Author><b:NameList><b:Person><b:Last>Philippon</b:Last><b:First>Thomas</b:First></b:Person></b:NameList><b:Author><b:NameList><b:Person><b:Last>Asad</b:Last><b:First>Ali</b:First></b:Person></b:NameList></b:Author></b:Author><b:Title>User Experience (UX) and User Interface (UI) of Fintech Apps</b:Title><b:Year>2024</b:Year><b:Guid>{3E646770-9CDB-4CA4-83F1-7DAC5D757796}</b:Guid><b:Publisher>Faculty of Economics and Management</b:Publisher></b:Source></b:Sources>
+<b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography"
+           xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography">
+
+  <!-- Dokumentacje (InternetSite) -->
+
+  <b:Source>
+    <b:Tag>NextJS</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>Next.js Team</b:Corporate></b:Author>
+    <b:Title>Next.js Documentation</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Supabase</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>Supabase</b:Corporate></b:Author>
+    <b:Title>Supabase Documentation</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Stripe</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>Stripe</b:Corporate></b:Author>
+    <b:Title>Stripe Documentation</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>OpenAI</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>OpenAI</b:Corporate></b:Author>
+    <b:Title>OpenAI API Documentation</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>TypeScript</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>Microsoft TypeScript Team</b:Corporate></b:Author>
+    <b:Title>TypeScript Documentation</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>React</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>React Team</b:Corporate></b:Author>
+    <b:Title>React Documentation</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>TailwindCSS</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>Tailwind Labs</b:Corporate></b:Author>
+    <b:Title>Tailwind CSS Documentation</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>PostgreSQL</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>PostgreSQL Global Development Group</b:Corporate></b:Author>
+    <b:Title>PostgreSQL Documentation</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Vercel</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>Vercel</b:Corporate></b:Author>
+    <b:Title>Vercel Documentation</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Upstash</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>Upstash</b:Corporate></b:Author>
+    <b:Title>Upstash Documentation</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Pino</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>Pino Team</b:Corporate></b:Author>
+    <b:Title>Pino Logger Documentation</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Sentry</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>Sentry</b:Corporate></b:Author>
+    <b:Title>Sentry Documentation</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Shadcn</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>shadcn</b:Corporate></b:Author>
+    <b:Title>shadcn/ui Documentation</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Zod</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>Zod</b:Corporate></b:Author>
+    <b:Title>Zod Documentation</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Vitest</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>Vitest</b:Corporate></b:Author>
+    <b:Title>Vitest Documentation</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Playwright</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>Microsoft</b:Corporate></b:Author>
+    <b:Title>Playwright Documentation</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>OAuth2Doc</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>Google Developers</b:Corporate></b:Author>
+    <b:Title>OAuth 2.0 Documentation</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Cursor</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>Cursor</b:Corporate></b:Author>
+    <b:Title>Cursor Documentation</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>WCAG</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>W3C</b:Corporate></b:Author>
+    <b:Title>WCAG 2.1 Guidelines</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>OWASP</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>OWASP</b:Corporate></b:Author>
+    <b:Title>OWASP Top 10</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>JWTDoc</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>IETF</b:Corporate></b:Author>
+    <b:Title>JWT RFC 7519</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>MDNWebSec</b:Tag>
+    <b:SourceType>InternetSite</b:SourceType>
+    <b:Author><b:Corporate>Mozilla</b:Corporate></b:Author>
+    <b:Title>MDN Web Security Documentation</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <!-- Książki & artykuły naukowe -->
+
+  <b:Source>
+    <b:Tag>CleanArch</b:Tag>
+    <b:SourceType>Book</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Martin</b:Last><b:First>Robert C.</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Clean Architecture: A Craftsman's Guide to Software Structure and Design</b:Title>
+    <b:Year>2017</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Beskid2011</b:Tag>
+    <b:SourceType>Book</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Beskid</b:Last><b:First>L.</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Finanse gospodarstw domowych i finanse osobiste</b:Title>
+    <b:Year>2011</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Sztuczka2012</b:Tag>
+    <b:SourceType>JournalArticle</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Sztuczka</b:Last><b:First>Paweł</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Zmiany świadomości ekonomicznej w polskich gospodarstwach domowych</b:Title>
+    <b:Year>2012</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Dziembek2010</b:Tag>
+    <b:SourceType>JournalArticle</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Dziembek</b:Last><b:First>Damian</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Model SaaS jako forma zdalnej eksploatacji aplikacji dla przedsiębiorstw</b:Title>
+    <b:Year>2010</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Malyszko2008</b:Tag>
+    <b:SourceType>Report</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Małyszko</b:Last><b:First>Michał</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>SaaS jako metoda świadczenia e-usług</b:Title>
+    <b:Year>2008</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>FinInt2013</b:Tag>
+    <b:SourceType>Book</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Berman</b:Last><b:First>Karen</b:First></b:Person>
+        <b:Person><b:Last>Knight</b:Last><b:First>Joe</b:First></b:Person>
+        <b:Person><b:Last>Case</b:Last><b:First>John</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Financial Intelligence</b:Title>
+    <b:Year>2013</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Lazuardy2022</b:Tag>
+    <b:SourceType>JournalArticle</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Lazuardy</b:Last><b:First>Mochammad Fariz Syah</b:First></b:Person>
+        <b:Person><b:Last>Anggraini</b:Last><b:First>Dyah</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Modern Front End Web Architectures with React.Js and Next.Js</b:Title>
+    <b:Year>2022</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>FinTechBook2016</b:Tag>
+    <b:SourceType>Book</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Chishti</b:Last><b:First>Susanne</b:First></b:Person>
+        <b:Person><b:Last>Barberis</b:Last><b:First>Jonas</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>The FinTech Book</b:Title>
+    <b:Year>2016</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>CaoYangYu2021Book</b:Tag>
+    <b:SourceType>Book</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Cao</b:Last><b:First>Longbing</b:First></b:Person>
+        <b:Person><b:Last>Yang</b:Last><b:First>Qiang</b:First></b:Person>
+        <b:Person><b:Last>Yu</b:Last><b:First>Philip S.</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Data Science and AI in FinTech</b:Title>
+    <b:Year>2021</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>SyedJanamolla2024</b:Tag>
+    <b:SourceType>JournalArticle</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Syed</b:Last><b:First>Waheeduddin Khadri</b:First></b:Person>
+        <b:Person><b:Last>Janamolla</b:Last><b:First>Kavitha Reddy</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>How AI-driven Robo-Advisors Impact Investment Decision-making and Portfolio Performance in the Financial Sector</b:Title>
+    <b:Year>2024</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>CaoAIinFinance2021</b:Tag>
+    <b:SourceType>JournalArticle</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Cao</b:Last><b:First>Longbing</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>AI in Finance: Challenges, Techniques, and Opportunities</b:Title>
+    <b:Year>2021</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>GoraiMaurya2025</b:Tag>
+    <b:SourceType>JournalArticle</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Gorai</b:Last><b:First>S. K.</b:First></b:Person>
+        <b:Person><b:Last>Maurya</b:Last><b:First>Amar</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Artificial Intelligence In Personal Finance Management: Opportunities And Challenges</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>WasiuEtAl2025</b:Tag>
+    <b:SourceType>JournalArticle</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Eyinade</b:Last><b:First>Wasiu</b:First></b:Person>
+        <b:Person><b:Last>Ezeilo</b:Last><b:First>Onyinye Jacqueline</b:First></b:Person>
+        <b:Person><b:Last>Ogundeji</b:Last><b:First>Ibidapo Abiodun</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Artificial Intelligence in Financial Forecasting: Accuracy and Limitations</b:Title>
+    <b:Year>2025</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Healy2019</b:Tag>
+    <b:SourceType>Book</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Healy</b:Last><b:First>Kieran</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Data Visualization: A Practical Introduction</b:Title>
+    <b:Year>2019</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>ThalerSunstein2008</b:Tag>
+    <b:SourceType>Book</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Thaler</b:Last><b:First>Richard H.</b:First></b:Person>
+        <b:Person><b:Last>Sunstein</b:Last><b:First>Cass R.</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Nudge: Improving Decisions About Health, Wealth, and Happiness</b:Title>
+    <b:Year>2008</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Kleppmann2017</b:Tag>
+    <b:SourceType>Book</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Kleppmann</b:Last><b:First>Martin</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Designing Data-Intensive Applications</b:Title>
+    <b:Year>2017</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>ProvostFawcett2013</b:Tag>
+    <b:SourceType>Book</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Provost</b:Last><b:First>Foster</b:First></b:Person>
+        <b:Person><b:Last>Fawcett</b:Last><b:First>Tom</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Data Science for Business</b:Title>
+    <b:Year>2013</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Erl2013</b:Tag>
+    <b:SourceType>Book</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Erl</b:Last><b:First>Thomas</b:First></b:Person>
+        <b:Person><b:Last>Puttini</b:Last><b:First>Ricardo</b:First></b:Person>
+        <b:Person><b:Last>Mahmood</b:Last><b:First>Zaigham</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Cloud Computing: Concepts, Technology &amp; Architecture</b:Title>
+    <b:Year>2013</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Muller2020</b:Tag>
+    <b:SourceType>Book</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Müller</b:Last><b:First>Vincent C.</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Ethics of Artificial Intelligence</b:Title>
+    <b:Year>2020</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Jung2018</b:Tag>
+    <b:SourceType>JournalArticle</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Jung</b:Last><b:First>Daniel</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>FinTech Adoption and Consumer Behavior</b:Title>
+    <b:Year>2018</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Hendershott2021</b:Tag>
+    <b:SourceType>JournalArticle</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Hendershott</b:Last><b:First>Terrence</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Personalization, Data Analytics and User Engagement in Financial Applications</b:Title>
+    <b:Year>2021</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>CaoYangYu2020</b:Tag>
+    <b:SourceType>JournalArticle</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Cao</b:Last><b:First>Longbing</b:First></b:Person>
+        <b:Person><b:Last>Yang</b:Last><b:First>Qiang</b:First></b:Person>
+        <b:Person><b:Last>Yu</b:Last><b:First>Philip S.</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Predictive Analytics for Personal Finance</b:Title>
+    <b:Year>2020</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Lim2019</b:Tag>
+    <b:SourceType>JournalArticle</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Lim</b:Last><b:First>Sarah</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Behavioral Biases in Personal Financial Decision-Making</b:Title>
+    <b:Year>2019</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Norman2013</b:Tag>
+    <b:SourceType>Book</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Norman</b:Last><b:First>Don</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>The Design of Everyday Things (Revised Edition)</b:Title>
+    <b:Year>2013</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Garrett2010</b:Tag>
+    <b:SourceType>Book</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Garrett</b:Last><b:First>Jesse James</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>The Elements of User Experience: User-Centered Design for the Web and Beyond</b:Title>
+    <b:Year>2010</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>EBA2020</b:Tag>
+    <b:SourceType>Report</b:SourceType>
+    <b:Author><b:Corporate>European Banking Authority</b:Corporate></b:Author>
+    <b:Title>Guidelines on ICT and security risk management</b:Title>
+    <b:Year>2020</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Pfleeger2015</b:Tag>
+    <b:SourceType>Book</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Pfleeger</b:Last><b:First>Charles P.</b:First></b:Person>
+        <b:Person><b:Last>Pfleeger</b:Last><b:First>Shari L.</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Security in Computing</b:Title>
+    <b:Year>2015</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Anderson2020</b:Tag>
+    <b:SourceType>Book</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Anderson</b:Last><b:First>Ross</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Security Engineering: A Guide to Building Dependable Distributed Systems</b:Title>
+    <b:Year>2020</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>ArslanianFischer2020</b:Tag>
+    <b:SourceType>Book</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Arslanian</b:Last><b:First>Henri</b:First></b:Person>
+        <b:Person><b:Last>Fischer</b:Last><b:First>Fabrice</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>The Future of Finance: The Impact of FinTech, AI, and Crypto on Financial Services</b:Title>
+    <b:Year>2020</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>OAuth2RFC6749</b:Tag>
+    <b:SourceType>Report</b:SourceType>
+    <b:Author><b:Corporate>IETF</b:Corporate></b:Author>
+    <b:Title>The OAuth 2.0 Authorization Framework (RFC 6749)</b:Title>
+    <b:Year>2012</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Leong2017</b:Tag>
+    <b:SourceType>JournalArticle</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Leong</b:Last><b:First>Kim</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Monetization Models and Consumer Behavior in Digital Services</b:Title>
+    <b:Year>2017</b:Year>
+  </b:Source>
+
+  <b:Source>
+    <b:Tag>Hua2019</b:Tag>
+    <b:SourceType>JournalArticle</b:SourceType>
+    <b:Author>
+      <b:NameList>
+        <b:Person><b:Last>Hua</b:Last><b:First>Guang</b:First></b:Person>
+      </b:NameList>
+    </b:Author>
+    <b:Title>Pricing Transparency and Trust in Financial Platforms</b:Title>
+    <b:Year>2019</b:Year>
+  </b:Source>
+
+</b:Sources>
+
