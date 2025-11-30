@@ -4,19 +4,19 @@
 
 Rozdział drugi stanowi fundament teoretyczny pracy i ma na celu przedstawienie koncepcji związanych z zarządzaniem finansami osobistymi, współczesnymi modelami aplikacji finansowych oraz technologicznymi podstawami systemów typu SaaS. Omawiane treści tworzą kontekst dla późniejszej części projektowo-implementacyjnej, a jednocześnie pozwalają zrozumieć, w jaki sposób rozwiązania stosowane w branży FinTech wpisują się w szersze zjawiska ekonomiczne, technologiczne i społeczne.
 
-# 2.1. Zarządzanie finansami osobistymi – podstawy
+## 2.1. Zarządzanie finansami osobistymi – podstawy
 
 W pierwszej części rozdziału omówiono podstawy zarządzania finansami osobistymi, skupiając się na najważniejszych pojęciach, modelach decyzyjnych oraz roli danych i automatyzacji w procesie analizy danych finansowych. Szczególną uwagę poświęcono również aspektom psychologicznym i behawioralnym, które często determinują sposób, w jaki użytkownicy korzystają z narzędzi finansowych.
 
-## 2.1.1. Kluczowe pojęcia i modele decyzyjne
+### 2.1.1. Kluczowe pojęcia i modele decyzyjne
 
-Zarządzanie finansami osobistymi obejmuje zestaw działań, których celem jest świadome planowanie, kontrolowanie i optymalizowanie zasobów finansowych uzytkownika. W literaturze finanse osobiste definiowane są jako proces podejmowania decyzji dotyczących wydatków, oszczędności, inwestycji oraz zarządzania ryzykiem, oparty na indywidualnych preferencjach i możliwościach ekonomicznych (Madura, 2023). W odróżnieniu od finansów korporacyjnych, które bazują na sformalizowanych strukturach i procedurach, finanse osobiste dotyczą przede wszystkim codziennych wyborów jednostki, podejmowanych często w warunkach niepewności i ograniczonych informacji.
+Zarządzanie finansami osobistymi obejmuje zestaw działań, których celem jest swiadome planowanie, kontrolowanie oraz optymalizowanie zasobów finansowych jednostki. W literaturze podkreśla się, że finanse osobiste nie ograniczają się wyłącznie do ewidencjonowania wydatków, lecz obejmują również procesy związane z kształtowaniem świadomości ekonomicznej, oceną ryzyka i wyznaczaniem celów finansowych (Beskid, 2011). Autorzy zajmujący się tym obszarem zwracają uwagę, że efektywne zarządzanie budżetem wymaga nie tylko wiedzy, lecz także umiejętności interpretowania danych finansowych i rozumienia długoterminowych konsekwencji podejmowanych decyzji (Berman, Knight & Case, 2013).
 
-Na proces decyzyjny w finansach personalnych wpływa szereg czynników, zarówno ekonomicznych, jak i behawioralnych. Tradycyjny model racjonalnego decydenta zakłada podejmowanie decyzji na podstawie maksymalizacji użyteczności oraz dostępnych danych. Jednak badania z zakresu ekonomii behawioralnej dowodzą, że rzeczywiste decyzje finansowe są często rezultatem uproszczonych heurystyk, emocji czy nawyków, które mogą prowadzić do nieracjonalnych wyborów (Thaler & Sunstein, 2008). Dlatego współczesne aplikacje finansowe coraz częściej integrują elementy edukacyjne i analityczne, wspierające użytkowników w podejmowaniu bardziej świadomych decyzji.
+Proces decyzyjny w finansach osobistych ma wiele aspektów i zależy zarówno od czynników ekonomicznych, jak i psychologicznych. Tradycyjne podejścia zakładają racjonalność jednostki, która analizuje dostępne informacje i podejmuje decyzje prowadzące do maksymalizacji korzyści. Jednak badania z zakresu ekonomii behawioralnej pokazują, że rzeczywiste decyzje finansowe często odbiegają od modelu racjonalnego, natomiast kształtowane są przez heurystyki, emocje, nawyki oraz kontekst społeczny (Thaler & Sunstein, 2008). Zjawiska takie jak nadmierna pewność siebie, skłonność do natychmiastowej gratyfikacji czy unikanie strat prowadzą do decyzji, które mogą obniżać stabilność finansową gospodarstw domowych (Sztuczka, 2012).
 
-W literaturze wyróżnia się kilka kluczowych modeli wspierających zarządzanie finansami osobistymi. Popularny model 50/30/20 Elizabeth Warren proponuje podział budżetu na trzy kategorie: potrzeby, zachcianki oraz oszczędności i spłatę zobowiązań. Inne podejścia, jak zero-based budgeting, wymagają szczegółowego planowania każdej jednostki budżetowej i przypisywania jej konkretnych celów (Knight & Berman, 2013). Tego typu modele zyskały popularność ze względu na swoją praktyczność oraz stosunkowo niską barierę wejścia.
+W literaturze i praktyce finansowej funkcjonuje wiele modeli wspierających proces zarządzania budżetem. Modele te różnią się stopniem szczegółowości oraz założeniami dotyczącymi kontroli i planowania. Jednym z najbardziej znanych jest reguła 50/30/20, która dzieli budżet na trzy podstawowe kategorie: potrzeby, zachcianki oraz oszczędności i spłatę zobowiązań. Inne podejście, zero-based budgeting, zakłada, że każda jednostka budżetowa musi zostać przypisana do konkretnego celu, a dostępne środki rozdysponowane w sposób świadomy i planowy (Berman, Knight & Case, 2013). W kontekście współczesnych rozwiązań FinTech zwraca się uwagę, że aplikacje finansowe coraz częściej implementują takie modele albo w formie automatycznych rekomendacji, albo jako wbudowane narzędzia edukacyjne, co sprzyja świadomemu podejmowaniu decyzji (Chishti & Barberis, 2016).
 
-## 2.1.2. Rola automatyzacji i danych w finansach osobistych
+### 2.1.2. Rola automatyzacji i danych w finansach osobistych
 
 Automatyzacja odgrywa coraz większą rolę w sposobie zarządzania finansami, umożliwiając użytkownikom ograniczenie powtarzalnych czynności i uzyskanie pełniejszego obrazu swojej sytuacji ekonomicznej. Współczesne rozwiązania bazują na koncepcji przetwarzania danych w czasie rzeczywistym oraz integracji różnych źródeł informacji finansowych - od rachunków bankowych, przez historię transakcji, po dane kontekstowe, takie jak lokalizacja czy cykle płatności (Provost & Fawcett, 2013).
 
@@ -32,11 +32,11 @@ graph TD
     F --> C
 ```
 
-Automatyzacja procesów, takich jak klasyfikacja transakcji czy generowanie raportów, pozwala na skrócenie czasu potrzebnego na analizę finansową oraz umożliwia użytkownikom skoncentrowanie się na decyzjach strategicznych. Według badań opublikowanych w _Information Systems Research_, personalizacja oraz inteligentna analiza danych stanowią podstawowy czynnik wpływający na satysfakcję i długoterminowe zaangażowanie w korzystanie z aplikacji finansowych (Hendershott et al., 2021).
+Automatyzacja procesów, takich jak klasyfikacja transakcji czy generowanie raportów, pozwala na skrócenie czasu potrzebnego na analizę finansową oraz umożliwia użytkownikom skoncentrowanie się na decyzjach strategicznych. Według badań opublikowanych w _Information Systems Research_, personalizacja oraz inteligentna analiza danych stanowią podstawowy czynnik wpływający na satysfakcję i długoterminowe zaangażowanie w korzystanie z aplikacji finansowych (Hendershott et al., 2021). Jednocześnie zgodnie z podejściem opisanym przez Healy'ego (2019), kluczową rolę odgrywa jakość wizualizacji danych, bo to od jej przejrzystości zależy, czy użytkownicy są w stanie poprawnie zinterpretować wskaźniki finansowe i przełożyć je na konkretne decyzje.
 
 Wykorzystanie danych obejmuje również metody predykcyjne, które pozwalają przewidywać przyszłe wydatki, identyfikować anomalie oraz oceniać ryzyko finansowe. Zastosowanie algorytmów uczenia maszynowego w aplikacjach budżetowych umożliwia tworzenie bardziej precyzyjnych rekomendacji, bazujących na indywidualnej historii użytkownika oraz podobnych wzorcach zachowań w szerokiej populacji (Cao et al., 2020). Dzięki temu użytkownicy otrzymują nie tylko statyczny obraz swoich wydatków, ale takze dynamiczne, proaktywne wskazówki.
 
-## 2.1.3. Wyzwania behawioralne użytkowników
+### 2.1.3. Wyzwania behawioralne użytkowników
 
 Choć nowoczesne narzędzia technologiczne znacząco ułatwiają zarządzanie finansami, wyzwania związane z zachowaniami użytkowników pozostają jednym z najistotniejszych problemów. W literaturze często podkreśla się, że nawet najlepsze narzędzia analityczne nie gwarantują poprawy sytuacji finansowej, jeśli użytkownicy nie potrafią utrzymać dyscypliny budżetowej lub zmagają się z błędami poznawczymi (Lim et al., 2019).
 
@@ -46,11 +46,11 @@ Wyzwania te sprawiają, że aplikacje finansowe coraz częściej implementują r
 
 Podsumowując, zarządzanie finansami osobistymi jest dziedziną interdyscyplinarną (todo: jaka?), łączącą ekonomię, psychologię oraz współczesne technologie. Zrozumienie zachowań użytkowników oraz wykorzystanie danych do automatyzacji procesów stanowi fundament skutecznych systemów wspierających decyzje finansowe.
 
-# 2.2. Modele aplikacji finansowych
+## 2.2. Modele aplikacji finansowych
 
 Ta część rozdziału skupia się na klasyfikacji współczesnych rozwiązań FinTech, analizując ich funkcje, strategie monetyzacji oraz relacje z regulacjami rynku finansowego. Omówiono różnice między tradycyjnymi aplikacjami budżetowymi, platformami subskrypcyjnymi oraz narzędziami działającymi w modelu open banking. Wskazane zostały również czynniki determinujące rozwój ekosystemu FinTech. Sekcja ta pozwala zrozumieć, na jakich fundamentach projektowane są nowoczesne systemy zarządzania finansami osobistymi.
 
-## 2.2.1. Kategorie funkcjonalne rozwiązań FinTech
+### 2.2.1. Kategorie funkcjonalne rozwiązań FinTech
 
 Ekosystem FinTech obejmuje różnorodne kategorie aplikacji, które wspierają użytkowników w zarządzaniu finansami, inwestowaniem, płatnościami czy analizą danych. W literaturze przedmiotu wyróżnia się kilka dominujących grup funkcjonalnych: narzędzia do budżetowania i kontroli wydatków, aplikacje inwestycyjne, platformy płatnicze, menedżery subskrypcji oraz systemy doradztwa finansowego (Chishti & Barberis, 2016). Każda z tych kategorii odpowiada na inny zestaw potrzeb użytkowników, co wpływa na sposób projektowania rozwiązań oraz zakres ich funkcjonalności.
 
@@ -69,7 +69,7 @@ graph TD
 
 Takie ujęcie pozwala lepiej zrozumieć, jakie miejsce zajmują aplikacje podobne do Finwise – są one hybrydą kilku kategorii: budżetowania, analityki i automatyzacji, co umożliwiają wspieranie użytkownika nie tylko poprzez prezentację danych, lecz także poprzez wskazówki pomocne w podejmowaniu decyzji finansowych.
 
-## 2.2.2. Modele monetyzacji i subskrypcji
+### 2.2.2. Modele monetyzacji i subskrypcji
 
 Modele biznesowe w aplikacjach FinTech są zróżnicowane i często dostosowywane zarówno do specyfiki rynku, jak i oczekiwań użytkowników. W literaturze wyróżnia się kilka najpopularniejszych strategii monetyzacji: subskrypcje, model freemium, opłaty transakcyjne oraz sprzedaż usług dodatkowych (Erl et al., 2013). Subskrypcje są szczególnie powszechne w aplikacjach oferujących zaawansowane funkcje analityczne, automatyzację czy integracje z innymi usługami.
 
@@ -77,7 +77,7 @@ Model freemium zakłada udostępnianie podstawowych funkcji za darmo, przy jedno
 
 Wybór odpowiedniego modelu przychodu odgrywa kluczową rolę zarówno dla stabilności finansowej projektu, jak i dla satysfakcji użytkowników. Badania wskazują, że przejrzystość zasad i kosztów korzystania z aplikacji jest jednym z czynników budujących zaufanie do platformy, zwłaszcza w sektorze finansów, gdzie kwestie bezpieczeństwa i transparentności są szczególnie wrażliwe (Hua et al., 2019).
 
-## 2.2.3. Wymagania regulacyjne dla aplikacji finansowych
+### 2.2.3. Wymagania regulacyjne dla aplikacji finansowych
 
 Aplikacje finansowe działają w środowisku silnie regulowanym, co wynika z konieczności ochrony użytkowników oraz zapewnienia bezpieczeństwa transakcji. W Unii Europejskiej podstawowym zestawem regulacji wpływających na projektowanie systemów finansowych są: PSD2 (dotycząca usług płatniczych), RODO (ochrona danych osobowych) oraz wytyczne EBA w zakresie przetwarzania danych finansowych (EBA, 2020).
 
@@ -87,19 +87,23 @@ W kontekście aplikacji internetowych szczególne znaczenie mają również stan
 
 Zrozumienie wymagań regulacyjnych jest kluczowe dla tworzenia aplikacji, które mogą być stosowane komercyjnie i zgodnie z prawem funkcjonować na rynku finansowym. Obejmują one zarówno procesy projektowe, jak i zasady przetwarzania oraz przechowywania danych, komunikację z użytkownikami, a także dokumentowanie wykonywanych operacji.
 
-# 2.3. Technologie webowe w architekturze SaaS
+## 2.3. Technologie webowe w architekturze SaaS
 
 W tym fragmencie rozdziału przedstawione zostają najważniejsze elementy architektury stosowanej w aplikacjach SaaS. Analiza obejmuje charakterystykę frameworków, usług serverless oraz zasad bezpieczeństwa, które decydują o niezawodności i skalowalności nowoczesnych systemów. Omówiono również konsekwencje projektowe wynikające z użycia technologii takich jak Next.js, Supabase czy Vercel. Sekcja wyznacza teoretyczną podstawę dla późniejszej implementacji.
 
-## 2.3.1. Charakterystyka architektury Next.js + Supabase
+### 2.3.1. Charakterystyka architektury Next.js + Supabase
 
-Architektura nowoczesnych aplikacji SaaS coraz częściej opiera się na podejściu łączącym elastyczność frameworków frontendowych z usługami backendowymi dostarczanymi jako gotowe komponenty. Next.js, jako framework Reacta, jest przykładem narzędzia umożliwiającego tworzenie aplikacji hybrydowych, łączących renderowanie po stronie serwera (SSR), generowanie statyczne (SSG) oraz logikę wykonywaną w funkcjach serwerowych. Jego architektura pozwala na utrzymanie wysokiej wydajności, a jednocześnie zapewnia spójność kodu dzięki unified routing (todo: wytlumaczyc) oraz wsparciu dla TypeScript (Next.js Documentation, 2025).
+Architektura współczesnych aplikacji internetowych, w szczególności rozwiązań SaaS, opiera się na zasadach modularności, separacji odpowiedzialności oraz elastyczności warstw systemowych. W literaturze podkreśla się, że stabilne systemy webowe wymagają jasnego rozdziału logiki domenowej, komunikacji z infrastrukturą oraz interfejsu użytkownika, co sprzyja skalowalności i ułatwia rozwój projektu (Martin, 2017). Te podstawowe zasady projektowe stanowią fundament dla architektury Next.js oraz usług backendowych typu BaaS, takich jak Supabase.
 
-Supabase natomiast pełni funkcję backendu jako usługi (BaaS) i udostępnia zestaw narzędzi obejmujących bazę danych PostgreSQL, system autentykacji, storage oraz funkcje serwerowe. Kluczową cechą Supabase jest ścisłe powiązanie między bazą danych a warstwą API. Każda tabela otrzymuje automatycznie generowany interfejs API, co przyspiesza tworzenie aplikacji i minimalizuje ryzyko niespójności (Supabase Docs, 2025). Dodatkową wartością są polityki Row Level Security, umożliwiające precyzyjne definiowanie uprawnień użytkowników bezpośrednio w bazie danych.
+Next.js, jako framework rozwijany na bazie Reacta, pozwala na budowę aplikacji hybrydowych, łączących różne strategie renderowania — SSR, SSG, CSR oraz Incremental Static Regeneration (ISR). W badaniach nad architekturami frontendowymi zwraca się uwagę, że tego typu podejście umożliwia osiągnięcie równowagi między wydajnością a elastycznością, a także ułatwia implementację funkcjonalności o zróżnicowanych wymaganiach czasowych (Lazuardy & Anggraini, 2022). Dzięki 'unified routing' (todo) opartemu na App Router oraz natywnemu wsparciu dla TypeScript, Next.js wspiera modularne podejście do tworzenia kodu i sprzyja porządkowi architektonicznemu (Next.js Documentation, 2025).
 
-Połączenie Next.js z Supabase tworzy model lekkiej architektury, w którym część logiki wykonywana jest w środowisku serverless, a część w przeglądarce klienta. Takie podejście zwiększa skalowalność aplikacji oraz upraszcza proces zarządzania infrastrukturą.
+Z kolei Supabase pełni rolę backendu jako usługi (BaaS), dostarczając spójny ekosystem obejmujący bazę PostgreSQL, system uwierzytelniania, storage oraz funkcje serwerowe. Jedną z wazniejszych właściwości Supabase jest automatyczne generowanie API typu REST i GraphQL na podstawie schematu bazy danych, co minimalizuje ryzyko niespójności między warstwami aplikacji oraz przyspiesza rozwój funkcjonalności (Supabase Docs, 2025). Dodatkowo polityki Row Level Security umożliwiają osadzenie warstwy autoryzacji bezpośrednio w bazie danych, zgodnie z podejściem „security by design”, ograniczając konieczność duplikowania logiki w backendzie.
 
-Poniższy diagram przedstawia uproszczony model architektury SaaS wykorzystywany w wielu współczesnych aplikacjach internetowych:
+W literaturze przedmiotu podkreśla się, że tego typu podejście wpisuje się w szerszą ewolucję modelu SaaS jako zdalnej eksploatacji aplikacji, w której dostawca przejmuje odpowiedzialność za infrastrukturę, aktualizacje oraz bezpieczeństwo, a użytkownik korzysta z oprogramowania wyłącznie jako z usługi dostępnej przez sieć (Dziembek, 2010; Małyszko, 2008). Pozwala to obniżyć próg wejścia dla mniejszych podmiotów i użytkowników indywidualnych, a jednocześnie sprzyja skalowalności oraz standaryzacji rozwiązań finansowych.
+
+Połączenie Next.js z Supabase tworzy lekką architekturę webową, która łączy funkcje serverless, obsługę żądań przez edge functions i bezpośrednią komunikację z bazą danych. Taki model upraszcza proces zarządzania infrastrukturą, zwiększa skalowalność oraz redukuje koszty dzięki wykorzystaniu usług zależnych od rzeczywistego obciążenia.
+
+Poniższy diagram prezentuje uproszczony model architektury SaaS stosowany w wielu współczesnych aplikacjach webowych, odzwierciedlający typowe relacje między warstwami systemu:
 
 ```mermaid
 graph TD
@@ -111,7 +115,7 @@ graph TD
 
 Model ten nie odnosi się bezpośrednio do implementacji Finwise, lecz obrazuje typowe zależności między warstwami w architekturze SaaS.
 
-## 2.3.2. Integracje w modelu serverless (Vercel, Upstash)
+### 2.3.2. Integracje w modelu serverless (Vercel, Upstash)
 
 Modele serverless zyskały popularność dzięki możliwości dynamicznego skalowania i rozliczania na podstawie faktycznego użycia. W kontekście aplikacji SaaS jest to szczególnie istotne, ponieważ obciążenie systemu może zmieniać się w zależności od liczby użytkowników, wykonywanych operacji oraz procesów automatycznych (Erl et al., 2013).
 
@@ -121,7 +125,7 @@ Upstash natomiast dostarcza usługi bazujące na Redisie oraz mechanizmy rate li
 
 Łączenie usług serverless w architekturze SaaS pozwala budować systemy zwarte, skalowalne i elastyczne, co — jak podkreśla Kleppmann (2017) — jest jednym z fundamentów projektowania nowoczesnych aplikacji rozproszonych.
 
-## 2.3.3. Standardy bezpieczeństwa (OAuth2, JWT, RLS)
+### 2.3.3. Standardy bezpieczeństwa (OAuth2, JWT, RLS)
 
 Bezpieczeństwo jest jednym z najważniejszych aspektów systemów finansowych, a architektura SaaS wymaga szczególnej dbałości o zarządzanie dostępem i ochronę danych. W tym kontekście stosuje się szereg standardów technicznych oraz dobrych praktyk.
 
@@ -133,19 +137,21 @@ W literaturze z zakresu inżynierii bezpieczeństwa podkreśla się, że efektyw
 
 Podsumowując, technologie webowe wykorzystywane w architekturze SaaS umożliwiają tworzenie aplikacji skalowalnych, wydajnych i bezpiecznych, a ich właściwe dobranie ma istotny wpływ dla stabilności całego systemu.
 
-# 2.4. Sztuczna inteligencja w FinTech
+## 2.4. Sztuczna inteligencja w FinTech
 
 Ta sekcja prezentuje rolę sztucznej inteligencji w nowoczesnych usługach finansowych, od analizy danych po interakcje konwersacyjne. Omówione zostają możliwości i ograniczenia modeli językowych, a także kwestie etyczne związane z ich wykorzystaniem w obszarze finansów osobistych. Szczególną uwagę poświęcono personalizacji rekomendacji oraz odpowiedzialnemu przetwarzaniu danych użytkowników. Jest to obszar szczególnie dynamiczny, a jego rozwój w istotny sposób wpływa na sposób, w jaki użytkownicy wchodzą w interakcję z nowoczesnymi aplikacjami. Sekcja stanowi podstawę do dalszych rozważań o roli AI w systemach takich jak Finwise.
 
-## 2.4.1. Wykorzystanie OpenAI API do analizy i dialogu
+### 2.4.1. Wykorzystanie OpenAI API do analizy i dialogu
 
-Sztuczna inteligencja odgrywa coraz większą rolę w sektorze FinTech, przyczyniając się do automatyzacji procesów, poprawy jakości usług oraz dostarczania użytkownikom spersonalizowanych rekomendacji. Jednym z najbardziej dynamicznie rozwijających się obszarów jest przetwarzanie języka naturalnego (NLP), wykorzystywane zarówno w analityce finansowej, jak i w systemach dialogowych wspomagających użytkowników. Modele językowe dużej skali, takie jak te rozwijane przez OpenAI, umożliwiają interpretację złożonych danych finansowych, generowanie opisów, wyjaśnień czy streszczeń oraz prowadzenie interaktywnych rozmów z użytkownikami (OpenAI Documentation, 2025).
+Sztuczna inteligencja odgrywa coraz większą rolę w sektorze FinTech, wspierając zarówno procesy analityczne, jak i interakcję użytkownika z systemem. Dynamiczny rozwój przetwarzania języka naturalnego (NLP) pozwala na przekształcanie złożonych danych finansowych w formę bardziej zrozumiałą i dostępną, co w znaczący sposób podnosi jakość doświadczeń użytkowników korzystających z aplikacji finansowych. Modele językowe dużej skali, rozwijane m.in. przez OpenAI, umożliwiają analizę danych, generowanie opisów, streszczeń oraz prowadzenie interaktywnych dialogów z użytkownikiem na wysokim poziomie precyzji (OpenAI Documentation, 2025).
 
-Zastosowanie modeli NLP w aplikacjach finansowych obejmuje m.in.: klasyfikację transakcji, wykrywanie anomalii, generowanie podsumowań wydatków oraz udzielanie odpowiedzi na pytania dotyczące stanu finansów. Badania wskazują, że zastosowanie modeli AI może zwiększać zrozumiałość danych finansowych i ułatwiać użytkownikom podejmowanie decyzji, szczególnie w sytuacjach, gdy dane liczbowe wymagają interpretacji kontekstowej (Pamuk & Schumann, 2025).
+Zastosowanie NLP w systemach finansowych jest szerokie. Badania wskazują, że modele oparte na sztucznej inteligencji mogą efektywnie wspierać takie zadania jak klasyfikacja i kategoryzacja transakcji, wykrywanie anomalii, generowanie podsumowań wydatków czy tworzenie rekomendacji finansowych (Gorai & Maurya, 2025; Cao, Yang & Yu, 2021). W literaturze podkreśla się również, że AI staje się coraz bardziej skuteczna w analizie szeregów czasowych i przewidywaniu zachowań finansowych użytkowników, co zwiększa jej wartość w kontekście planowania budżetu oraz zarządzania ryzykiem (Wasiu E. W. et al., 2025).
 
-Co istotne, interfejsy konwersacyjne stanowią jeden z najbardziej intuicyjnych sposobów komunikacji z systemem. W literaturze podkreśla się, że możliwość wyrażania zapytań w języku naturalnym obniża barierę wejścia oraz zwiększa dostępność narzędzi finansowych dla osób mniej zaawansowanych technologicznie (Feng et al., 2025). Dzięki temu sztuczna inteligencja staje się nie tylko narzędziem analitycznym, lecz także wspierającym proces edukacji finansowej.
+Interfejsy konwersacyjne, oparte na modelach językowych, stanowią jeden z najbardziej naturalnych sposobów komunikacji użytkownika z systemem. Autorzy badań nad rozwiązaniami typu robo-advisors wskazują, że dialog w języku naturalnym obniża barierę wejścia, ułatwia zrozumienie skomplikowanych zagadnień finansowych oraz buduje większe poczucie kontroli nad własnymi decyzjami (Syed & Janamolla, 2024). Dodatkowo, literatura dotycząca sztucznej inteligencji w finansach podkreśla, że systemy oparte na NLP mogą pełnić funkcję edukacyjną, wspierając użytkowników w rozwijaniu kompetencji finansowych i podejmowaniu bardziej świadomych decyzji (Cao et al., 2021).
 
-## 2.4.2. Aspekty etyczne i odpowiedzialne AI
+W rezultacie modele językowe, takie jak te udostępniane przez OpenAI API, stają się zasadnicznym elementem nowoczesnych aplikacji finansowych. Umożliwiają one nie tylko analizę danych i automatyzację procesów, lecz także tworzą bardziej przystępny, dialogowy interfejs, który zwiększa dostępność i przyjazność narzędzi finansowych dla szerokiej grupy odbiorców.
+
+### 2.4.2. Aspekty etyczne i odpowiedzialne AI
 
 Rozwój sztucznej inteligencji w sektorze finansowym wiąże się również z szeregiem wyzwań etycznych. W literaturze wskazuje się, że systemy oparte na AI muszą spełniać kryteria przejrzystości, niezawodności, bezpieczeństwa oraz niedyskryminacji (Müller, 2020). W kontekście FinTech szczególnego znaczenia nabiera kwestia odpowiedzialności za rekomendacje oraz ryzyka wynikającego z błędnych predykcji.
 
@@ -153,7 +159,7 @@ Złożoność modeli generatywnych powoduje, że ich działanie często ma chara
 
 Kolejną kwestią jest ochrona danych osobowych. Modele AI muszą operować na danych w sposób zgodny z regulacjami takimi jak RODO, co obejmuje m.in. minimalizację danych, ograniczenie czasu przechowywania oraz zapewnienie użytkownikowi wglądu do sposobu ich przetwarzania. W przypadku modeli konwersacyjnych istnieją dodatkowe ryzyka związane z przypadkowym ujawnieniem informacji wrażliwych, dlatego kluczowe jest stosowanie mechanizmów anonimizacji oraz kontroli kontekstu (Pfleeger & Pfleeger, 2015).
 
-## 2.4.3. Personalizacja rekomendacji finansowych
+### 2.4.3. Personalizacja rekomendacji finansowych
 
 Personalizacja jest jednym z najważniejszych obszarów, w których AI wnosi istotną wartość w sektorze FinTech. W tradycyjnym podejściu użytkownik otrzymuje uniwersalne wskazówki i raporty, które nie uwzględniają jego indywidualnych nawyków, celów czy ryzyka finansowego. Algorytmy uczenia maszynowego pozwalają tworzyć spersonalizowane rekomendacje, oparte zarówno na danych historycznych użytkownika, jak i porównaniach z szerokimi zbiorami danych populacyjnych (Cao et al., 2020).
 
@@ -171,11 +177,11 @@ W przeciwieństwie do klasycznych metod analitycznych, które oferują głównie
 
 Podsumowując, sztuczna inteligencja stanowi istotny element współczesnych systemów FinTech, wpływając zarówno na automatyzację procesów, jak i jakość interakcji z użytkownikiem. Jej rozwój otwiera możliwości tworzenia bardziej dostępnych, inteligentnych i spersonalizowanych aplikacji finansowych.
 
-# 2.5. Przegląd istniejących platform
+## 2.5. Przegląd istniejących platform
 
 Ostatnia część rozdziału obejmuje przegląd wybranych platform finansowych, stanowiący punkt odniesienia dla dalszych etapów projektowania systemu. Analiza dostępnych rozwiązań rynkowych pozwala zidentyfikować zarówno ich mocne strony, jak i ograniczenia, a także określić, jakie funkcje i podejścia mogą zostać wykorzystane przy projektowaniu nowych narzędzi.
 
-## 2.5.1. Mint, YNAB, Revolut, PocketGuard – charakterystyka
+### 2.5.1. Mint, YNAB, Revolut, PocketGuard – charakterystyka
 
 Aplikacje do zarządzania finansami osobistymi różnią się zakresem funkcji, modelem biznesowym oraz stopniem automatyzacji procesów finansowych. Wśród najczęściej analizowanych rozwiązań znajdują się Mint, You Need a Budget (YNAB), Revolut oraz PocketGuard. Każda z tych platform reprezentuje odmienny styl pracy z danymi finansowymi.
 
@@ -189,7 +195,7 @@ Aplikacje do zarządzania finansami osobistymi różnią się zakresem funkcji, 
 
 ---
 
-## 2.5.2. Tabela porównawcza funkcjonalności i technologii
+### 2.5.2. Tabela porównawcza funkcjonalności i technologii
 
 Poniższa tabela przedstawia zestawienie wybranych funkcji oraz charakterystyk technologicznych analizowanych platform.
 
@@ -204,7 +210,7 @@ Poniższa tabela przedstawia zestawienie wybranych funkcji oraz charakterystyk t
 
 ---
 
-## 2.5.3. Wnioski benchmarkingowe dla Finwise
+### 2.5.3. Wnioski benchmarkingowe dla Finwise
 
 Analiza istniejących platform wskazuje, że na rynku dominują dwa główne podejścia do zarządzania finansami: automatyczne (Mint, PocketGuard) oraz świadome i manualne (YNAB). Rozwiązania takie jak Revolut dodatkowo integrują funkcje budżetowe z szeroką ofertą usług finansowych, co czyni je bardziej uniwersalnymi, ale mniej wyspecjalizowanymi.
 
