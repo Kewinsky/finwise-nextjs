@@ -1,5 +1,3 @@
-<!-- cSpell:disable -->
-
 ### 8 How AI-driven Robo-Advisors Impact Investment Decision-making and Portfolio Performance in the Financial Sector
 
 1. AI-driven robo-advisors wykorzystują zaawansowane techniki uczenia maszynowego i analizy big data do dostarczania spersonalizowanych strategii inwestycyjnych, co znacząco poprawia dostępność i efektywność usług finansowych.
@@ -1012,4 +1010,3 @@ _Dlaczego to ważne dla Finwise?_ – Można rozważyć, jak architektury SaaS w
 - Zastosowanie zasad Dependency Rule i decoupling do modularnej budowy systemów finansowych, co poprawi ich bezpieczeństwo i skalowalność.
 - Segmentacja architektury na warstwy i granice, aby umożliwić łatwe i niezależne aktualizacje funkcji, co jest istotne przy integracjach z Stripe i Supabase.
 - Wykorzystanie różnych architektur (np. Ports and Adapters), co może wspierać elastyczne rozwiązania w zakresie modelowania AI, wizualizacji danych i bezpieczeństwa.
-<!-- cSpell:enable -->
