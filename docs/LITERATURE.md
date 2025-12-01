@@ -26,7 +26,7 @@
 - Książki & artykuły naukowe
   1. Finwise[[link]](https://agorism.dev/book/software-architecture/%28Robert%20C.%20Martin%20Series%29%20Robert%20C.%20Martin%20-%20Clean%20Architecture_%20A%20Craftsman%E2%80%99s%20Guide%20to%20Software%20Structure%20and%20Design-Prentice%20Hall%20%282017%29.pdf) Clean Architecture by Martin, R. C.
 
-  2. Finwise[[link]](https://dbc.wroc.pl/Content/73260/Swiecka_Finanse_Gospodarstw_Domowych_i_Finanse_Osobiste.pdf) Finanse gospodarstw domowych i finanse osobiste — L. Beskid (2011)
+  2. Finwise[[link]](https://dbc.wroc.pl/Content/73260/Swiecka_Finanse_Gospodarstw_Domowych_i_Finanse_Osobiste.pdf) Finanse gospodarstw domowych i finanse osobiste — Beata Świecka (2011)
   3. Finwise[[link]](https://bazhum.muzhp.pl/media/texts/problemy-zarzadzania-finansow-i-marketingu/2012-tom-27/problemy_zarzadzania_finansow_i_marketingu-r2012-t27-s567-576.pdf) Zmiany świadomości ekonomicznej w polskich gospodarstwach domowych — Paweł Sztuczka (2012)
   4. Finwise[[link]](https://dbc.wroc.pl/Content/121580/Dziembek_Model_SaaS_jako_forma_zdalnej.pdf) Model Saas jako forma zdalnej eksploatacji aplikacji dla przedsiębiorstw — Damian Dziembek (2010)
 
@@ -41,24 +41,24 @@
   12. Finwise[[link]](https://www.iosrjournals.org/iosr-jce/papers/Vol27-issue1/Ser-1/B2701010717.pdf) Artificial Intelligence In Personal Finance Management: Opportunities And Challenges — Gorai & Maurya (2025)
   13. Finwise[[link]](https://iiardjournals.org/get/WJFIR/VOL.%209%20NO.%204%202025/Artificial%20Intelligence%20in%20Financial%2061-79.pdf) Artificial Intelligence in Financial Forecasting: Accuracy and Limitations — Wasiu E. W., Ezeilo & Ogundeji (2025)
   14. Finwise[[link]](https://jwmason.org/wp-content/uploads/2021/08/Kieran-Healy-Data-Visualization_-A-Practical-Introduction-Princeton-University-Press-2019.pdf) Data Visualization: A Practical Introduction — Kieran Healy (2019)
-  15. Nudge: Improving Decisions About Health, Wealth, and Happiness — Thaler & Sunstein (2008)
-  16. Designing Data-Intensive Applications — Martin Kleppmann (2017)
-  17. Data Science for Business — Provost & Fawcett (2013)
-  18. Cloud Computing: Concepts, Technology & Architecture — Erl, Puttini & Mahmood (2013)
-  19. Ethics of Artificial Intelligence — Müller (2020)
-  20. FinTech Adoption and Consumer Behavior — Jung et al. (2018)
-  21. Hendershott, T. i in. (2021). Artykuł opublikowany w _Information Systems Research_, dotyczący personalizacji, analizy danych i satysfakcji użytkowników w aplikacjach finansowych.
+  15. Nudge: Improving Decisions About Health, Wealth, and Happiness — Thaler & Sunstein (2008) https://www.researchgate.net/publication/235413094_NUDGE_Improving_Decisions_About_Health_Wealth_and_Happiness
+  16. Designing Data-Intensive Applications — Martin Kleppmann (2017) https://books.google.pl/books?hl=pl&lr=&id=p1heDgAAQBAJ&oi=fnd&pg=PP15&dq=Designing+Data-Intensive+Applications&ots=BEe-ArknXn&sig=ttk9rKWHj2opcnp0h7jGdXMExD0&redir_esc=y#v=onepage&q=Designing%20Data-Intensive%20Applications&f=false
+  17. Data Science for Business — Provost & Fawcett (2013) https://helion.pl/ksiazki/data-science-for-business-what-you-need-to-know-about-data-mining-and-data-analytic-thinking-foster-provost-tom-fawcett,e_2g6i.htm?srsltid=AfmBOoqc3nO6bj99WQPbZodQmn7Xbj32IK4L5hkJIHyFXP_jy46CrxSo#format/e
+  18. Cloud Computing: Concepts, Technology & Architecture — Erl, Puttini & Mahmood (2013) https://ptgmedia.pearsoncmg.com/images/9780133387520/samplepages/0133387526.pdf
+  19. Ethics of Artificial Intelligence — Müller (2020) https://arxiv.org/abs/2508.16658
+  20. FinTech Adoption and Consumer Behavior — Jung et al. (2018) https://link.springer.com/article/10.1007/s12525-017-0279-9 
+  21. Hendershott, T. i in. (2021). Artykuł opublikowany w _Information Systems Research_, dotyczący personalizacji, analizy danych i satysfakcji użytkowników w aplikacjach finansowych. https://faculty.haas.berkeley.edu/hender/fintech_intro.pdf
   22. Cao, L., Yang, L. & Yu, P. (2020). Praca dotycząca zastosowania metod predykcyjnych i uczenia maszynowego w analizie danych finansowych.
-  23. Lim, S. i in. (2019). Publikacja z zakresu ekonomii behawioralnej, omawiająca m.in. present bias, anchoring oraz nadmierną pewność siebie w decyzjach finansowych.
-  24. Norman, D. A. (2013). The Design of Everyday Things (rev. ed.). MIT Press.
-  25. Garrett, J. J. (2010). The Elements of User Experience: User-Centered Design for the Web and Beyond (2nd ed.). New Riders.
-  26. European Banking Authority (2020). Guidelines on ICT and security risk management.
-  27. Pfleeger, C. P. & Pfleeger, S. L. (2015). Security in Computing (5th ed.). Pearson.
-  28. Anderson, R. (2020). Security Engineering: A Guide to Building Dependable Distributed Systems (3rd ed.). Wiley.
-  29. Arslanian, H. & Fischer, F. (2020). The Future of Finance: The Impact of FinTech, AI, and Crypto on Financial Services. Palgrave Macmillan.
-  30. IETF (2012). The OAuth 2.0 Authorization Framework (RFC 6749).
-  31. Leong, K. i in. (2017). Publikacja dotycząca modeli monetyzacji (subskrypcje, freemium) oraz zachowań użytkowników w usługach cyfrowych, w tym aplikacjach finansowych.
-  32. Hua, G. i in. (2019). Artykuł analizujący wpływ przejrzystości kosztów i struktury opłat na zaufanie oraz satysfakcję użytkowników platform finansowych.
+  23. Lim, S. i in. (2019). Publikacja z zakresu ekonomii behawioralnej, omawiająca m.in. present bias, anchoring oraz nadmierną pewność siebie w decyzjach finansowych.https://www.researchgate.net/publication/327091706_An_Empirical_Study_of_the_Impacts_of_Perceived_Security_and_Knowledge_on_Continuous_Intention_to_Use_Mobile_Fintech_Payment_Services
+  24. Norman, D. A. (2013). The Design of Everyday Things (rev. ed.). MIT Press. https://www.semanticscholar.org/paper/The-Design-of-Everyday-Things%3A-Revised-and-Expanded-Norman/d61435d38e02bdc35fdae7afd60f99eefd472306
+  25. Garrett, J. J. (2010). The Elements of User Experience: User-Centered Design for the Web and Beyond (2nd ed.). New Riders. https://ptgmedia.pearsoncmg.com/images/9780321683687/samplepages/0321683684.pdf
+  26. European Banking Authority (2020). Guidelines on ICT and security risk management. https://www.eba.europa.eu/sites/default/files/document_library/Publications/Guidelines/2020/GLs%20on%20ICT%20and%20security%20risk%20management/872936/Final%20draft%20Guidelines%20on%20ICT%20and%20security%20risk%20management.pdf
+  27. Pfleeger, C. P. & Pfleeger, S. L. (2015). Security in Computing (5th ed.). Pearson. https://fullpdfword.org/look-up/mL5B28/602676/4965447-security-in-computing-by-charles-p-pfleeger
+  28. Anderson, R. (2020). Security Engineering: A Guide to Building Dependable Distributed Systems (3rd ed.). Wiley. https://www.cl.cam.ac.uk/archive/rja14/Papers/SEv3.pdf
+  29. Arslanian, H. & Fischer, F. (2020). The Future of Finance: The Impact of FinTech, AI, and Crypto on Financial Services. Palgrave Macmillan. https://link.springer.com/book/10.1007/978-3-030-14533-0
+  30. IETF (2012). The OAuth 2.0 Authorization Framework (RFC 6749). https://datatracker.ietf.org/doc/html/rfc6749
+  31. Leong, K. i in. (2017). Publikacja dotycząca modeli monetyzacji (subskrypcje, freemium) oraz zachowań użytkowników w usługach cyfrowych, w tym aplikacjach finansowych. https://www.sciencedirect.com/science/article/pii/S0268401216308180
+  32. Hua, G. i in. (2019). Artykuł analizujący wpływ przejrzystości kosztów i struktury opłat na zaufanie oraz satysfakcję użytkowników platform finansowych. https://www.emerald.com/imds/article-abstract/119/7/1401/391339/Current-practices-new-insights-and-emerging-trends?redirectedFrom=fulltext
 
 zrodla do usuniecia:
 

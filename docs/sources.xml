@@ -223,11 +223,11 @@
   </b:Source>
 
   <b:Source>
-    <b:Tag>Beskid2011</b:Tag>
-    <b:SourceType>Book</b:SourceType>
+      <b:Tag>Beskid2011</b:Tag>
+      <b:SourceType>JournalArticle</b:SourceType>
     <b:Author>
       <b:NameList>
-        <b:Person><b:Last>Beskid</b:Last><b:First>L.</b:First></b:Person>
+        <b:Person><b:Last>Świecka</b:Last><b:First>Beata</b:First></b:Person>
       </b:NameList>
       <b:Author>
         <b:NameList>
@@ -235,9 +235,9 @@
         </b:NameList>
       </b:Author>
     </b:Author>
-    <b:Title>Finanse gospodarstw domowych i finanse osobiste</b:Title>
+    <b:Title>Finanse gospodarstw domowych i finanse osobiste - nowe wyzwania teorii</b:Title>
     <b:Year>2011</b:Year>
-    <b:Guid>{GUID-Beskid2011}</b:Guid>
+    <b:Guid>{GUID-Świecka2011}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -485,7 +485,7 @@
       <b:Author>
         <b:NameList>
           <b:Person><b:Last>Thaler</b:Last><b:First>Richard H.</b:First></b:Person>
-          <b:Person><b:Last>Sunstein</b:Last><b:First>Cass R.</b:First></b:Person>
+          <b:Person><b:Last>Sunstein</b:Last><b:First>C.</b:First></b:Person>
         </b:NameList>
       </b:Author>
     </b:Author>
@@ -577,15 +577,15 @@
     <b:SourceType>JournalArticle</b:SourceType>
     <b:Author>
       <b:NameList>
-        <b:Person><b:Last>Jung</b:Last><b:First>Daniel</b:First></b:Person>
+        <b:Person><b:Last>Jung</b:Last><b:First>Dominik</b:First></b:Person>
       </b:NameList>
       <b:Author>
         <b:NameList>
-          <b:Person><b:Last>Jung</b:Last><b:First>Daniel</b:First></b:Person>
+          <b:Person><b:Last>Jung</b:Last><b:First>Dominik</b:First></b:Person>
         </b:NameList>
       </b:Author>
     </b:Author>
-    <b:Title>FinTech Adoption and Consumer Behavior</b:Title>
+    <b:Title>Designing a robo-advisor for risk-averse, low-budget consumers</b:Title>
     <b:Year>2018</b:Year>
     <b:Guid>{GUID-Jung2018}</b:Guid>
   </b:Source>
@@ -603,7 +603,7 @@
         </b:NameList>
       </b:Author>
     </b:Author>
-    <b:Title>Personalization, Data Analytics and User Engagement in Financial Applications</b:Title>
+    <b:Title>FinTech as a Game Changer: Overview of Research Frontiers</b:Title>
     <b:Year>2021</b:Year>
     <b:Guid>{GUID-Hendershott2021}</b:Guid>
   </b:Source>
@@ -635,11 +635,11 @@
     <b:SourceType>JournalArticle</b:SourceType>
     <b:Author>
       <b:NameList>
-        <b:Person><b:Last>Lim</b:Last><b:First>Sarah</b:First></b:Person>
+        <b:Person><b:Last>Lim</b:Last><b:First>Se Hun</b:First></b:Person>
       </b:NameList>
       <b:Author>
         <b:NameList>
-          <b:Person><b:Last>Lim</b:Last><b:First>Sarah</b:First></b:Person>
+          <b:Person><b:Last>Lim</b:Last><b:First>Se Hun</b:First></b:Person>
         </b:NameList>
       </b:Author>
     </b:Author>
@@ -679,7 +679,7 @@
         </b:NameList>
       </b:Author>
     </b:Author>
-    <b:Title>The Elements of User Experience: User-Centered Design for the Web and Beyond</b:Title>
+    <b:Title>The Elements of User Experience</b:Title>
     <b:Year>2010</b:Year>
     <b:Guid>{GUID-Garrett2010}</b:Guid>
   </b:Source>
@@ -699,12 +699,10 @@
     <b:Author>
       <b:NameList>
         <b:Person><b:Last>Pfleeger</b:Last><b:First>Charles P.</b:First></b:Person>
-        <b:Person><b:Last>Pfleeger</b:Last><b:First>Shari L.</b:First></b:Person>
       </b:NameList>
       <b:Author>
         <b:NameList>
           <b:Person><b:Last>Pfleeger</b:Last><b:First>Charles P.</b:First></b:Person>
-          <b:Person><b:Last>Pfleeger</b:Last><b:First>Shari L.</b:First></b:Person>
         </b:NameList>
       </b:Author>
     </b:Author>
@@ -732,7 +730,7 @@
   </b:Source>
 
   <b:Source>
-    <b:Tag>ArslanianFischer2020</b:Tag>
+    <b:Tag>ArslanianFischer2019</b:Tag>
     <b:SourceType>Book</b:SourceType>
     <b:Author>
       <b:NameList>
@@ -748,7 +746,7 @@
     </b:Author>
     <b:Title>The Future of Finance: The Impact of FinTech, AI, and Crypto on Financial Services</b:Title>
     <b:Year>2020</b:Year>
-    <b:Guid>{GUID-ArslanianFischer2020}</b:Guid>
+    <b:Guid>{GUID-ArslanianFischer2019}</b:Guid>
   </b:Source>
 
   <b:Source>
@@ -765,15 +763,15 @@
     <b:SourceType>JournalArticle</b:SourceType>
     <b:Author>
       <b:NameList>
-        <b:Person><b:Last>Leong</b:Last><b:First>Kim</b:First></b:Person>
+        <b:Person><b:Last>Leong</b:Last><b:First>Carmen</b:First></b:Person>
       </b:NameList>
       <b:Author>
         <b:NameList>
-          <b:Person><b:Last>Leong</b:Last><b:First>Kim</b:First></b:Person>
+          <b:Person><b:Last>Leong</b:Last><b:First>Carmen</b:First></b:Person>
         </b:NameList>
       </b:Author>
     </b:Author>
-    <b:Title>Monetization Models and Consumer Behavior in Digital Services</b:Title>
+    <b:Title>Nurturing a FinTech ecosystem: The case of a youth microloan startup in China</b:Title>
     <b:Year>2017</b:Year>
     <b:Guid>{GUID-Leong2017}</b:Guid>
   </b:Source>
@@ -783,18 +781,17 @@
     <b:SourceType>JournalArticle</b:SourceType>
     <b:Author>
       <b:NameList>
-        <b:Person><b:Last>Hua</b:Last><b:First>Guang</b:First></b:Person>
+        <b:Person><b:Last>Hua</b:Last><b:First>Xiuping</b:First></b:Person>
       </b:NameList>
       <b:Author>
         <b:NameList>
-          <b:Person><b:Last>Hua</b:Last><b:First>Guang</b:First></b:Person>
+          <b:Person><b:Last>Hua</b:Last><b:First>Xiuping</b:First></b:Person>
         </b:NameList>
       </b:Author>
     </b:Author>
-    <b:Title>Pricing Transparency and Trust in Financial Platforms</b:Title>
+    <b:Title>Current practices, new insights, and emerging trends of financial technologies</b:Title>
     <b:Year>2019</b:Year>
     <b:Guid>{GUID-Hua2019}</b:Guid>
   </b:Source>
 
 </b:Sources>
-
