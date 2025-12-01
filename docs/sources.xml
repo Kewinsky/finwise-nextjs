@@ -209,8 +209,13 @@
     <b:SourceType>Book</b:SourceType>
     <b:Author>
       <b:NameList>
-        <b:Person><b:Last>Martin</b:Last><b:First>Robert C.</b:First></b:Person>
+        <b:Person><b:Last>Martin</b:Last><b:First>Robert</b:First><b:Middle>C.</b:Middle></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Martin</b:Last><b:First>Robert C.</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Clean Architecture: A Craftsman's Guide to Software Structure and Design</b:Title>
     <b:Year>2017</b:Year>
@@ -224,6 +229,11 @@
       <b:NameList>
         <b:Person><b:Last>Beskid</b:Last><b:First>L.</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Świecka</b:Last><b:First>Beata</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Finanse gospodarstw domowych i finanse osobiste</b:Title>
     <b:Year>2011</b:Year>
@@ -237,6 +247,11 @@
       <b:NameList>
         <b:Person><b:Last>Sztuczka</b:Last><b:First>Paweł</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Sztuczka</b:Last><b:First>Paweł</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Zmiany świadomości ekonomicznej w polskich gospodarstwach domowych</b:Title>
     <b:Year>2012</b:Year>
@@ -250,6 +265,11 @@
       <b:NameList>
         <b:Person><b:Last>Dziembek</b:Last><b:First>Damian</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Dziembek</b:Last><b:First>Damian</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Model SaaS jako forma zdalnej eksploatacji aplikacji dla przedsiębiorstw</b:Title>
     <b:Year>2010</b:Year>
@@ -259,10 +279,15 @@
   <b:Source>
     <b:Tag>Malyszko2008</b:Tag>
     <b:SourceType>Report</b:SourceType>
-    <b:Author>
+        <b:Author>
       <b:NameList>
         <b:Person><b:Last>Małyszko</b:Last><b:First>Michał</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Małyszko</b:Last><b:First>Michał</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Saas jako metoda świadczenia e-usług</b:Title>
     <b:Year>2008</b:Year>
@@ -276,8 +301,13 @@
       <b:NameList>
         <b:Person><b:Last>Berman</b:Last><b:First>Karen</b:First></b:Person>
         <b:Person><b:Last>Knight</b:Last><b:First>Joe</b:First></b:Person>
-        <b:Person><b:Last>Case</b:Last><b:First>John</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Berman</b:Last><b:First>Karen</b:First></b:Person>
+          <b:Person><b:Last>Knight</b:Last><b:First>Joe</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Financial Intelligence</b:Title>
     <b:Year>2013</b:Year>
@@ -292,6 +322,12 @@
         <b:Person><b:Last>Lazuardy</b:Last><b:First>Mochammad Fariz Syah</b:First></b:Person>
         <b:Person><b:Last>Anggraini</b:Last><b:First>Dyah</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Lazuardy</b:Last><b:Middle>Fariz</b:Middle><b:First>Mochammad</b:First></b:Person>
+          <b:Person><b:Last>Anggraini</b:Last><b:First>Dyah</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Modern Front End Web Architectures with React.Js and Next.Js</b:Title>
     <b:Year>2022</b:Year>
@@ -306,6 +342,12 @@
         <b:Person><b:Last>Chishti</b:Last><b:First>Susanne</b:First></b:Person>
         <b:Person><b:Last>Barberis</b:Last><b:First>Jonas</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Barberis</b:Last><b:First>Jonas</b:First></b:Person>
+          <b:Person><b:Last>Chishti</b:Last><b:First>Susanne</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>The FinTech Book</b:Title>
     <b:Year>2016</b:Year>
@@ -321,6 +363,13 @@
         <b:Person><b:Last>Yang</b:Last><b:First>Qiang</b:First></b:Person>
         <b:Person><b:Last>Yu</b:Last><b:First>Philip S.</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Cao</b:Last><b:First>Longbing</b:First></b:Person>
+          <b:Person><b:Last>Yang</b:Last><b:First>Qiang</b:First></b:Person>
+          <b:Person><b:Last>Yu</b:Last><b:First>Philip S.</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Data Science and AI in FinTech</b:Title>
     <b:Year>2021</b:Year>
@@ -330,11 +379,17 @@
   <b:Source>
     <b:Tag>SyedJanamolla2024</b:Tag>
     <b:SourceType>JournalArticle</b:SourceType>
-    <b:Author>
+        <b:Author>
       <b:NameList>
-        <b:Person><b:Last>Syed</b:Last><b:First>Waheeduddin Khadri</b:First></b:Person>
-        <b:Person><b:Last>Janamolla</b:Last><b:First>Kavitha Reddy</b:First></b:Person>
+        <b:Person><b:Last>Syed</b:Last><b:Middle>Khadri</b:Middle><b:First>Waheeduddin</b:First></b:Person>
+        <b:Person><b:Last>Janamolla</b:Last><b:Middle>Kavitha</b:Middle><b:First>Reddy</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Syed</b:Last><b:Middle>Khadri</b:Middle><b:First>Waheeduddin</b:First></b:Person>
+          <b:Person><b:Last>Janamolla</b:Last><b:Middle>Kavitha</b:Middle><b:First>Reddy</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>How AI-driven Robo-Advisors Impact Investment Decision-making and Portfolio Performance in the Financial Sector</b:Title>
     <b:Year>2024</b:Year>
@@ -348,6 +403,11 @@
       <b:NameList>
         <b:Person><b:Last>Cao</b:Last><b:First>Longbing</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Cao</b:Last><b:First>Longbing</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>AI in Finance: Challenges, Techniques, and Opportunities</b:Title>
     <b:Year>2021</b:Year>
@@ -359,9 +419,15 @@
     <b:SourceType>JournalArticle</b:SourceType>
     <b:Author>
       <b:NameList>
-        <b:Person><b:Last>Gorai</b:Last><b:First>S. K.</b:First></b:Person>
+        <b:Person><b:Last>Gorai</b:Last><b:First>S.K.</b:First></b:Person>
         <b:Person><b:Last>Maurya</b:Last><b:First>Amar</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Gorai</b:Last><b:First>S.K.</b:First></b:Person>
+          <b:Person><b:Last>Maurya</b:Last><b:First>Amar</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Artificial Intelligence In Personal Finance Management: Opportunities And Challenges</b:Title>
     <b:Year>2025</b:Year>
@@ -373,10 +439,17 @@
     <b:SourceType>JournalArticle</b:SourceType>
     <b:Author>
       <b:NameList>
-        <b:Person><b:Last>Eyinade</b:Last><b:First>Wasiu</b:First></b:Person>
+        <b:Person><b:First>Wasiu</b:First><b:Middle>Eyinade</b:Middle></b:Person>
         <b:Person><b:Last>Ezeilo</b:Last><b:First>Onyinye Jacqueline</b:First></b:Person>
-        <b:Person><b:Last>Ogundeji</b:Last><b:First>Ibidapo Abiodun</b:First></b:Person>
+        <b:Person><b:Last>Ogundeji</b:Last><b:First>Ibidapo</b:First><b:Middle>Abiodun</b:Middle></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Eyinade</b:Last><b:First>Wasiu</b:First></b:Person>
+          <b:Person><b:Last>Ezeilo</b:Last><b:Middle>Onyinye</b:Middle><b:First>Jacqueline</b:First></b:Person>
+          <b:Person><b:Last>Ogundeji</b:Last><b:Middle>Ibidapo</b:Middle><b:First>Abiodun</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Artificial Intelligence in Financial Forecasting: Accuracy and Limitations</b:Title>
     <b:Year>2025</b:Year>
@@ -390,6 +463,11 @@
       <b:NameList>
         <b:Person><b:Last>Healy</b:Last><b:First>Kieran</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Healy</b:Last><b:First>Kieran</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Data Visualization: A Practical Introduction</b:Title>
     <b:Year>2019</b:Year>
@@ -404,6 +482,12 @@
         <b:Person><b:Last>Thaler</b:Last><b:First>Richard H.</b:First></b:Person>
         <b:Person><b:Last>Sunstein</b:Last><b:First>Cass R.</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Thaler</b:Last><b:First>Richard H.</b:First></b:Person>
+          <b:Person><b:Last>Sunstein</b:Last><b:First>Cass R.</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Nudge: Improving Decisions About Health, Wealth, and Happiness</b:Title>
     <b:Year>2008</b:Year>
@@ -417,6 +501,11 @@
       <b:NameList>
         <b:Person><b:Last>Kleppmann</b:Last><b:First>Martin</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Kleppmann</b:Last><b:First>Martin</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Designing Data-Intensive Applications</b:Title>
     <b:Year>2017</b:Year>
@@ -431,6 +520,12 @@
         <b:Person><b:Last>Provost</b:Last><b:First>Foster</b:First></b:Person>
         <b:Person><b:Last>Fawcett</b:Last><b:First>Tom</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Provost</b:Last><b:First>Foster</b:First></b:Person>
+          <b:Person><b:Last>Fawcett</b:Last><b:First>Tom</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Data Science for Business</b:Title>
     <b:Year>2013</b:Year>
@@ -446,6 +541,13 @@
         <b:Person><b:Last>Puttini</b:Last><b:First>Ricardo</b:First></b:Person>
         <b:Person><b:Last>Mahmood</b:Last><b:First>Zaigham</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Erl</b:Last><b:First>Thomas</b:First></b:Person>
+          <b:Person><b:Last>Puttini</b:Last><b:First>Ricardo</b:First></b:Person>
+          <b:Person><b:Last>Mahmood</b:Last><b:First>Zaigham</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Cloud Computing: Concepts, Technology &amp; Architecture</b:Title>
     <b:Year>2013</b:Year>
@@ -459,6 +561,11 @@
       <b:NameList>
         <b:Person><b:Last>Müller</b:Last><b:First>Vincent C.</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Müller</b:Last><b:First>Vincent C.</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Ethics of Artificial Intelligence</b:Title>
     <b:Year>2020</b:Year>
@@ -472,6 +579,11 @@
       <b:NameList>
         <b:Person><b:Last>Jung</b:Last><b:First>Daniel</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Jung</b:Last><b:First>Daniel</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>FinTech Adoption and Consumer Behavior</b:Title>
     <b:Year>2018</b:Year>
@@ -485,6 +597,11 @@
       <b:NameList>
         <b:Person><b:Last>Hendershott</b:Last><b:First>Terrence</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Hendershott</b:Last><b:First>Terrence</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Personalization, Data Analytics and User Engagement in Financial Applications</b:Title>
     <b:Year>2021</b:Year>
@@ -500,6 +617,13 @@
         <b:Person><b:Last>Yang</b:Last><b:First>Qiang</b:First></b:Person>
         <b:Person><b:Last>Yu</b:Last><b:First>Philip S.</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Cao</b:Last><b:First>Longbing</b:First></b:Person>
+          <b:Person><b:Last>Yang</b:Last><b:First>Qiang</b:First></b:Person>
+          <b:Person><b:Last>Yu</b:Last><b:First>Philip S.</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Predictive Analytics for Personal Finance</b:Title>
     <b:Year>2020</b:Year>
@@ -513,6 +637,11 @@
       <b:NameList>
         <b:Person><b:Last>Lim</b:Last><b:First>Sarah</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Lim</b:Last><b:First>Sarah</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Behavioral Biases in Personal Financial Decision-Making</b:Title>
     <b:Year>2019</b:Year>
@@ -526,6 +655,11 @@
       <b:NameList>
         <b:Person><b:Last>Norman</b:Last><b:First>Don</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Norman</b:Last><b:First>Don</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>The Design of Everyday Things (Revised Edition)</b:Title>
     <b:Year>2013</b:Year>
@@ -539,6 +673,11 @@
       <b:NameList>
         <b:Person><b:Last>Garrett</b:Last><b:First>Jesse James</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Garrett</b:Last><b:First>Jesse James</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>The Elements of User Experience: User-Centered Design for the Web and Beyond</b:Title>
     <b:Year>2010</b:Year>
@@ -562,6 +701,12 @@
         <b:Person><b:Last>Pfleeger</b:Last><b:First>Charles P.</b:First></b:Person>
         <b:Person><b:Last>Pfleeger</b:Last><b:First>Shari L.</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Pfleeger</b:Last><b:First>Charles P.</b:First></b:Person>
+          <b:Person><b:Last>Pfleeger</b:Last><b:First>Shari L.</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Security in Computing</b:Title>
     <b:Year>2015</b:Year>
@@ -575,6 +720,11 @@
       <b:NameList>
         <b:Person><b:Last>Anderson</b:Last><b:First>Ross</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Anderson</b:Last><b:First>Ross</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Security Engineering: A Guide to Building Dependable Distributed Systems</b:Title>
     <b:Year>2020</b:Year>
@@ -589,6 +739,12 @@
         <b:Person><b:Last>Arslanian</b:Last><b:First>Henri</b:First></b:Person>
         <b:Person><b:Last>Fischer</b:Last><b:First>Fabrice</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Arslanian</b:Last><b:First>Henri</b:First></b:Person>
+          <b:Person><b:Last>Fischer</b:Last><b:First>Fabrice</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>The Future of Finance: The Impact of FinTech, AI, and Crypto on Financial Services</b:Title>
     <b:Year>2020</b:Year>
@@ -611,6 +767,11 @@
       <b:NameList>
         <b:Person><b:Last>Leong</b:Last><b:First>Kim</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Leong</b:Last><b:First>Kim</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Monetization Models and Consumer Behavior in Digital Services</b:Title>
     <b:Year>2017</b:Year>
@@ -624,6 +785,11 @@
       <b:NameList>
         <b:Person><b:Last>Hua</b:Last><b:First>Guang</b:First></b:Person>
       </b:NameList>
+      <b:Author>
+        <b:NameList>
+          <b:Person><b:Last>Hua</b:Last><b:First>Guang</b:First></b:Person>
+        </b:NameList>
+      </b:Author>
     </b:Author>
     <b:Title>Pricing Transparency and Trust in Financial Platforms</b:Title>
     <b:Year>2019</b:Year>
