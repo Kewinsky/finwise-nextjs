@@ -100,8 +100,7 @@
 4.5.3. Mechanizmy ograniczania kosztów i rate limiting  
 4.6. Eksport danych i personalizacja  
 4.6.1. Eksport CSV/PDF oraz integracje zewnętrzne  
-4.6.2. Profile użytkownika i preferencje UI  
-4.6.3. Mechanizmy lokalizacji i wielojęzyczności (opcjonalnie)
+4.6.2. Profile użytkownika i preferencje UI
 
 ## 5. TESTY I WALIDACJA SYSTEMU
 
@@ -113,10 +112,6 @@
 5.2.1. Scenariusze krytyczne (kont, transakcji, AI)  
 5.2.2. Walidacja przepływów płatności i subskrypcji  
 5.2.3. Testy integracji z API zewnętrznymi  
-5.3. Testy bezpieczeństwa  
-5.3.1. Odniesienie do OWASP Top 10  
-5.3.2. Testy RLS, OAuth2, JWT i szyfrowania danych  
-5.3.3. Analiza podatności i monitoring incydentów  
 5.4. Testy UX i wydajności  
 5.4.1. Badania użyteczności i mini-ankiety użytkowników  
 5.4.2. Core Web Vitals i Lighthouse  
