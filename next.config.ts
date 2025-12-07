@@ -12,7 +12,9 @@ const nextConfig: NextConfig = {
   },
 
   async headers() {
-    const headers = [
+    const isProd = process.env.NODE_ENV === 'production';
+
+    const securityHeaders = [
       { key: 'X-Frame-Options', value: 'DENY' },
       { key: 'X-Content-Type-Options', value: 'nosniff' },
       { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
@@ -36,11 +38,16 @@ const nextConfig: NextConfig = {
           "form-action 'self'",
         ].join('; '),
       },
-      // 🚫 Disable all caching for now
+    ];
+
+    // In non-production environments disable caching aggressively for easier development
+    const noCacheHeaders = [
       { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate' },
       { key: 'Pragma', value: 'no-cache' },
       { key: 'Expires', value: '0' },
     ];
+
+    const headers = isProd ? securityHeaders : [...securityHeaders, ...noCacheHeaders];
 
     return [
       {
