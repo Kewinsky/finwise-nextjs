@@ -2,28 +2,13 @@
 
 # SPIS TREŚCI
 
-## 1. WPROWADZENIE
+## 1. WSTĘP
 
-1.1. Cel i zakres pracy  
-1.1.1. Zakres merytoryczny projektu  
-1.1.2. Zakres technologiczny (Next.js, Supabase, Stripe, OpenAI)  
-1.1.3. Zakres badawczy i ewaluacyjny  
-1.2. Uzasadnienie wyboru tematu  
-1.2.1. Kontekst rozwoju FinTech w Polsce i na świecie  
-1.2.2. Problem zarządzania finansami osobistymi  
-1.2.3. Luka rynkowa adresowana przez Finwise  
-1.3. Kontekst rynkowy i problem badawczy  
-1.3.1. Analiza trendów i konkurencji  
-1.3.2. Formułowanie pytań badawczych  
-1.3.3. Hipotezy dotyczące skuteczności systemu  
-1.4. Metodyka realizacji projektu  
-1.4.1. Metody badań jakościowych i ilościowych  
-1.4.2. Proces projektowo-implementacyjny  
-1.4.3. Narzędzia i źródła danych  
-1.5. Struktura dokumentu  
-1.5.1. Logika układu rozdziałów  
-1.5.2. Zakres treści poszczególnych części  
-1.5.3. Powiązania między rozdziałami
+1.1. Uzasadnienie wyboru tematu  
+1.2. Cel pracy  
+1.3. Metodologia badawcza  
+1.4. Zakres pracy  
+1.5. Struktura pracy
 
 ## 2. ANALIZA TEORETYCZNA I PRZEGLĄD ROZWIĄZAŃ
 
@@ -72,9 +57,9 @@
 3.5.2. Reguły RLS i polityki bezpieczeństwa  
 3.5.3. Strategie migracji oraz backupu  
 3.6. Modele UX  
-3.6.1. Wireframes i makiety high-fidelity  
-3.6.2. Warianty dark/light mode i responsywność  
-3.6.3. Standardy dostępności i heurystyki UX
+3.6.1. Model nawigacji i główne widoki  
+3.6.2. Responsywność i prezentacja danych  
+3.6.3. Dostępność i współpraca z modułem AI
 
 ## 4. IMPLEMENTACJA
 
@@ -104,18 +89,26 @@
 
 ## 5. TESTY I WALIDACJA SYSTEMU
 
-5.1. Strategia testów  
-5.1.1. Zakres testów funkcjonalnych i regresyjnych  
-5.1.2. Narzędzia (Vitest, Playwright, Lighthouse)  
-5.1.3. Automatyzacja w pipeline CI/CD  
-5.2. Testy funkcjonalne  
-5.2.1. Scenariusze krytyczne (kont, transakcji, AI)  
-5.2.2. Walidacja przepływów płatności i subskrypcji  
-5.2.3. Testy integracji z API zewnętrznymi  
-5.4. Testy UX i wydajności  
-5.4.1. Badania użyteczności i mini-ankiety użytkowników  
-5.4.2. Core Web Vitals i Lighthouse  
-5.4.3. Testy obciążeniowe API oraz bazy danych
+5.1. Strategia testów i narzędzia  
+5.1.1. Testy jednostkowe i integracyjne z wykorzystaniem Vitest  
+5.1.2. Testy end-to-end z wykorzystaniem Playwright  
+5.1.3. Pomiary wydajności jako element strategii testów  
+5.2. Testy jednostkowe – logika, walidacja, moduł AI  
+5.2.1. Testy funkcji pomocniczych w module utils  
+5.2.2. Testy walidacji danych opartej na schematach Zod  
+5.2.3. Testy modułu sztucznej inteligencji (AIAssistantService)  
+5.3. Testy integracyjne – Stripe, OpenAI, Supabase  
+5.3.1. Integracja ze Stripe – obsługa webhooków płatności  
+5.3.2. Integracja z OpenAI – wywołania API i obsługa błędów  
+5.3.3. Integracja z Supabase – operacje na transakcjach  
+5.4. Testy end-to-end – główne scenariusze użytkownika  
+5.4.1. Weryfikacja strony głównej  
+5.4.2. Logowanie z użyciem magic linku  
+5.4.3. Dodawanie transakcji z poziomu dashboardu  
+5.4.4. Interakcja z asystentem AI  
+5.5. Testy wydajności (Lighthouse) i ograniczenia testowania  
+5.5.1. Metodyka pomiarów z użyciem Lighthouse  
+5.5.2. Ograniczenia przyjętego podejścia do testowania
 
 ## 6. WNIOSKI I KIERUNKI ROZWOJU
 
@@ -125,45 +118,27 @@
 6.1.3. Wnioski dotyczące zastosowanego stacku  
 6.2. Analiza ograniczeń  
 6.2.1. Ograniczenia technologiczne i integracyjne  
-6.2.2. Bariery czasowe i budżetowe projektu  
-6.2.3. Ograniczenia danych i badań użytkowników  
+6.2.2. Ograniczenia danych i badań użytkowników  
 6.3. Kierunki rozwoju  
-6.3.1. Import danych (CSV, bankowość otwarta)  
-6.3.2. Zaawansowana analityka ML i prognozowanie wydatków  
-6.3.3. Analiza trendów i rekomendacje inwestycyjne  
+6.3.1. Import danych (CSV, open banking)  
+6.3.2. Analiza trendów i rekomendacje inwestycyjne  
+6.3.3. Aplikacja mobilna  
 6.4. Podsumowanie  
 6.4.1. Kluczowe rezultaty projektu  
 6.4.2. Wkład pracy w rozwój FinTech  
 6.4.3. Rekomendacje dla dalszych badań
 
-## 7. STUDIUM PRZYPADKU UŻYTKOWNIKA (opcjonalnie)
+## 7. BIBLIOGRAFIA
 
-7.1. Scenariusze użytkownika  
-7.1.1. Nowy użytkownik – onboarding i konfiguracja  
-7.1.2. Zaawansowany użytkownik – codzienne zarządzanie finansami  
-7.1.3. Użytkownik premium – praca z modułem AI i subskrypcją  
-7.2. Analiza przebiegu interakcji  
-7.2.1. Mierniki sukcesu i satysfakcji  
-7.2.2. Bariery i punkty tarcia w ścieżkach  
-7.2.3. Rekomendacje usprawnień UX
+## 8. ZAŁĄCZNIKI
 
-## 8. BIBLIOGRAFIA
-
-## 9. ZAŁĄCZNIKI
-
-9.1. Materiały projektowe  
-9.1.1. Diagramy architektury i ERD  
-9.1.2. Flowchart server actions i integracji  
-9.1.3. Wireframes, mockupy i warianty UI  
-9.2. Materiały techniczne  
-9.2.1. Instrukcje uruchomienia i konfiguracji środowisk  
-9.2.2. Dokumentacja API i konfiguracji CI/CD  
-9.2.3. Raporty z testów (Vitest, Playwright, Lighthouse)  
-9.3. Inne materiały  
-9.3.1. Wyniki badań użytkowników i ankiet  
-9.3.2. Dokumentacja zgodności (RODO, polityka prywatności)  
-9.3.3. Link do repozytorium i materiałów uzupełniających
-
----
-
-**Uwaga:** Struktura może zostać dostosowana do wymagań promotora lub regulaminu uczelni; rekomenduje się konsultację przed finalizacją.
+8.1. Materiały projektowe  
+8.1.1. Diagramy architektury i ERD  
+8.1.2. Flowchart server actions i integracji  
+8.1.3. Wireframes, mockupy i warianty UI  
+8.2. Materiały techniczne  
+8.2.1. Instrukcje uruchomienia i konfiguracji środowisk  
+8.2.3. Raporty z testów (Vitest, Playwright, Lighthouse)  
+8.3. Inne materiały  
+8.3.1. Wyniki badań użytkowników i ankiet  
+8.3.3. Link do repozytorium i materiałów uzupełniających
