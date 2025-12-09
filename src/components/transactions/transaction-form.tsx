@@ -329,7 +329,7 @@ export function TransactionForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px]" data-testid="transaction-form">
         <DialogHeader>
           <DialogTitle>{transaction ? 'Edit' : 'Add'} Transaction</DialogTitle>
           <DialogDescription>
@@ -394,6 +394,7 @@ export function TransactionForm({
                     type="number"
                     step="0.01"
                     placeholder="0.00"
+                    data-testid="transaction-amount-input"
                     className="pl-8"
                     {...form.register('amount')}
                   />
@@ -408,6 +409,7 @@ export function TransactionForm({
                 <Input
                   id="description"
                   placeholder="Enter description"
+                  data-testid="transaction-description-input"
                   {...form.register('description')}
                 />
                 <FormError message={form.formState.errors.description?.message} />
@@ -515,6 +517,7 @@ export function TransactionForm({
                 id="notes"
                 placeholder="Add any additional notes..."
                 className="resize-none h-20 overflow-y-auto"
+                data-testid="transaction-notes-input"
                 {...form.register('notes')}
               />
             </div>
@@ -528,6 +531,7 @@ export function TransactionForm({
                 type="submit"
                 disabled={isLoading}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                data-testid="transaction-save-button"
               >
                 <Save className="mr-2 h-4 w-4" />
                 {isLoading ? 'Saving...' : 'Save Transaction'}

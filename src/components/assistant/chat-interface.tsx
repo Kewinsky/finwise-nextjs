@@ -153,7 +153,7 @@ export function ChatInterface({ canMakeQuery, refetch }: ChatInterfaceProps) {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" data-testid="ai-chat-interface">
       <ScrollArea className="flex-1 p-2">
         <div className="space-y-4">
           {messages.map((message) => {
@@ -293,12 +293,14 @@ export function ChatInterface({ canMakeQuery, refetch }: ChatInterfaceProps) {
             onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
             disabled={isLoading || !canMakeQuery}
             className="flex-1"
+            data-testid="ai-chat-input"
           />
           <Button
             onClick={() => handleSendMessage()}
             disabled={!inputMessage.trim() || isLoading || !canMakeQuery}
             size="icon"
             className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white disabled:opacity-50"
+            data-testid="ai-chat-send-button"
           >
             <Send className="h-4 w-4" />
           </Button>

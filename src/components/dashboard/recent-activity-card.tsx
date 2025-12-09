@@ -124,6 +124,7 @@ export const RecentActivityCard = React.memo(function RecentActivityCard({
                 return (
                   <div
                     key={transaction.id}
+                    data-testid="recent-transaction-row"
                     className="group relative flex items-center justify-between gap-3 @md:gap-4 py-3 @md:py-4 transition-colors hover:bg-muted/50 rounded-lg -mx-2 px-2"
                   >
                     {/* Separator line */}
