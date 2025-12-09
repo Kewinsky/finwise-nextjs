@@ -6,9 +6,10 @@ vi.mock('@/lib/openai/config', () => ({
   isOpenAIConfigured: () => true,
 }));
 
-vi.mock('openai', () => {
-  const createMock = vi.fn();
+// Share the mock instance between the mock factory and the test
+const createMock = vi.fn();
 
+vi.mock('openai', () => {
   class OpenAI {
     chat = {
       completions: {
@@ -23,17 +24,12 @@ vi.mock('openai', () => {
 
   return {
     default: OpenAI,
-    __mock: {
-      createMock,
-    },
   };
 });
 
 describe('OpenAI service integration', () => {
   it('handles API errors gracefully (rate limit)', async () => {
-    const { __mock } = await import('openai');
-
-    __mock.createMock.mockRejectedValueOnce(new Error('Request failed due to rate limit'));
+    createMock.mockRejectedValueOnce(new Error('Request failed due to rate limit'));
 
     // Provide a fake API key so that getOpenAIClient does not throw before
     // our mocked client is used.
