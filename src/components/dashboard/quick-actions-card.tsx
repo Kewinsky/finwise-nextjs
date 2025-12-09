@@ -75,6 +75,11 @@ export function QuickActionsCard({ onAddTransaction }: QuickActionsCardProps) {
             <Button
               key={action.label}
               variant="outline"
+              data-testid={
+                action.type === 'accounts'
+                  ? 'quick-action-manage-accounts'
+                  : `quick-action-${action.type}`
+              }
               className={`relative h-full py-4 @sm:py-5 flex flex-col items-center justify-center gap-3 transition-transform duration-200 group overflow-hidden border-2 ${action.borderGradient} bg-gradient-to-br ${action.bgGradient} ${action.hoverGradient} shadow-sm hover:shadow-lg hover:scale-[1.02]`}
               onClick={() => {
                 if (action.onClick) {

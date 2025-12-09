@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { ArrowRight, Sparkles, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'motion/react';

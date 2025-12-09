@@ -158,6 +158,7 @@ export function AuthForm({ className, ...props }: React.ComponentProps<'div'>) {
               id="email"
               type="email"
               placeholder="m@example.com"
+              data-testid="auth-email-input"
               {...magicLinkForm.register('email')}
               disabled={isMagicLinkLoading}
             />
@@ -168,6 +169,7 @@ export function AuthForm({ className, ...props }: React.ComponentProps<'div'>) {
             type="submit"
             className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]"
             disabled={isMagicLinkLoading}
+            data-testid="auth-magic-link-button"
           >
             {isMagicLinkLoading ? (
               <LoadingSpinner message="Sending magic link..." inline />
