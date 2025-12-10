@@ -65,6 +65,8 @@ flowchart TD
     G --> H[Chat z robo-doradcą i doprecyzowanie pytań]
 ```
 
+Diagram 4. Uproszczony przepływ użytkownika w scenariuszu codziennego korzystania z panelu Finwise.
+
 Diagram ten ma charakter ogólny i nie odzwierciedla konkretnych ekranów aplikacji, lecz wskazuje na główne kroki i punkty decyzyjne, które zostały następnie przełożone na wymagania funkcjonalne w kolejnym podrozdziale.
 
 ## 3.2. Wymagania funkcjonalne
@@ -177,51 +179,52 @@ Architektura Finwise została zaprojektowana jako lekki, modularny system SaaS o
 
 W niniejszej sekcji przedstawiono uproszczony obraz architektury, skupiając się na roli poszczególnych komponentów oraz integracjach z usługami zewnętrznymi.
 
-### 3.4.1. Diagram architektury i przepływ żądań
+### 3.4.1. Diagram architektury
 
 Na wysokim poziomie system składa się z czterech głównych obszarów: warstwy klienckiej (przeglądarka), aplikacji Next.js (w tym server actions i API routes), warstwy logiki biznesowej (serwisy domenowe) oraz warstwy danych i usług zewnętrznych. Poniższy diagram prezentuje uproszczoną architekturę i główne kierunki przepływu żądań.
 
 ```mermaid
-graph TD
-    subgraph Klient
-        U[Użytkownik (przeglądarka)]
-    end
+---
+config:
+  layout: dagre
+---
+flowchart LR
+ subgraph Client["Klient"]
+        U["Użytkownik"]
+        BROWSER["Przeglądarka / Interfejs webowy<br>React + Next.js"]
+  end
+ subgraph App["Aplikacja Next.js (warstwa prezentacji)"]
+        PUBLIC["Strony publiczne<br>(landing, oferta, blog)"]
+        AUTH["Moduł uwierzytelniania<br>(logowanie, rejestracja)"]
+        PROTECTED["Panel użytkownika<br>(dashboard, konta, transakcje, ustawienia)"]
+        ASSISTANT["Asystent AI<br>(interfejs czatu)"]
+  end
+ subgraph Backend["Backend aplikacji"]
+        ROUTES["Server Components, API routes,<br>Server Actions"]
+        SERVICES["Logika biznesowa<br>(autoryzacja, finanse, AI, subskrypcje)"]
+  end
+ subgraph DataInfra["Dane i usługi zewnętrzne"]
+        DB["Supabase<br>(PostgreSQL + Auth)"]
+        CACHE["Upstash Redis<br>(cache, rate limiting)"]
+        STRIPE["Stripe<br>(płatności i subskrypcje)"]
+        OPENAI["OpenAI API<br>(model asystenta AI)"]
+        OBS["Monitoring i logowanie<br>(Sentry, logger)"]
+  end
+    U --> BROWSER
+    BROWSER --> PUBLIC & AUTH & PROTECTED
+    PROTECTED --> ASSISTANT & ROUTES
+    PUBLIC --> ROUTES
+    AUTH --> ROUTES
+    ASSISTANT --> ROUTES
+    ROUTES --> SERVICES
+    SERVICES --> DB & CACHE & STRIPE & OPENAI
+    App --> OBS
+    Backend --> OBS
 
-    subgraph Aplikacja_Next.js
-        UI[Komponenty UI / strony]
-        SA[Server Actions]
-        API[API Routes]
-        MW[Middleware]
-    end
-
-    subgraph Logika_biznesowa
-        Srv[Serwisy domenowe<br/>(konto, transakcje, subskrypcje, AI)]
-    end
-
-    subgraph Dane_i_usługi
-        DB[(Supabase / PostgreSQL)]
-        AUTH[(Supabase Auth + RLS)]
-        STRIPE[Stripe]
-        OPENAI[OpenAI API]
-        REDIS[Upstash Redis]
-    end
-
-    U --> UI
-    UI --> SA
-    UI --> API
-    UI --> MW
-
-    SA --> Srv
-    API --> Srv
-    MW --> REDIS
-
-    Srv --> DB
-    Srv --> AUTH
-    Srv --> STRIPE
-    Srv --> OPENAI
-
-    STRIPE -. webhook .-> API
+    DB@{ shape: cyl}
 ```
+
+Diagram 5. Wysokopoziomowa architektura systemu Finwise.
 
 Taki podział pozwala na:
 
@@ -289,64 +292,70 @@ Na wysokim poziomie logicznym model danych Finwise obejmuje następujące encje:
 Uproszczony diagram relacji pomiędzy tymi encjami przedstawiono poniżej:
 
 ```mermaid
+---
+config:
+  layout: elk
+---
 erDiagram
-    User ||--o{ Account : "posiada"
-    User ||--o{ Transaction : "wykonuje"
-    User ||--|| Subscription : "ma"
-    User ||--|| Preference : "ma"
-    User ||--o{ AIInsight : "otrzymuje"
+	direction TB
+	User {
+		uuid id  ""
+		text email  ""
+		text full_name  ""
+		text role  ""
+	}
 
-    Account ||--o{ Transaction : "źródło / cel"
+	Account {
+		uuid id  ""
+		uuid user_id  ""
+		text name  ""
+		text type  ""
+		numeric balance  ""
+	}
 
-    User {
-        uuid id
-        text email
-        text full_name
-        text role
-    }
+	Transaction {
+		uuid id  ""
+		uuid user_id  ""
+		uuid from_account_id  ""
+		uuid to_account_id  ""
+		text type  ""
+		numeric amount  ""
+		date date  ""
+		text category  ""
+	}
 
-    Account {
-        uuid id
-        uuid user_id
-        text name
-        text type
-        numeric balance
-    }
+	Subscription {
+		uuid id  ""
+		uuid user_id  ""
+		text plan_type  ""
+		text status  ""
+	}
 
-    Transaction {
-        uuid id
-        uuid user_id
-        uuid from_account_id
-        uuid to_account_id
-        text type
-        numeric amount
-        date date
-        text category
-    }
+	Preference {
+		uuid id  ""
+		uuid user_id  ""
+		text theme  ""
+		text language  ""
+	}
 
-    Subscription {
-        uuid id
-        uuid user_id
-        text plan_type
-        text status
-    }
+	AIInsight {
+		uuid id  ""
+		uuid user_id  ""
+		jsonb insights  ""
+		timestamp generated_at  ""
+	}
 
-    Preference {
-        uuid id
-        uuid user_id
-        text theme
-        text language
-    }
-
-    AIInsight {
-        uuid id
-        uuid user_id
-        jsonb insights
-        timestamp generated_at
-    }
+	User||--o{Account:"posiada"
+	User||--o{Transaction:"wykonuje"
+	User||--||Subscription:"ma"
+	User||--||Preference:"ma"
+	User||--o{AIInsight:"otrzymuje"
+	Account||--o{Transaction:"źródło / cel"
 ```
 
-Diagram ukazuje główne relacje i odpowiedzialności encji, a nie zaś wszystkie kolumny, indeksy czy ograniczenia właściwe dla docelowej bazy danych. Takie podejście pozwala oddzielić model logiczny od fizycznej implementacji i zachować elastyczność przy zmianach technologicznych. Szczegółowy diagram ERD w pewersji pełnej, obejmujący wszystkie encje i atrybuty, został dołączony w Załączniku 8.1.1.
+Diagram 6. Uproszczony diagram ERD modelu danych systemu Finwise.
+
+Diagram ukazuje główne relacje i odpowiedzialności encji, a nie zaś wszystkie kolumny, indeksy czy ograniczenia właściwe dla docelowej bazy danych. Takie podejście pozwala oddzielić model logiczny od fizycznej implementacji i zachować elastyczność przy zmianach technologicznych. Szczegółowy diagram ERD w wersji pełnej, obejmujący wszystkie encje, pola i powiązania, został dołączony w Załączniku 8.1.2.
 
 ### 3.5.2. Reguły RLS i polityki bezpieczeństwa
 
@@ -378,7 +387,7 @@ Doświadczenie użytkownika (UX) stanowi juz ostatni filar systemu Finwise. Nawe
 
 ### 3.6.1. Model nawigacji i główne widoki
 
-Finwise został zaprojektowany jako aplikacja, w której punktem wyjścia jest widok główny (dashboard). Po zalogowaniu użytkownik widzi w jednym miejscu syntetyczne informacje o swojej sytuacji finansowej: łączny stan środków, podstawowe metryki oraz skróty do najważniejszych działań (dodanie transakcji, przejście do listy kont, wywołanie modułu AI). Wybrane widoki interfejsu (strona główna, dashboard, formularze transakcji oraz panel asystenta AI) zilustrowano na zrzutach ekranu w Załączniku 8.1.2.
+Finwise został zaprojektowany jako aplikacja, w której punktem wyjścia jest widok główny (dashboard). Po zalogowaniu użytkownik widzi w jednym miejscu syntetyczne informacje o swojej sytuacji finansowej: łączny stan środków, podstawowe metryki oraz skróty do najważniejszych działań (dodanie transakcji, przejście do listy kont, wywołanie modułu AI). Wybrane widoki interfejsu (strona główna, dashboard, formularze transakcji oraz panel asystenta AI) zilustrowano na zrzutach ekranu w Załączniku 8.1.3.
 
 Model nawigacji opiera się na kilku czytelnych obszarach:
 

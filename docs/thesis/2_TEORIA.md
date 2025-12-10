@@ -32,6 +32,8 @@ graph TD
     F --> C
 ```
 
+Diagram 1. Uproszczony przepływ danych w aplikacji do zarządzania finansami osobistymi.
+
 Automatyzacja procesów, takich jak klasyfikacja transakcji czy generowanie raportów, pozwala na skrócenie czasu potrzebnego na analizę finansową oraz umożliwia użytkownikom skoncentrowanie się na decyzjach strategicznych. Według badań opublikowanych w _Information Systems Research_, personalizacja oraz inteligentna analiza danych stanowią podstawowy czynnik wpływający na satysfakcję i długoterminowe zaangażowanie w korzystanie z aplikacji finansowych (Hendershott et al., 2021). Jednocześnie zgodnie z podejściem opisanym przez Healy'ego (2019), kluczową rolę odgrywa jakość wizualizacji danych, bo to od jej przejrzystości zależy, czy użytkownicy są w stanie poprawnie zinterpretować wskaźniki finansowe i przełożyć je na konkretne decyzje.
 
 Wykorzystanie danych obejmuje również metody predykcyjne, które pozwalają przewidywać przyszłe wydatki, identyfikować anomalie oraz oceniać ryzyko finansowe. Zastosowanie algorytmów uczenia maszynowego w aplikacjach budżetowych umożliwia tworzenie bardziej precyzyjnych rekomendacji, bazujących na indywidualnej historii użytkownika oraz podobnych wzorcach zachowań w szerokiej populacji (Cao et al., 2020). Dzięki temu użytkownicy otrzymują nie tylko statyczny obraz swoich wydatków, ale takze dynamiczne, proaktywne wskazówki.
@@ -66,6 +68,8 @@ graph TD
     A --> E[Analiza danych]
     A --> F[Zarządzanie subskrypcjami]
 ```
+
+Diagram 2. Główne kategorie funkcjonalne współczesnych rozwiązań FinTech.
 
 Takie ujęcie pozwala lepiej zrozumieć, jakie miejsce zajmują aplikacje podobne do Finwise – są one hybrydą kilku kategorii: budżetowania, analityki i automatyzacji, co umożliwiają wspieranie użytkownika nie tylko poprzez prezentację danych, lecz także poprzez wskazówki pomocne w podejmowaniu decyzji finansowych.
 
@@ -112,6 +116,8 @@ graph TD
     B --> D[Usługi zewnętrzne: AI, płatności]
     A --> E[CDN i edge caching]
 ```
+
+Diagram 3. Typowa architektura warstwowa aplikacji SaaS opartej na Next.js.
 
 Model ten nie odnosi się bezpośrednio do implementacji Finwise, lecz obrazuje typowe zależności między warstwami w architekturze SaaS.
 

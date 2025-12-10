@@ -16,52 +16,6 @@ System stylowania oparto na TailwindCSS 4, który zapewnia narzędziową składn
 
 Formularze (m.in. rejestracji, logowania, aktualizacji profilu, konfiguracji subskrypcji) zaimplementowano z użyciem React Hook Form oraz walidacji schematów Zod. Dzięki temu walidacja wejścia jest wykonywana zarówno po stronie klienta, jak i na poziomie server actions, a błędy walidacyjne są zwracane w ujednoliconym formacie i mapowane na komunikaty interfejsu.
 
-Na poziomie architektury całego systemu SaaS zastosowano układ opisany wcześniej w rozdziale trzecim. Ten sam diagram architektury i przepływu żądań, odwzorowany w implementacji, przedstawiono poniżej:
-
-```mermaid
-graph TD
-    subgraph Klient
-        U[Użytkownik (przeglądarka)]
-    end
-
-    subgraph Aplikacja_Next.js
-        UI[Komponenty UI / strony]
-        SA[Server Actions]
-        API[API Routes]
-        MW[Middleware]
-    end
-
-    subgraph Logika_biznesowa
-        Srv[Serwisy domenowe<br/>(konto, transakcje, subskrypcje, AI)]
-    end
-
-    subgraph Dane_i_usługi
-        DB[(Supabase / PostgreSQL)]
-        AUTH[(Supabase Auth + RLS)]
-        STRIPE[Stripe]
-        OPENAI[OpenAI API]
-        REDIS[Upstash Redis]
-    end
-
-    U --> UI
-    UI --> SA
-    UI --> API
-    UI --> MW
-
-    SA --> Srv
-    API --> Srv
-    MW --> REDIS
-
-    Srv --> DB
-    Srv --> AUTH
-    Srv --> STRIPE
-    Srv --> OPENAI
-
-    STRIPE -. webhook .-> API
-```
-
-Diagram ten pełni jednocześnie rolę wysokopoziomowego diagramu architektury systemu SaaS oraz diagramu integracji z usługami zewnętrznymi (OpenAI, Stripe, Supabase, Upstash), pokazując, że implementacja Next.js, warstwa serwisów i Supabase działają jako spójny szkielet, a usługi zewnętrzne są dołączone w postaci wyspecjalizowanych modułów.
-
 ### 4.1.2. Supabase, PostgreSQL, OAuth2, JWT
 
 Warstwa danych Finwise opiera się na Supabase, który udostępnia zarządzaną instancję PostgreSQL oraz moduł uwierzytelniania Supabase Auth. Wdrożono tu docelowy model danych opisany w rozdziale trzecim – z tabelami `profiles`, `subscriptions`, `user_preferences`, `notification_preferences`, a w pełnej wersji także encjami dotyczącymi kont i transakcji. Baza danych wykorzystuje typy wyliczeniowe (`subscription_status`, `user_role`) oraz zestaw indeksów zoptymalizowanych pod najczęstsze zapytania, takie jak wyszukiwanie subskrypcji po użytkowniku czy filtrowanie aktywnych planów.
@@ -127,6 +81,8 @@ sequenceDiagram
     Form-->>User: Show confirmation
 ```
 
+Diagram 7. Przebieg rejestracji użytkownika z wykorzystaniem server actions i Supabase.
+
 Ten sam wzorzec – formularz klienta, walidacja po stronie serwera, wywołanie warstwy serwisów, zapis w Supabase – został wykorzystany w implementacji innych operacji: logowania, aktualizacji profilu, tworzenia sesji Checkout Stripe czy modyfikacji preferencji użytkownika. Dzięki spójnemu wykorzystaniu server actions możliwe jest zachowanie czystego rozdziału odpowiedzialności między UI, HTTP a logiką domenową.
 
 ### 4.2.2. System komponentów i stylowanie (TailwindCSS, shadcn/ui)
@@ -185,6 +141,10 @@ Serwisy domenowe nie zawierają wiedzy o tym, skąd pochodzi klient – dzięki 
 Na potrzeby implementacji warstwy danych przyjęto schemat bazy odpowiadający diagramowi ERD przedstawionemu w rozdziale trzecim. Wysokopoziomowa relacja pomiędzy kluczowymi tabelami wygląda następująco:
 
 ```mermaid
+---
+config:
+  layout: elk
+---
 erDiagram
     auth_users ||--|| profiles : "1:1"
     profiles ||--|| subscriptions : "1:1"
@@ -197,6 +157,8 @@ erDiagram
     accounts ||--o{ transactions : "from_account"
     accounts ||--o{ transactions : "to_account"
 ```
+
+Diagram 8. Relacje między kluczowymi tabelami bazy danych Finwise.
 
 Diagram ten odzwierciedla faktyczną strukturę zaimplementowaną w Supabase: użytkownik (profil) posiada dokładnie jeden rekord subskrypcji, zestaw preferencji interfejsu i powiadomień, wiele kont finansowych oraz wiele transakcji i rekordów wykorzystania modułu AI. Serwisy domenowe operują bezpośrednio na tych tabelach, wykorzystując polityki RLS oraz indeksy opisane w części pracy poświęconej projektowi bazy danych.
 
@@ -308,6 +270,8 @@ sequenceDiagram
     Stripe-->>UI: Redirect to success page
 ```
 
+Diagram 9. Przepływ płatności subskrypcyjnej w integracji Finwise ze Stripe.
+
 Fakturowanie obsługiwane jest natywnie przez Stripe – aplikacja Finwise nie generuje własnych dokumentów księgowych. Dla potrzeb audytu i obsługi użytkownika możliwe jest pobieranie listy faktur z użyciem funkcji Stripe API (np. `invoices.list`) oraz ewentualne przekazywanie linków do dokumentów na stronach panelu. Tego typu operacje są delegowane do `BillingService` i nie naruszają spójności danych pomiędzy Finwise, a Stripe.
 
 ### 4.4.3. Obsługa reklamacji i zwrotów
@@ -342,14 +306,18 @@ Generowanie finansowych spostrzeżenia przebiega w kilku etapach. Po stronie baz
 
 Po otrzymaniu odpowiedzi `AIService` parsuje JSON, waliduje go i zapisuje w tabeli `ai_insights` jako dokument `jsonb` wraz ze znacznikiem czasu `generated_at`. W ten sposób insighty mogą być prezentowane użytkownikowi w dashboardzie oraz wykorzystywane wtórnie w interfejsie czatu. W przypadku niepowodzenia połączenia z OpenAI lub błędu odpowiedzi zaimplementowano fallback w postaci prostych, regułowych sugestii bazujących wyłącznie na lokalnych obliczeniach.
 
-Architektura modułu AI może zostać ujęta jako połączenie serwisu AI, serwisu śledzenia użycia oraz cienkiej warstwy klienta API:
+Architektura modułu AI może zostać ujęta jako połączenie serwisu AI, serwisu śledzenia użycia oraz warstwy klienta API:
 
 ```mermaid
+---
+config:
+  layout: elk
+---
 graph TD
     subgraph "AI Layer"
         AIService[AIService]
         UsageService[OpenAIUsageService]
-        OpenAIClient[callOpenAI()]
+        OpenAIClient[callOpenAI]
     end
 
     subgraph "Data Layer"
@@ -366,6 +334,8 @@ graph TD
     AIService --> UsageService
     UsageService --> OpenAIUsage
 ```
+
+Diagram 10. Architektura modułu sztucznej inteligencji w systemie Finwise.
 
 Takie podejście zapewnia separację odpowiedzialności: przygotowanie danych finansowych pozostaje w domenie serwisów transakcyjnych, generowanie i zapis spostrzeżeń w `AIService`, a kontrola limitów i kosztów w `OpenAIUsageService`.
 
@@ -396,6 +366,8 @@ sequenceDiagram
     AIService-->>ChatUI: Answer + suggestions
     ChatUI-->>User: Display response
 ```
+
+Diagram 11. Przepływ żądania w scenariuszu rozmowy użytkownika z asystentem AI.
 
 Kluczowym elementem implementacji jest sposób budowy kontekstu dla modelu. `AIService` nie przekazuje pojedynczych surowych transakcji w nieprzefiltrowanej formie, lecz agregaty, zestawienia i wycinki danych dopasowane do pytania użytkownika (np. transakcje w wybranym okresie lub dla danej kategorii), co ma na celu ograniczenie ilości przekazywanych danych, zmniejszając ryzyko ujawnienia nadmiarowych szczegółów.
 
