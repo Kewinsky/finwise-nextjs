@@ -229,7 +229,7 @@ Taki podział pozwala na:
 - **centralizację logiki domenowej w serwisach** – co sprzyja spójności reguł biznesowych, np. dotyczących naliczania sald czy uprawnień do danych,
 - **wykorzystanie server actions i API routes jako cienkiej warstwy integracyjnej** – skupionej na walidacji danych wejściowych, przekazywaniu ich do odpowiednich serwisów oraz obsłudze mechanizmów bezpieczeństwa (rate limiting, uwierzytelnianie).
 
-Przyjęta architektura wpisuje się w trend łączenia architektury serwerless z usługami BaaS, w którym część odpowiedzialności (uwierzytelnianie, przechowywanie danych, integracje płatnicze) delegowana jest do wyspecjalizowanych platform chmurowych.
+Przyjęta architektura wpisuje się w trend łączenia architektury serwerless z usługami BaaS, w którym część odpowiedzialności (uwierzytelnianie, przechowywanie danych, integracje płatnicze) delegowana jest do wyspecjalizowanych platform chmurowych. Pełną, wysokorozdzielczą wersję diagramu architektury wraz z dodatkowymi oznaczeniami komponentów zamieszczono w Załączniku 8.1.1.
 
 ### 3.4.2. Integracja OpenAI (AI assistant)
 
@@ -346,7 +346,7 @@ erDiagram
     }
 ```
 
-Diagram ukazuje główne relacje i odpowiedzialności encji, a nie zaś wszystkie kolumny, indeksy czy ograniczenia właściwe dla docelowej bazy danych. Takie podejście pozwala oddzielić model logiczny od fizycznej implementacji i zachować elastyczność przy zmianach technologicznych.
+Diagram ukazuje główne relacje i odpowiedzialności encji, a nie zaś wszystkie kolumny, indeksy czy ograniczenia właściwe dla docelowej bazy danych. Takie podejście pozwala oddzielić model logiczny od fizycznej implementacji i zachować elastyczność przy zmianach technologicznych. Szczegółowy diagram ERD w pewersji pełnej, obejmujący wszystkie encje i atrybuty, został dołączony w Załączniku 8.1.1.
 
 ### 3.5.2. Reguły RLS i polityki bezpieczeństwa
 
@@ -378,7 +378,7 @@ Doświadczenie użytkownika (UX) stanowi juz ostatni filar systemu Finwise. Nawe
 
 ### 3.6.1. Model nawigacji i główne widoki
 
-Finwise został zaprojektowany jako aplikacja, w której punktem wyjścia jest widok główny (dashboard). Po zalogowaniu użytkownik widzi w jednym miejscu syntetyczne informacje o swojej sytuacji finansowej: łączny stan środków, podstawowe metryki oraz skróty do najważniejszych działań (dodanie transakcji, przejście do listy kont, wywołanie modułu AI).
+Finwise został zaprojektowany jako aplikacja, w której punktem wyjścia jest widok główny (dashboard). Po zalogowaniu użytkownik widzi w jednym miejscu syntetyczne informacje o swojej sytuacji finansowej: łączny stan środków, podstawowe metryki oraz skróty do najważniejszych działań (dodanie transakcji, przejście do listy kont, wywołanie modułu AI). Wybrane widoki interfejsu (strona główna, dashboard, formularze transakcji oraz panel asystenta AI) zilustrowano na zrzutach ekranu w Załączniku 8.1.2.
 
 Model nawigacji opiera się na kilku czytelnych obszarach:
 

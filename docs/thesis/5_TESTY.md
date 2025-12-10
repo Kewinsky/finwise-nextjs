@@ -117,7 +117,7 @@ Uzupełnieniem testów funkcjonalnych i integracyjnych są pomiary wydajności o
 
 ### 5.5.1. Metodyka pomiarów z użyciem Lighthouse
 
-Do pomiaru wydajności użyto narzędzia **Lighthouse** uruchamianego z poziomu przeglądarki (Chrome DevTools). Analiza została przeprowadzona dla adresu `/` w konfiguracji desktopowej, przy wykorzystaniu domyślnego profilu symulującego wolniejsze łącze sieciowe i ograniczoną moc CPU. Wynik raportu dołączono w formie pliku PDF w załączniku, co umożliwia jego ponowną analizę lub porównanie z wynikami przyszłych wersji systemu.
+Do pomiaru wydajności użyto narzędzia **Lighthouse** uruchamianego z poziomu przeglądarki (Chrome DevTools). Analiza została przeprowadzona dla adresu `/` w konfiguracji desktopowej, przy wykorzystaniu domyślnego profilu symulującego wolniejsze łącze sieciowe i ograniczoną moc CPU. Wynik raportu dołączono w formie pliku PDF w Załączniku 8.2.1, co umożliwia jego ponowną analizę lub porównanie z wynikami przyszłych wersji systemu. W tym samym załączniku zebrano również przykładowe raporty z uruchomień testów jednostkowych (Vitest) i end‑to‑end (Playwright).
 
 Raport Lighthouse obejmuje cztery główne kategorie: Performance, Accessibility, Best Practices oraz SEO. W przypadku Finwise szczególną uwagę zwrócono na:
 

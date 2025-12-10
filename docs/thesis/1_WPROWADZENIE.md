@@ -27,7 +27,7 @@ Cel główny został uzupełniony celami szczegółowymi:
 
   1.4. Zakres pracy
   Zakres pracy obejmuje zagadnienia związane z projektowaniem i tworzeniem webowej aplikacji do zarządzania finansami osobistymi. Opracowanie obejmuje analizę teoretyczną obszarów istotnych dla budowy tego typu systemów, w tym finansów osobistych, architektury SaaS, projektowania interfejsów użytkownika, bezpieczeństwa aplikacji internetowych i zastosowań sztucznej inteligencji w analizie danych.
-  W części praktycznej skupiono się na pełnym procesie wytworzenia aplikacji Finwise: od zdefiniowania wymagań funkcjonalnych i niefunkcjonalnych, przez przygotowanie modelu danych i projekt architektury, aż po implementację interfejsu użytkownika, logiki biznesowej oraz integrację z usługami takimi jak Supabase, Stripe czy OpenAI API. Zakres obejmuje także przeprowadzenie testów oraz wdrożenie aplikacji w środowisku produkcyjnym.
+  W części praktycznej skupiono się na pełnym procesie wytworzenia aplikacji Finwise: od zdefiniowania wymagań funkcjonalnych i niefunkcjonalnych, przez przygotowanie modelu danych i projekt architektury, aż po implementację interfejsu użytkownika, logiki biznesowej oraz integrację z usługami takimi jak Supabase, Stripe czy OpenAI API. Zakres obejmuje także przeprowadzenie testów oraz wdrożenie aplikacji w środowisku produkcyjnym. Publiczne repozytorium z kodem źródłowym aplikacji oraz szczegółową instrukcją uruchomienia środowiska zostało udostępnione w Załączniku 8.3.1.
   W ramach pracy świadomie pominięto zaawansowane integracje bankowe zgodne z PSD2 i Open Banking, implementację natywnej aplikacji mobilnej oraz rozbudowany moduł budżetowania. Obszary te zostały wskazane jako możliwe kierunki dalszego rozwoju systemu.
 
   1.5. Struktura pracy

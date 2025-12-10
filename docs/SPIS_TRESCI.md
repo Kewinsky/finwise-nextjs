@@ -134,11 +134,8 @@
 
 8.1. Materiały projektowe  
 8.1.1. Diagramy architektury i ERD  
-8.1.2. Flowchart server actions i integracji  
-8.1.3. Wireframes, mockupy i warianty UI  
+8.1.2. Zrzuty ekranu interfejsu użytkownika  
 8.2. Materiały techniczne  
-8.2.1. Instrukcje uruchomienia i konfiguracji środowisk  
-8.2.3. Raporty z testów (Vitest, Playwright, Lighthouse)  
+8.2.1. Raporty z testów (Vitest, Playwright, Lighthouse)  
 8.3. Inne materiały  
-8.3.1. Wyniki badań użytkowników i ankiet  
-8.3.3. Link do repozytorium i materiałów uzupełniających
+8.3.1. Link do repozytorium i materiałów uzupełniających
