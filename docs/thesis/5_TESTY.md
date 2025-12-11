@@ -17,7 +17,7 @@ Strategia testów Finwise została zaprojektowana tak, aby możliwie prosto odzw
 
 ### 5.1.1. Testy jednostkowe i integracyjne z wykorzystaniem Vitest
 
-Do testów jednostkowych i integracyjnych wykorzystano bibliotekę **Vitest**, skonfigurowaną w pliku `vitest.config.mts`. Testy domyślnie obejmują pliki `src/**/*.test.{ts,tsx}`, a dodatkowo rozszerzono zakres o `integration/**/*.test.ts`, gdzie umieszczono testy integracyjne dla Stripe, OpenAI i Supabase. Vitest uruchamiany jest przy pomocy skryptów z `package.json`:
+Do testów jednostkowych i integracyjnych wykorzystano bibliotekę **Vitest**, skonfigurowaną w pliku `vitest.config.mts`. Testy domyślnie obejmują pliki `src/**/*.test.{ts,tsx}`, a dodatkowo rozszerzono zakres o `integration/**/*.test.ts`, gdzie umieszczono testy integracyjne dla Stripe, OpenAI i Supabase. Vitest, zgodnie z dokumentacją, zapewnia szybki runner testów kompatybilny składniowo z Jest, obsługę trybu watch oraz raportowanie pokrycia kodu, co zostało odzwierciedlone w skryptach `package.json` (Vitest Documentation, 2025):
 
 - `pnpm test` – uruchomienie wszystkich testów (unit + integration),
 - `pnpm test:watch` – tryb obserwacji podczas pracy deweloperskiej,
@@ -25,7 +25,7 @@ Do testów jednostkowych i integracyjnych wykorzystano bibliotekę **Vitest**, s
 
 ### 5.1.2. Testy end‑to‑end z wykorzystaniem Playwright
 
-Testy end‑to‑end zrealizowano w oparciu o **Playwright**. Konfiguracja znajduje się w pliku `playwright.config.ts` i definiuje katalog `e2e/`, domyślny adres aplikacji (`http://127.0.0.1:3000`) oraz proces uruchamiania serwera deweloperskiego (`pnpm dev`) przed startem testów. Dzięki temu zestaw E2E można uruchomić jedną komendą:
+Testy end‑to‑end zrealizowano w oparciu o **Playwright**. Konfiguracja znajduje się w pliku `playwright.config.ts` i definiuje katalog `e2e/`, domyślny adres aplikacji (`http://127.0.0.1:3000`) oraz proces uruchamiania serwera deweloperskiego (`pnpm dev`) przed startem testów, zgodnie z przykładowymi przepływami startu aplikacji opisanymi w dokumentacji Playwright (Playwright Documentation, 2025). Dzięki temu zestaw E2E można uruchomić jedną komendą:
 
 ```bash
 # w jednym terminalu
@@ -126,7 +126,7 @@ Raport Lighthouse obejmuje cztery główne kategorie: Performance, Accessibility
 - wykorzystanie pamięci podręcznej przeglądarki oraz cache na poziomie Vercel,
 - poprawność semantyki HTML i etykiet ARIA (mając na uwadze wymagania dostępnościowe opisane w rozdziale trzecim).
 
-Uzyskane wyniki wykazały, że strona główna ładuje się szybko w warunkach zbliżonych do rzeczywistych, a największy wpływ na wynik Performance mają przede wszystkim cięższe biblioteki UI oraz skrypty analityczne. W kategoriach Best Practices i SEO Finwise osiągnęło wysokie noty dzięki zastosowaniu semantycznych znaczników, poprawnej konfiguracji meta‑tagów oraz obsłudze trybu dark/light bez nadmiernej ilości dodatkowego kodu.
+Uzyskane wyniki wykazały, że strona główna osiąga niemal maksymalny poziom wydajności w warunkach zbliżonych do rzeczywistych, co w dużej mierze wynika z włączenia globalnego cache na Vercel. W kategoriach Best Practices i SEO Finwise osiągnęło wysokie noty dzięki zastosowaniu semantycznych znaczników, poprawnej konfiguracji meta‑tagów oraz obsłudze trybu dark/light bez nadmiernej ilości dodatkowego kodu.
 
 ### 5.5.2. Ograniczenia przyjętego podejścia do testowania
 

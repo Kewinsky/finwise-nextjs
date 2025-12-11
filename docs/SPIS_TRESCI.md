@@ -134,7 +134,134 @@
 
 8.1. Materiały projektowe  
 8.1.1. Diagram architektury systemu Finwise  
-8.1.2. Diagram ERD modelu danych  
+8.1.2. Diagram ERD modelu danych
+
+```mermaid
+---
+config:
+  layout: elk
+---
+erDiagram
+  profiles {
+    uuid id
+    text email
+    text full_name
+    text avatar_url
+    boolean is_first_login
+    text role
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz deleted_at
+  }
+
+  accounts {
+    uuid id
+    uuid user_id
+    text name
+    text type
+    numeric balance
+    text color
+    boolean is_mandatory
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  transactions {
+    uuid id
+    uuid user_id
+    uuid from_account_id
+    uuid to_account_id
+    text type
+    text description
+    text category
+    numeric amount
+    date date
+    text notes
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  subscriptions {
+    uuid id
+    uuid user_id
+    text status
+    text plan_type
+    text billing_status
+    boolean cancel_at_period_end
+    boolean has_used_trial
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz current_period_start
+    timestamptz stripe_current_period_end
+    timestamptz trial_end
+    timestamptz ended_at
+    text stripe_customer_id
+    text stripe_price_id
+    text stripe_subscription_id
+    timestamptz canceled_at
+  }
+
+  user_preferences {
+    uuid id
+    uuid user_id
+    text base_currency
+    text font_size
+    text system_font
+    text language
+    text header_title_preference
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  notification_preferences {
+    uuid id
+    uuid user_id
+    boolean email_billing
+    boolean email_marketing
+    boolean email_security
+    boolean email_social
+    boolean email_updates
+    boolean email_weekly_digest
+    boolean push_comments
+    boolean push_likes
+    boolean push_mentions
+    boolean push_security
+    boolean push_updates
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  ai_insights {
+    uuid id
+    uuid user_id
+    timestamptz generated_at
+    jsonb insights
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  openai_usage {
+    uuid id
+    uuid user_id
+    int year
+    int month
+    int query_count
+    int tokens_used
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  profiles ||--|| subscriptions : "1:1"
+  profiles ||--|| user_preferences : "1:1"
+  profiles ||--|| notification_preferences : "1:1"
+  profiles ||--o{ accounts : "1:N"
+  profiles ||--o{ transactions : "1:N"
+  profiles ||--o{ ai_insights : "1:N"
+  profiles ||--o{ openai_usage : "1:N"
+  accounts ||--o{ transactions : "from_account"
+  accounts ||--o{ transactions : "to_account"
+```
+
 8.1.3. Zrzuty ekranu interfejsu użytkownika  
 8.2. Materiały techniczne  
 8.2.1. Raporty z testów (Vitest, Playwright, Lighthouse)  

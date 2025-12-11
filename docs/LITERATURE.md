@@ -5,24 +5,18 @@
   2. [[link]](https://supabase.com/docs) Dokumentacja Supabase — Supabase (2025)
   3. [[link]](https://docs.stripe.com/) Dokumentacja Stripe — Stripe (2025)
   4. [[link]](https://platform.openai.com/docs/) Dokumentacja OpenAI — OpenAI (2025)
-  5. [[link]](https://www.typescriptlang.org/docs/) Dokumentacja TypeScript — Microsoft TypeScript Team (2025)
-  6. [[link]](https://react.dev/) Dokumentacja React — React Team (2025)
-  7. [[link]](https://tailwindcss.com/) Dokumentacja TailwindCSS — Tailwind Labs (2025)
-  8. [[link]](https://www.postgresql.org/docs/) Dokumentacja PostgreSQL — PostgreSQL Global Development Group (2025)
-  9. [[link]](https://vercel.com/docs) Dokumentacja Vercel — Vercel (2025)
-  10. [[link]](https://upstash.com/docs/introduction) Dokumentacja Upstash — Upstash (2025)
-  11. [[link]](https://getpino.io/#/) Dokumentacja Pino — Pino Team (2025)
-  12. [[link]](https://docs.sentry.io/) Dokumentacja Sentry — Sentry (2025)
-  13. [[link]](https://ui.shadcn.com/) Dokumentacja shadcn.ui — shadcn (2025)
-  14. [[link]](https://zod.dev/) Dokumentacja Zod — Zod (2025)
-  15. [[link]](https://vitest.dev/guide/) Dokumentacja Vitest — Vitest (2025)
-  16. [[link]](https://playwright.dev/) Dokumentacja Playwright — Microsoft (2025)
-  17. [[link]](https://developers.google.com/identity/protocols/oauth2) Dokumentacja OAuth 2.0 — Google Developers (2025)
-  18. [[link]](https://cursor.com/docs) Dokumentacja Cursor — Cursor (2025)
-  19. [[link]](https://www.w3.org/TR/WCAG21/) Dokumentacja WCAG — W3C (2025)
-  20. [[link]](https://owasp.org/www-project-top-ten/?utm_source=chatgpt.com) Dokumentacja OWASP — OWASP (2025)
-  21. [[link]](https://www.rfc-editor.org/rfc/rfc7519) Dokumentacja JWT — IETF (2025)
-  22. [[link]](https://developer.mozilla.org/en-US/docs/Web/Security) Dokumentacja MDN Web Security — Mozilla (2025)
+  5. [[link]](https://www.postgresql.org/docs/) Dokumentacja PostgreSQL — PostgreSQL Global Development Group (2025)
+  6. [[link]](https://vercel.com/docs) Dokumentacja Vercel — Vercel (2025)
+  7. [[link]](https://upstash.com/docs/introduction) Dokumentacja Upstash — Upstash (2025)
+  8. [[link]](https://getpino.io/#/) Dokumentacja Pino — Pino Team (2025)
+  9. [[link]](https://docs.sentry.io/) Dokumentacja Sentry — Sentry (2025)
+  10. [[link]](https://zod.dev/) Dokumentacja Zod — Zod (2025)
+  11. [[link]](https://vitest.dev/guide/) Dokumentacja Vitest — Vitest (2025)
+  12. [[link]](https://playwright.dev/) Dokumentacja Playwright — Microsoft (2025)
+  13. [[link]](https://developers.google.com/identity/protocols/oauth2) Dokumentacja OAuth 2.0 — Google Developers (2025)
+  14. [[link]](https://www.w3.org/TR/WCAG21/) Dokumentacja WCAG — W3C (2025)
+  15. [[link]](https://owasp.org/www-project-top-ten/?utm_source=chatgpt.com) Dokumentacja OWASP — OWASP (2025)
+  16. [[link]](https://www.rfc-editor.org/rfc/rfc7519) Dokumentacja JWT — IETF (2025)
 - Książki & artykuły naukowe
   1. Finwise[[link]](https://agorism.dev/book/software-architecture/%28Robert%20C.%20Martin%20Series%29%20Robert%20C.%20Martin%20-%20Clean%20Architecture_%20A%20Craftsman%E2%80%99s%20Guide%20to%20Software%20Structure%20and%20Design-Prentice%20Hall%20%282017%29.pdf) Clean Architecture by Martin, R. C.
 
@@ -46,7 +40,7 @@
   17. Data Science for Business — Provost & Fawcett (2013) https://helion.pl/ksiazki/data-science-for-business-what-you-need-to-know-about-data-mining-and-data-analytic-thinking-foster-provost-tom-fawcett,e_2g6i.htm?srsltid=AfmBOoqc3nO6bj99WQPbZodQmn7Xbj32IK4L5hkJIHyFXP_jy46CrxSo#format/e
   18. Cloud Computing: Concepts, Technology & Architecture — Erl, Puttini & Mahmood (2013) https://ptgmedia.pearsoncmg.com/images/9780133387520/samplepages/0133387526.pdf
   19. Ethics of Artificial Intelligence — Müller (2020) https://arxiv.org/abs/2508.16658
-  20. FinTech Adoption and Consumer Behavior — Jung et al. (2018) https://link.springer.com/article/10.1007/s12525-017-0279-9 
+  20. FinTech Adoption and Consumer Behavior — Jung et al. (2018) https://link.springer.com/article/10.1007/s12525-017-0279-9
   21. Hendershott, T. i in. (2021). Artykuł opublikowany w _Information Systems Research_, dotyczący personalizacji, analizy danych i satysfakcji użytkowników w aplikacjach finansowych. https://faculty.haas.berkeley.edu/hender/fintech_intro.pdf
   22. Cao, L., Yang, L. & Yu, P. (2020). Praca dotycząca zastosowania metod predykcyjnych i uczenia maszynowego w analizie danych finansowych.
   23. Lim, S. i in. (2019). Publikacja z zakresu ekonomii behawioralnej, omawiająca m.in. present bias, anchoring oraz nadmierną pewność siebie w decyzjach finansowych.https://www.researchgate.net/publication/327091706_An_Empirical_Study_of_the_Impacts_of_Perceived_Security_and_Knowledge_on_Continuous_Intention_to_Use_Mobile_Fintech_Payment_Services
@@ -56,13 +50,5 @@
   27. Pfleeger, C. P. & Pfleeger, S. L. (2015). Security in Computing (5th ed.). Pearson. https://fullpdfword.org/look-up/mL5B28/602676/4965447-security-in-computing-by-charles-p-pfleeger
   28. Anderson, R. (2020). Security Engineering: A Guide to Building Dependable Distributed Systems (3rd ed.). Wiley. https://www.cl.cam.ac.uk/archive/rja14/Papers/SEv3.pdf
   29. Arslanian, H. & Fischer, F. (2020). The Future of Finance: The Impact of FinTech, AI, and Crypto on Financial Services. Palgrave Macmillan. https://link.springer.com/book/10.1007/978-3-030-14533-0
-  30. IETF (2012). The OAuth 2.0 Authorization Framework (RFC 6749). https://datatracker.ietf.org/doc/html/rfc6749
-  31. Leong, K. i in. (2017). Publikacja dotycząca modeli monetyzacji (subskrypcje, freemium) oraz zachowań użytkowników w usługach cyfrowych, w tym aplikacjach finansowych. https://www.sciencedirect.com/science/article/pii/S0268401216308180
-  32. Hua, G. i in. (2019). Artykuł analizujący wpływ przejrzystości kosztów i struktury opłat na zaufanie oraz satysfakcję użytkowników platform finansowych. https://www.emerald.com/imds/article-abstract/119/7/1401/391339/Current-practices-new-insights-and-emerging-trends?redirectedFrom=fulltext
-
-zrodla do usuniecia:
-
-- [[link]](https://journalstar.in/wp-content/uploads/2025/04/202561037.pdf) AI Powered Personal Finance Management System — N. Subasri et al. (2025)
-- [[link]](https://www.researchgate.net/profile/Asad-Ali-39/publication/389913366_S_E_M_I_N_A_R_F_I_N_T_E_C_H_S_A_N_D_D_I_G_I_T_I_Z_A_T_I_O_N_OF_B_A_N_K_I_N_G_User_Experience_UX_and_User_Interface_UI_of_Fintech_Apps_Chair_of_Banking_and_Finance_Influence_of_UXUI_Design_on_User_Sati/links/67d888b67c5b5569dcc036f6/S-E-M-I-N-A-R-F-I-N-T-E-C-H-S-A-N-D-D-I-G-I-T-I-Z-A-T-I-O-N-OF-B-A-N-K-I-N-G-User-Experience-UX-and-User-Interface-UI-of-Fintech-Apps-Chair-of-Banking-and-Finance_Influence_of_UX-UI_Design-on-User-Sa.pdf) UX and UI of Fintech Apps — Asad Ali (2024)
-- [[link]](https://www.sciengine.com/doi/pdf/54db5f7a1ecf4bd98cd70490881af757) Software-as-a-service (SaaS): perspectives and challenges — W. T. Tsai et al. (2014)
-- [[link]](https://creativa.legal/wp-content/uploads/2023/02/EBOOK-CREATIVA-SAAS-2023-1.pdf) Budowa i wdrożenie aplikacji Saas — Szczudło & Skrzypecka (2023)
+  30. Leong, K. i in. (2017). Publikacja dotycząca modeli monetyzacji (subskrypcje, freemium) oraz zachowań użytkowników w usługach cyfrowych, w tym aplikacjach finansowych. https://www.sciencedirect.com/science/article/pii/S0268401216308180
+  31. Hua, G. i in. (2019). Artykuł analizujący wpływ przejrzystości kosztów i struktury opłat na zaufanie oraz satysfakcję użytkowników platform finansowych. https://www.emerald.com/imds/article-abstract/119/7/1401/391339/Current-practices-new-insights-and-emerging-trends?redirectedFrom=fulltext
