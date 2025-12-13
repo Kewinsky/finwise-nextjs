@@ -2,25 +2,25 @@
 
 # 4. IMPLEMENTACJA
 
-Rozdział czwarty przenosi opis systemu Finwise z poziomu wymagań i architektury na poziom faktycznej realizacji w kodzie, konfiguracjach i integracjach zewnętrznych. W tej części przedstawiono, w jaki sposób zaprojektowany w rozdziale trzecim model domenowy, architektura SaaS oraz wymagania niefunkcjonalne zostały odwzorowane przy użyciu stosu technologicznego opartego na Next.js, Supabase, Stripe, OpenAI API, Upstash Redis oraz usługach chmurowych Vercel.
+Rozdział czwarty przenosi opis systemu Finwise z poziomu wymagań i architektury na poziom faktycznej realizacji w kodzie, konfiguracjach i integracjach zewnętrznych. W tej części przedstawiono, w jaki sposób zaprojektowany w rozdziale trzecim model domenowy, architektura SaaS oraz wymagania niefunkcjonalne zostały odwzorowane przy użyciu wybranego stosu technologicznego.
 
-## 4.1. Stack technologiczny
+## 4.1. Stos technologiczny
 
-W tej części przedstawiono technologie wchodzące w skład stosu Finwisem który oparty jest na nowoczesnym ekosystemie JavaScript oraz usługach typu BaaS. Implementacja łączy Next.js 15 z App Routerem, silne typowanie w TypeScript, system stylowania oparty na TailwindCSS i komponentach shadcn/ui, a także usługi Supabase, Stripe, OpenAI, Upstash oraz narzędzia Vercel, Pino i Sentry, tworząc spójny szkielet aplikacji SaaS.
+W tej części opisano elementy stosu technologicznego, opartego na nowoczesnym ekosystemie JavaScript oraz usługach typu BaaS. Implementacja wykorzystuje Next.js 15 z App Routerem, statyczne typowanie w TypeScript, system stylowania oparty na TailwindCSS i komponentach shadcn/ui, a także usługi Supabase, Stripe, OpenAI, Upstash oraz narzędzia Vercel, Pino i Sentry, które wspólnie tworzą spójny szkielet aplikacji SaaS.
 
 ### 4.1.1. Next.js, TypeScript, TailwindCSS, shadcn/ui
 
-Do implementacji warstwy prezentacji i logiki interfejsu użytkownika wykorzystano framework Next.js 15.5.7 oparty na React 19, w trybie App Router. Aplikacja działa w architekturze serverless na Vercel, co pozwala łączyć serwerowe komponenty Reacta, server actions oraz klasyczne API routes w ramach jednego monolitu aplikacyjnego. Cały kod pisany jest w TypeScript w trybie `strict`, dzięki czemu typy domenowe (np. profile użytkowników, subskrypcje, transakcje) są spójne z typami generowanymi z bazy danych Supabase i wykorzystywane na wszystkich poziomach, od serwisów po komponenty UI.
+Do implementacji warstwy prezentacji i logiki interfejsu użytkownika wykorzystano framework Next.js 15.5.7 oparty na React 19, w trybie App Router. Aplikacja działa w architekturze serverless, co pozwala łączyć serwerowe komponenty Reacta, server actions oraz klasyczne API routes w ramach jednego monolitu aplikacyjnego. Cały kod pisany jest w TypeScript w trybie `strict`, dzięki czemu typy domenowe (np. profile użytkowników, subskrypcje, transakcje) są spójne z typami generowanymi z bazy danych Supabase i wykorzystywane na wszystkich poziomach, od serwisów po komponenty UI.
 
 System stylowania oparto na TailwindCSS 4, który zapewnia narzędziową składnię klas CSS oraz ułatwia budowanie responsywnych widoków dashboardu, list kont i formularzy. Na tej warstwie osadzono bibliotekę komponentów shadcn/ui bazującą na Radix UI. W projekcie wykorzystano m.in. komponenty przycisków, formularzy, przełączników trybu ciemnego, kart oraz modalnych okien dialogowych. Komponenty te są dostosowane do potrzeb Finwise, a ich integracja z TailwindCSS umożliwia zachowanie spójnej „gramatyki wizualnej” w całej aplikacji.
 
-Formularze (m.in. rejestracji, logowania, aktualizacji profilu, konfiguracji subskrypcji) zaimplementowano z użyciem React Hook Form oraz walidacji schematów Zod, zgodnie z podejściem _schema‑first_ opisanym w oficjalnej dokumentacji. Dzięki temu walidacja wejścia jest wykonywana zarówno po stronie klienta, jak i na poziomie server actions, a błędy walidacyjne są zwracane w ujednoliconym formacie i mapowane na komunikaty interfejsu (Zod Documentation, 2025).
+Formularze (m.in. rejestracji, logowania, aktualizacji profilu, konfiguracji subskrypcji) zaimplementowano z użyciem React Hook Form oraz walidacji schematów Zod, zgodnie z podejściem schema-first opisanym w oficjalnej dokumentacji. Dzięki temu walidacja danych wejsciowych jest wykonywana zarówno po stronie klienta, jak i na poziomie server actions, a błędy walidacyjne są zwracane w ujednoliconym formacie i mapowane na komunikaty interfejsu (Zod Documentation, 2025).
 
 ### 4.1.2. Supabase, PostgreSQL, OAuth2, JWT
 
-Warstwa danych Finwise opiera się na Supabase, który udostępnia zarządzaną instancję PostgreSQL oraz moduł uwierzytelniania Supabase Auth. Wdrożono w niej model danych opisany w rozdziale trzecim, obejmujący tabele profiles, subscriptions, user_preferences, notification_preferences, a także domenowe tabele finansowe accounts i transactions oraz tabelę ai_insights przechowującą wygenerowane przez moduł AI podsumowania. Baza danych wykorzystuje typy wyliczeniowe PostgreSQL (subscription_status, user_role, account_type, transaction_type), które ograniczają możliwe wartości pól stanu subskrypcji, roli użytkownika oraz rodzaju konta i transakcji, oraz zestaw indeksów zoptymalizowanych pod najczęstsze zapytania, takie jak wyszukiwanie subskrypcji po użytkowniku czy filtrowanie transakcji po dacie i typie (PostgreSQL Documentation, 2025).
+Warstwa danych Finwise opiera się na Supabase, który udostępnia zarządzaną instancję PostgreSQL oraz moduł uwierzytelniania Supabase Auth. Wdrożono w niej model danych opisany w rozdziale trzecim, obejmujący tabele profiles, subscriptions, user_preferences, notification_preferences, a także domenowe tabele finansowe accounts i transactions oraz tabelę ai_insights przechowującą wygenerowane przez moduł AI podsumowania. Baza danych wykorzystuje typy wyliczeniowe PostgreSQL (subscription_status, user_role, account_type, transaction_type), które ograniczają możliwe wartości pól stanu subskrypcji, roli użytkownika oraz rodzaju konta i transakcji, oraz zestaw indeksów zoptymalizowanych pod najczęstsze zapytania, takie jak wyszukiwanie subskrypcji po użytkowniku czy filtrowanie transakcji po dacie i typie.
 
-Supabase Auth zapewnia implementację protokołu OAuth2 oraz sesji opartych na tokenach JWT, zgodnie z oficjalnymi przewodnikami i specyfikacjami. W aplikacji udostępniono kilka metod logowania: logowanie bezhasłowe z użyciem magic link oraz integracje OAuth z dostawcami takimi jak GitHub i Google. Po stronie Next.js sesje użytkowników obsługiwane są przez middleware, który przy każdym żądaniu odczytuje ciasteczka, weryfikuje ważność tokenu i w razie potrzeby odświeża go z użyciem refresh tokena (Supabase Documentation, 2025).
+Supabase Auth zapewnia implementację protokołu OAuth2 oraz sesji opartych na tokenach JWT, zgodnie z oficjalnymi przewodnikami i specyfikacjami. W aplikacji udostępniono dwie metody logowania: logowanie bezhasłowe z użyciem magic link oraz integracje OAuth z dostawcami takimi jak GitHub i Google. Po stronie Next.js sesje użytkowników obsługiwane są przez middleware, który przy każdym żądaniu odczytuje ciasteczka, weryfikuje ważność tokenu i w razie potrzeby odświeża go z użyciem refresh tokena (Supabase Documentation, 2025).
 
 Bezpieczeństwo danych użytkownika w warstwie bazy realizowane jest za pomocą mechanizmu Row Level Security. Dla tabel `profiles` i `subscriptions` zdefiniowano polityki RLS, które wymuszają zgodność identyfikatora użytkownika z funkcją `auth.uid()`, dzięki czemu warstwa aplikacji nie musi ręcznie filtrować rekordów po kolumnie `user_id`. Operacje administracyjne i webhooki Stripe korzystają z tzw. service role client, który działa w osobnej roli serwisowej i może obchodzić RLS wyłącznie w ściśle określonych miejscach, takich jak synchronizacja subskrypcji.
 
@@ -36,7 +36,7 @@ Do implementacji mechanizmów rate limiting wykorzystano Upstash Redis. W katalo
 
 Cała aplikacja jest budowana i wdrażana na platformie Vercel, która pełni rolę hostingu, CDN oraz środowiska uruchomieniowego dla serverless functions. Next.js middleware oraz API routes działają w funkcjach edge lub standardowych lambdach, a statyczne zasoby są serwowane z globalnej sieci CDN minimalizującej opóźnienia. Z perspektywy implementacyjnej sprowadza się to do konfiguracji projektu w pliku konfiguracyjnym Next.js oraz zestawu zmiennych środowiskowych przekazywanych z panelu Vercel (Vercel Documentation, 2025).
 
-Do logowania i monitorowania zastosowano dwa komplementarne narzędzia. Pino służy jako logger strukturalny po stronie serwera - serwisy oraz krytyczne fragmenty server actions wykorzystują ujednolicone komunikaty zdefiniowane w `src/lib/constants/logs.ts`, co umożliwia późniejszą analizę w systemach logujących (Pino Documentation, 2025). Sentry natomiast zapewnia centralne zbieranie błędów i metryk wydajności zarówno po stronie klienta, jak i serwera. W plikach `instrumentation.ts` oraz `sentry/instrumentation-client.ts` skonfigurowano integrację Sentry dla Next.js, włączając rejestrowanie wyjątków, śledzenie transakcji oraz w razie potrzeby, sesyjne nagrania interakcji użytkownika (Sentry Documentation, 2025).
+Do logowania i monitorowania zastosowano dwa komplementarne narzędzia. Pino służy jako logger strukturalny po stronie serwera, co umożliwia późniejszą analizę w systemach logujących (Pino Documentation, 2025). Sentry natomiast zapewnia centralne zbieranie błędów i metryk wydajności zarówno po stronie klienta, jak i serwera (Sentry Documentation, 2025).
 
 ## 4.2. Frontend
 
@@ -47,8 +47,8 @@ W tej części opisano implementację warstwy frontendowej Finwise: strukturę a
 Implementację warstwy widoków oparto na App Routerze Next.js. W katalogu `src/app` wprowadzono podział na segmenty odpowiadające odmiennym kontekstom nawigacyjnym:
 
 - `(auth)` – zestaw stron logowania, rejestracji, resetu hasła oraz potwierdzenia wysłania wiadomości e‑mail,
-- `(protected)` – widoki wymagające uwierzytelnienia, w tym główny dashboard, listy kont i transakcji oraz ustawienia profilu i subskrypcji,
 - `(public)` – strony ogólnodostępne, takie jak strona główna i sekcja cennika.
+- `(protected)` – widoki wymagające uwierzytelnienia, w tym główny dashboard, listy kont i transakcji oraz ustawienia profilu i subskrypcji,
 
 Każdy segment posiada własny plik `layout.tsx`, w którym zdefiniowano szkielet interfejsu: nagłówek, pasek boczny (w przypadku panelu użytkownika), przełącznik trybu ciemnego oraz wrapper odpowiedzialny za wyświetlanie komunikatów o błędach i powiadomień. Dzięki temu poszczególne widoki mogą koncentrować się wyłącznie na logice domenowej i prezentacji danych.
 
@@ -83,7 +83,7 @@ sequenceDiagram
 
 Diagram 7. Przebieg rejestracji użytkownika z wykorzystaniem server actions i Supabase.
 
-Ten sam wzorzec – formularz klienta, walidacja po stronie serwera, wywołanie warstwy serwisów, zapis w Supabase – został wykorzystany w implementacji innych operacji: logowania, aktualizacji profilu, tworzenia sesji Checkout Stripe czy modyfikacji preferencji użytkownika. Dzięki spójnemu wykorzystaniu server actions możliwe jest zachowanie czystego rozdziału odpowiedzialności między UI, HTTP a logiką domenową.
+Ten sam wzorzec został wykorzystany w implementacji innych operacji: logowania, aktualizacji profilu, tworzenia sesji Checkout Stripe czy modyfikacji preferencji użytkownika. Dzięki spójnemu wykorzystaniu server actions możliwe jest zachowanie czystego rozdziału odpowiedzialności.
 
 ### 4.2.2. System komponentów i stylowanie (TailwindCSS, shadcn/ui)
 
@@ -96,9 +96,7 @@ Na poziomie komponentów UI Finwise wykorzystuje kombinację TailwindCSS i shadc
 
 TailwindCSS zapewnia spójną warstwę stylowania opartą na klasach utility, co w połączeniu z komponentami shadcn/ui pozwala szybko budować złożone widoki, takie jak dashboard czy listy transakcji, bez rozpraszania logiki na wiele arkuszy CSS. Kluczowe kolory, spacing i typografia zostały skonfigurowane w jednym miejscu, co ułatwia utrzymanie kontrastów i czytelności zgodnych z wymaganiami WCAG.
 
-W widokach krytycznych dla doświadczenia użytkownika – np. dashboardzie – zastosowano kompozycję komponentów serwerowych i klienckich. Dane finansowe (profile, subskrypcje, podstawowe metryki) pobierane są w komponentach serwerowych z wykorzystaniem klienta Supabase dla serwera, natomiast interaktywne elementy UI, takie jak wykresy, przełączniki zakresu czasowego czy wywołania modułu AI, działają jako komponenty klienckie, reużywające te same typy i schematy walidacji.
-
-Warto podkreślić, że system komponentów zbudowano w ścisłym powiązaniu z modelem danych: karty na dashboardzie korzystają bezpośrednio z zagregowanych danych finansowych użytkownika (np. miesięczne sumy przychodów i wydatków, udział poszczególnych kategorii w strukturze kosztów, zmiany sald w czasie), a formularze edycji profilu i preferencji mapują się bezpośrednio na kolumny tabel `profiles`, `user_preferences` i `notification_preferences`.
+W widokach krytycznych dla doświadczenia użytkownika np. dashboardzie, zastosowano kompozycję komponentów serwerowych i klienckich. Dane finansowe (profile, subskrypcje, podstawowe metryki) pobierane są w komponentach serwerowych z wykorzystaniem klienta Supabase dla serwera, natomiast interaktywne elementy UI, takie jak wykresy, przełączniki zakresu czasowego czy wywołania modułu AI, działają jako komponenty klienckie, korzystajac przy tym z tych samych typow i schematow walidacji.
 
 ### 4.2.3. Mechanizmy personalizacji UI oraz tryby dostępności
 
@@ -120,7 +118,7 @@ Warstwa backendowa Finwise została zorganizowana wokół jasnego podziału na s
 
 ### 4.3.1. Warstwa usług i integracje Supabase
 
-Logika biznesowa Finwise została wydzielona do dedykowanej warstwy serwisów umieszczonej w katalogu `src/services`. Każdy serwis odpowiada za odrębny fragment domeny, m.in.:
+Logika biznesowa Finwise została wydzielona do dedykowanej warstwy serwisów umieszczonej w katalogu `src/services`. Każdy serwis odpowiada za odrębny fragment domeny:
 
 - `AuthService` – operacje uwierzytelniania i zarządzania sesją,
 - `BillingService` – integracja ze Stripe i obsługa przepływów płatności,
@@ -136,7 +134,7 @@ Integracja z Supabase opiera się na dwóch typach klientów:
 - kliencie RLS (`createClientForServer`), wykorzystywanym w operacjach wykonywanych w imieniu użytkownika, gdzie każde zapytanie do bazy danych jest filtrowane przez polityki Row Level Security,
 - kliencie serwisowym (`createServiceClient`), używanym wyłącznie w kontekstach zaufanych (np. webhooki Stripe), gdzie konieczne jest obejście RLS i wykonanie operacji na wielu użytkownikach jednocześnie.
 
-Serwisy domenowe nie zawierają wiedzy o tym, skąd pochodzi klient – dzięki temu ten sam kod może działać zarówno w kontekście żądania użytkownika (np. server action wywołana z formularza w przeglądarce), jak i operacji wykonywanych w tle, takich jak obsługa webhooków Stripe działająca poza kontekstem konkretnego żądania interfejsu. W praktyce server actions odpowiadają za pozyskanie odpowiedniego klienta i przekazanie go do serwisu, a następnie za mapowanie wyniku na odpowiedź HTTP lub przekierowanie.
+Serwisy domenowe nie zawierają wiedzy o tym, skąd pochodzi klient, dzięki temu ten sam kod może działać zarówno w kontekście żądania użytkownika (np. server action wywołana z formularza w przeglądarce), jak i operacji wykonywanych w tle, takich jak obsługa webhooków Stripe działająca poza kontekstem konkretnego żądania interfejsu. W praktyce server actions odpowiadają za pozyskanie odpowiedniego klienta i przekazanie go do serwisu, a następnie za mapowanie wyniku na odpowiedź HTTP lub przekierowanie.
 
 Na potrzeby implementacji warstwy danych przyjęto schemat bazy odpowiadający diagramowi ERD przedstawionemu w rozdziale trzecim. Wysokopoziomowa relacja pomiędzy kluczowymi tabelami wygląda następująco:
 
@@ -184,16 +182,16 @@ W warstwie aplikacyjnej sesje użytkowników są zarządzane przez Supabase Auth
 - przekierowuje użytkownika na `/login` w przypadku dostępu do tras chronionych bez uwierzytelnienia,
 - przekierowuje użytkownika na `/dashboard` w przypadku prób wejścia na strony logowania/rejestracji mając już aktywną sesję.
 
-Schemat przepływu autoryzacji i odświeżania tokenów odpowiada sekwencji opisanej w rozdziale trzecim. W praktyce oznacza to, że komponenty serwerowe i server actions nie muszą ręcznie parsować tokenów – korzystają z metod `supabase.auth.getUser()`, które uwzględniają aktualny stan sesji i obowiązujące polityki RLS.
+W praktyce oznacza to, że komponenty serwerowe i server actions nie muszą ręcznie parsować tokenów – korzystają z metod `supabase.auth.getUser()`, które uwzględniają aktualny stan sesji i obowiązujące polityki RLS.
 
 ### 4.3.3. Logowanie zdarzeń i monitoring (Pino, Sentry)
 
-Jak juz wczesniej wspomniano, do logowania i monitoringu wzastosowano narzd: Pino oraz Sentry. Po stronie serwera działa logger Pino, opakowany w pomocnicze funkcje umieszczone w `src/lib/logger.ts`. Serwisy domenowe oraz newralgiczne server actions logują istotne zdarzenia (np. tworzenie użytkownika, aktualizację subskrypcji, błędy integracji Stripe) w formie ustrukturyzowanej, z wykorzystaniem centralnie zdefiniowanych komunikatów w pliku `src/lib/constants/logs.ts`. Taki sposób logowania ułatwia późniejszą analizę oraz integrację z zewnętrznymi systemami obserwowalności.
+Po stronie serwera działa logger Pino, opakowany w pomocnicze funkcje umieszczone w `src/lib/logger.ts`. Serwisy domenowe oraz server actions logują zdarzenia (np. tworzenie użytkownika, aktualizację subskrypcji, błędy integracji Stripe) w formie ustrukturyzowanej, z wykorzystaniem centralnie zdefiniowanych komunikatów w pliku `src/lib/constants/logs.ts`. Taki sposób logowania ułatwia późniejszą analizę oraz integrację z zewnętrznymi systemami obserwowalności.
 
 Sentry pełni rolę nadrzędnego systemu monitoringu błędów i wydajności. Konfigurację Sentry dla części serwerowej umieszczono w `instrumentation.ts`, a dla frontendu – w `sentry/instrumentation-client.ts`. Włączono tam:
 
 - przechwytywanie wyjątków zarówno po stronie serwera, jak i klienta,
-- śledzenie transakcji obejmujących krytyczne ścieżki, takie jak rejestracja, logowanie, generowanie insightów AI czy przepływy płatności,
+- śledzenie transakcji obejmujących krytyczne ścieżki, takie jak rejestracja, logowanie, generowanie podsumowań AI czy przepływy płatności,
 - opcjonalne sesyjne nagrania interakcji użytkownika, wspierające diagnozowanie problemów UX.
 
 Typowy schemat obsługi błędu w server action polega na:
@@ -204,7 +202,7 @@ Typowy schemat obsługi błędu w server action polega na:
 4. wysłaniu wyjątku do Sentry z dodatkowymi tagami (np. `feature=billing`, `plan=pro`),
 5. zwróceniu użytkownikowi uproszczonego, nie wrażliwego komunikatu o błędzie.
 
-Takie podejście realizuje wymagania opisane w rozdziale trzecim: system zapewnia widoczność stanu, umożliwia analizę przyczyn błędów bez ujawniania szczegółów implementacyjnych użytkownikowi końcowemu i stanowi podstawę do dalszej optymalizacji wydajności i niezawodności (Sentry Documentation, 2025).
+Takie podejście realizuje wymagania opisane w rozdziale trzecim: system zapewnia widoczność stanu, umożliwia analizę przyczyn błędów bez ujawniania szczegółów implementacyjnych użytkownikowi końcowemu i stanowi podstawę do dalszej optymalizacji wydajności i niezawodności.
 
 ## 4.4. Integracja płatności Stripe
 
@@ -218,7 +216,7 @@ Konfiguracja integracji Stripe została wyodrębniona do modułu `src/lib/stripe
 - zarządzanie klientami (`createStripeCustomer`, `getStripeCustomer`),
 - operacje na subskrypcjach (odczyt, anulowanie, zmiana planu).
 
-Plany subskrypcyjne (Free, Basic, Pro) zostały zdefiniowane po stronie Stripe jako ceny (`price_id`), a ich mapowanie na wewnętrzne wartości pola `plan_type` w tabeli `subscriptions` odbywa się w warstwie serwisowej oraz w funkcjach obsługujących webhooki. Dzięki temu aplikacja nie musi znać szczegółów struktury cennika Stripe – operuje na abstrakcyjnym typie planu, podczas gdy identyfikatory Stripe pozostają w konfiguracji i w kolumnach `stripe_price_id` oraz `stripe_subscription_id`.
+Plany subskrypcyjne (Free, Basic, Pro) zostały zdefiniowane po stronie Stripe jako ceny (`price_id`), a ich mapowanie na wewnętrzne wartości pola `plan_type` w tabeli `subscriptions` odbywa się w warstwie serwisowej oraz w funkcjach obsługujących webhooki. Dzięki temu aplikacja nie musi znać szczegółów struktury cennika Stripe, a jedynie operuje na abstrakcyjnym typie planu, podczas gdy identyfikatory Stripe pozostają w konfiguracji i w kolumnach `stripe_price_id` oraz `stripe_subscription_id`.
 
 Webhooki Stripe są obsługiwane przez trasę `POST /api/stripe/webhook` w katalogu `src/app/api/stripe/webhook/route.ts`. W uproszczeniu wygląda to następująco:
 
@@ -231,7 +229,7 @@ Funkcja webhooku korzysta z klienta serwisowego Supabase, aby zaktualizować rek
 
 ### 4.4.2. Przepływy billingowe i fakturowanie
 
-Wyjściowym punktem przepływu billingowego po stronie użytkownika jest ekran cennika oraz widoki zarządzania subskrypcją w panelu. W komponentach UI osadzono przyciski, których akcją jest wywołanie odpowiednich server actions z pliku `src/lib/actions/billing-actions.ts`. Przykładowo, akcja `createCheckoutSessionAction(planType)`:
+Wyjściowym punktem przepływu billingowego po stronie użytkownika jest ekran cennika oraz widoki zarządzania subskrypcją w ustawieniach. W komponentach UI osadzono przyciski, których akcją jest wywołanie odpowiednich server actions z pliku `src/lib/actions/billing-actions.ts`. Przykładowo, akcja `createCheckoutSessionAction(planType)`:
 
 - wymusza uwierzytelnienie użytkownika,
 - opcjonalnie stosuje rate limiting dla operacji billingowych,
@@ -272,25 +270,25 @@ sequenceDiagram
 
 Diagram 9. Przepływ płatności subskrypcyjnej w integracji Finwise ze Stripe.
 
-Fakturowanie obsługiwane jest natywnie przez Stripe – aplikacja Finwise nie generuje własnych dokumentów księgowych. Dla potrzeb audytu i obsługi użytkownika możliwe jest pobieranie listy faktur z użyciem funkcji Stripe API (np. `invoices.list`) oraz ewentualne przekazywanie linków do dokumentów na stronach panelu. Tego typu operacje są delegowane do `BillingService` i nie naruszają spójności danych pomiędzy Finwise, a Stripe.
+Fakturowanie obsługiwane jest natywnie przez Stripe. Aplikacja Finwise nie generuje własnych dokumentów księgowych. Dla potrzeb audytu i obsługi użytkownika możliwe jest pobieranie listy faktur z użyciem funkcji Stripe API (np. `invoices.list`) oraz ewentualne przekazywanie linków do dokumentów na stronach panelu. Tego typu operacje są delegowane do `BillingService` i nie naruszają spójności danych pomiędzy Finwise, a Stripe.
 
 ### 4.4.3. Obsługa reklamacji i zwrotów
 
-Obsługa reklamacji i zwrotów w Finwise równiez została obsłuzona w oparciu o mechanizmy Stripe. Potencjalne zwroty i korekty faktur są inicjowane i przetwarzane po stronie Stripe (np. poprzez panel administracyjny Stripe), natomiast aplikacja Finwise reaguje na odpowiednie zdarzenia webhook. W praktyce oznacza to, że:
+Potencjalne zwroty i korekty faktur są inicjowane i przetwarzane po stronie Stripe (np. poprzez panel administracyjny Stripe), natomiast aplikacja Finwise reaguje na odpowiednie zdarzenia webhook. W praktyce oznacza to, że:
 
 - anulowanie subskrypcji przez użytkownika, zwrot płatności lub korekta rachunku skutkują wygenerowaniem zdarzeń typu `customer.subscription.deleted` lub zdarzeń związanych z fakturami,
 - webhook aktualizuje status rekordu w tabeli `subscriptions` (np. na `canceled`, `unpaid` czy `past_due`),
-- interfejs użytkownika – oparty na danych z Supabase – odzwierciedla aktualny stan dostępu do funkcji systemu, np. blokując dostęp do zaawansowanych modułów przy braku aktywnej subskrypcji.
+- interfejs użytkownika odzwierciedla aktualny stan dostępu do funkcji systemu, np. blokując dostęp do zaawansowanych modułów przy braku aktywnej subskrypcji.
 
-Tak zaprojektowany przepływ pozwala utrzymać jedno źródło prawdy w zakresie płatności (Stripe), a jednocześnie zapewnia spójny model uprawnień w aplikacji Finwise. Dzięki wykorzystaniu gotowych mechanizmów Stripe do rozliczania i zwrotów, warstwa implementacyjna systemu koncentruje się na synchronizacji statusów i nie wymaga budowania własnej logiki finansowo‑księgowej.
+Tak zaprojektowany przepływ pozwala utrzymać jedno źródło prawdy w zakresie płatności, a jednocześnie zapewnia spójny model uprawnień w aplikacji Finwise. Dzięki wykorzystaniu gotowych mechanizmów Stripe do rozliczania i zwrotów, warstwa implementacyjna systemu koncentruje się na synchronizacji statusów i nie wymaga budowania własnej logiki finansowo‑księgowej.
 
 ## 4.5. Moduł sztucznej inteligencji
 
-Moduł sztucznej inteligencji Finwise został zaprojektowany jako dodatkowa warstwa usług nadbudowana nad rdzeniem domenowym systemu, której celem jest przekształcanie danych finansowych użytkownika w zrozumiałe spostrzeżenia oraz prowadzenie dialogu w języku naturalnym, przy jednoczesnym zachowaniu kontroli nad kosztami wywołań API i bezpieczeństwem danych. W implementacji wykorzystano OpenAI API (model GPT‑4o‑mini), warstwę serwisową `AIService` i `OpenAIUsageService` oraz dedykowaną tabelę `openai_usage` w bazie danych.
+Moduł sztucznej inteligencji Finwise został zaprojektowany jako dodatkowa warstwa usług nadbudowana nad rdzeniem domenowym systemu, której celem jest przekształcanie danych finansowych użytkownika w zrozumiałe podsumowania oraz prowadzenie dialogu w języku naturalnym, przy jednoczesnym zachowaniu kontroli nad kosztami wywołań API i bezpieczeństwem danych. W implementacji wykorzystano OpenAI API (model GPT‑4o‑mini), warstwę serwisową `AIService` i `OpenAIUsageService` oraz dedykowaną tabelę `openai_usage` w bazie danych.
 
-### 4.5.1. Analiza finansów i spostrzeżenia generowane przez AI
+### 4.5.1. Analiza finansów i podsumowania generowane przez AI
 
-Generowanie finansowych spostrzeżenia przebiega w kilku etapach. Po stronie bazy danych gromadzone są transakcje, konta oraz powiązane z nimi metadane, które w warstwie usług są agregowane do postaci:
+Generowanie finansowych podsumowań przebiega w kilku etapach. Po stronie bazy danych gromadzone są transakcje, konta oraz powiązane z nimi metadane, które w warstwie usług są agregowane do postaci:
 
 - miesięcznych podsumowań przychodów i wydatków,
 - udziałów wydatków w poszczególnych kategoriach,
@@ -300,7 +298,7 @@ Generowanie finansowych spostrzeżenia przebiega w kilku etapach. Po stronie baz
 `AIService` pobiera te dane za pośrednictwem serwisów transakcyjnych i kont, a następnie buduje strukturę kontekstu przekazywaną do OpenAI w formie uporządkowanego promptu. Odpowiedzi modelu są zwracane w ustrukturyzowanym formacie JSON, zawierającym m.in. pola:
 
 - `spendingInsights` – obserwacje dotyczące struktury wydatków,
-- `savingsTips` – spostrzeżenia oszczędnościowe,
+- `savingsTips` – podsumowania oszczędnościowe,
 - `budgetOptimization` – sugestie zmian w budżecie,
 - `areasOfConcern` – wskazania potencjalnie niepokojących trendów.
 
@@ -341,7 +339,7 @@ Takie podejście zapewnia separację odpowiedzialności: przygotowanie danych fi
 
 ### 4.5.2. Chatbot konwersacyjny i zarządzanie kontekstem
 
-Oprócz cyklicznie generowanych spostrzeżeń moduł AI udostępnia użytkownikowi takze chat, w którym można zadawać pytania w języku naturalnym („Dlaczego w tym miesiącu wydałem więcej na jedzenie?”, „Jak wyglądają moje wydatki w porównaniu do poprzedniego miesiąca?”). Implementacja chatbota opiera się na tym samym `AIService`, jednak przepływ danych jest bardziej iteracyjny.
+Oprócz generowanych podsumowań, moduł AI udostępnia użytkownikowi takze chat, w którym można zadawać pytania w języku naturalnym („Dlaczego w tym miesiącu wydałem więcej na jedzenie?”, „Jak wyglądają moje wydatki w porównaniu do poprzedniego miesiąca?”). Implementacja chatbota opiera się na tym samym `AIService`, jednak przepływ danych jest bardziej iteracyjny.
 
 Przebieg komunikacji pomiędzy poszczególnymi komponentami można przedstawić w postaci następującej sekwencji:
 
@@ -369,7 +367,7 @@ sequenceDiagram
 
 Diagram 11. Przepływ żądania w scenariuszu rozmowy użytkownika z asystentem AI.
 
-Kluczowym elementem implementacji jest sposób budowy kontekstu dla modelu. `AIService` nie przekazuje pojedynczych surowych transakcji w nieprzefiltrowanej formie, lecz agregaty, zestawienia i wycinki danych dopasowane do pytania użytkownika (np. transakcje w wybranym okresie lub dla danej kategorii), co ma na celu ograniczenie ilości przekazywanych danych, zmniejszając ryzyko ujawnienia nadmiarowych szczegółów.
+Zasadniczym elementem implementacji jest sposób budowy kontekstu dla modelu. `AIService` nie przekazuje pojedynczych surowych transakcji w nieprzefiltrowanej formie, lecz agregaty, zestawienia i wycinki danych dopasowane do pytania użytkownika (np. transakcje w wybranym okresie lub dla danej kategorii), co ma na celu ograniczenie ilości przekazywanych danych, zmniejszając ryzyko ujawnienia nadmiarowych szczegółów.
 
 Odpowiedź modelu jest rozszerzana o propozycje pytań uzupełniających, co pozwala użytkownikowi płynnie pogłębiać analizę bez konieczności formułowania pytań od zera. W warstwie interfejsu odpowiedzi AI są wyraźnie oznaczone jako sugestie, a nie rekomendacje o statusie „prawdy absolutnej”, co wpisuje się w projektowe założenia przejrzystości i odpowiedzialnego wykorzystania AI z rozdziału drugiego.
 
@@ -408,15 +406,15 @@ async canMakeAPICall(userId: string): Promise<ServiceResult<boolean>> {
 
 Równolegle stosowany jest horyzontalny rate limiting oparty na Upstash Redis, który ogranicza częstotliwość wywołań API w krótkich oknach czasowych (np. 100 żądań na godzinę dla wybranych endpointów). Integracja ta jest wykorzystywana w server actions i API routes, tak aby blokować nadmiernie intensywne wykorzystanie modułu AI niezależnie od liczby posiadanych tokenów czy planu subskrypcyjnego.
 
-W połączeniu z fallbackami (regułowe spostrzeżenia w przypadku przekroczenia limitów lub niedostępności OpenAI) mechanizmy te zapewniają kontrolę kosztów, przewidywalność obciążenia oraz ciągłość działania systemu nawet przy incydentalnych problemach z usługą zewnętrzną.
+W połączeniu z fallbackami (regułowe podsumowania w przypadku przekroczenia limitów lub niedostępności OpenAI) mechanizmy te zapewniają kontrolę kosztów, przewidywalność obciążenia oraz ciągłość działania systemu nawet przy losowych problemach z usługą zewnętrzną.
 
 ## 4.6. Eksport danych i personalizacja
 
 Ostatnia część rozdziału implementacyjnego dotyczy rozwiązań związanych z eksportem danych użytkownika oraz personalizacją interfejsu. W Finwise funkcje te pełnią podwójną rolę: z jednej strony wspierają wymagania dotyczące przejrzystości i kontroli nad danymi, z drugiej, pozwalają dostosować wygląd i zachowanie aplikacji do indywidualnych preferencji użytkowników o różnym poziomie dojrzałości finansowej.
 
-### 4.6.1. Eksport CSV/PDF oraz integracje zewnętrzne
+### 4.6.1. Eksport danych w CSV/JSON
 
-Na poziomie wymagań funkcjonalnych, opisanych w rozdziale trzecim, przewidziano możliwość eksportu transakcji i raportów finansowych do formatów CSV i Excel, z uwzględnieniem filtrów po dacie, kategorii i koncie. W implementacji bazującej na Supabase oznacza to wykorzystanie zapytań selekcyjnych na tabeli transakcji oraz odpowiednie formatowanie danych po stronie warstwy serwisów lub server actions. Przepływ eksportu pokrywa się z ogólnym wzorcem obsługi zapytań w API:
+Na poziomie wymagań funkcjonalnych, opisanych w rozdziale trzecim, przewidziano możliwość eksportu transakcji i raportów finansowych do formatów CSV i JSON, z uwzględnieniem filtrów po dacie, kategorii i koncie. W implementacji bazującej na Supabase oznacza to wykorzystanie zapytań selekcyjnych na tabeli transakcji oraz odpowiednie formatowanie danych po stronie warstwy serwisów lub server actions. Przepływ eksportu pokrywa się z ogólnym wzorcem obsługi zapytań w API:
 
 1. uwierzytelnienie użytkownika i weryfikacja uprawnień,
 2. walidacja parametrów (zakres dat, filtry),
@@ -424,11 +422,9 @@ Na poziomie wymagań funkcjonalnych, opisanych w rozdziale trzecim, przewidziano
 4. serializacja wyników do formatu tekstowego,
 5. zwrócenie pliku lub danych do pobrania przez użytkownika.
 
-Choć implementacja eksportu PDF może wymagać dodatkowych narzędzi (np. generatorów raportów), architektura aplikacji – w szczególności podział na warstwę serwisów i API routes – została przygotowana w sposób umożliwiający rozszerzenie o tego typu mechanizmy bez modyfikacji modelu danych. Tak zaprojektowane rozwiązanie wpisuje się w wymagania rozdziału trzeciego dotyczące prawa użytkownika do przenoszenia danych oraz przejrzystości w kontekście systemów FinTech.
-
 ### 4.6.2. Profile użytkownika i preferencje UI
 
-Podstawą personalizacji w Finwise jest projekt bazy danych obejmujący tabele `profiles`, `user_preferences` i `notification_preferences`. Tabela `profiles` przechowuje kluczowe informacje o użytkowniku (adres e‑mail, imię i nazwisko, rola, znaczniki czasu), a jej rekord jest automatycznie tworzony w wyniku działania funkcji `handle_new_user()` powiązanej z tabelą `auth.users`. Dzięki temu każda osoba, która zarejestrowała się w systemie, ma gwarantowany, spójny profil po stronie bazy.
+Podstawą personalizacji w Finwise jest projekt bazy danych obejmujący tabele `profiles`, `user_preferences` i `notification_preferences`. Rekord w tabeli profiles powstaje automatycznie w momencie rejestracji użytkownika, dzięki czemu każda osoba korzystająca z systemu ma jednoznacznie powiązany profil, stanowiący punkt odniesienia dla dalszych ustawień i preferencji.
 
 Tabela `user_preferences` odpowiada za ustawienia interfejsu:
 

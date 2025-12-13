@@ -2,9 +2,9 @@
 
 # 5. TESTY I WALIDACJA SYSTEMU
 
-Rozdział piąty opisuje, w jaki sposób system Finwise został zweryfikowany pod względem poprawności działania, spójności integracji oraz podstawowych wymagań niefunkcjonalnych. W przeciwieństwie do rozdziału czwartego, który koncentrował się na samej implementacji, tutaj akcent przesunięty jest na praktyczne sprawdzenie, czy zaimplementowany kod rzeczywiście realizuje scenariusze użytkownika opisane w analizie wymagań i czy krytyczne elementy architektury (Supabase, Stripe, moduł AI, interfejs webowy) współpracują ze sobą w przewidywalny sposób.
+Rozdział piąty opisuje, w jaki sposób system Finwise został zweryfikowany pod względem poprawności działania, spójności integracji oraz podstawowych wymagań niefunkcjonalnych. W odróżnieniu od rozdziału czwartego, skupionego na samej implementacji, w tym rozdziale nacisk położono na sprawdzenie, czy zaimplementowany kod rzeczywiście realizuje scenariusze użytkownika opisane w analizie wymagań i czy krytyczne elementy architektury (Supabase, Stripe, moduł AI, interfejs webowy) współpracują ze sobą w przewidywalny sposób.
 
-W testach przyjęto pragmatyczne podejście: zamiast dążyć do pełnego pokrycia liniami kodu, skoncentrowano się na minimalnym, ale reprezentatywnym zestawie przypadków testowych. Każdy z poziomów testowania – jednostkowy, integracyjny, end‑to‑end oraz pomiary wydajności – został dobrany tak, aby pokrywać te fragmenty systemu, które są kluczowe z punktu widzenia użytkownika oraz architektury SaaS (transakcje finansowe, logowanie i sesje użytkowników, moduł sztucznej inteligencji, integracje płatności, szybkość ładowania strony głównej).
+W testach przyjęto pragmatyczne podejście: zamiast dążyć do pełnego pokrycia liniami kodu, skoncentrowano się na minimalnym, ale reprezentatywnym zestawie przypadków testowych. Każdy z poziomów testowania został dobrany tak, aby pokrywać te fragmenty systemu, które są kluczowe z punktu widzenia użytkownika oraz architektury SaaS.
 
 ## 5.1. STRATEGIA TESTÓW I NARZĘDZIA
 
@@ -65,7 +65,7 @@ Dzięki tym testom można mieć pewność, że najczęściej używane ścieżki 
 
 Trzecia grupa testów jednostkowych dotyczy modułu sztucznej inteligencji. W pliku `src/services/ai.service.test.ts` sprawdzono zachowanie klasy `AIAssistantService` w dwóch wymiarach. Po pierwsze, metoda wewnętrzna `analyzeFinancialData` otrzymuje zagregowane dane finansowe (miesięczne podsumowanie, rozbicie wydatków na kategorie, trendy, salda kont) i na ich podstawie generuje listy wniosków: `spendingInsights`, `savingsTips`, `budgetOptimization` oraz `areasOfConcern`. Testy weryfikują, że przy danych wejściowych odpowiadających "trudnej" sytuacji finansowej (wydatki przewyższają dochody, ujemne saldo na jednym z kont) moduł AI wskazuje to w swoich wnioskach jako obszar wymagający uwagi.
 
-Po drugie, sprawdzono zachowanie metody `generateMockResponse`, która pełni rolę fallbacku w sytuacji, gdy OpenAI API jest niedostępne lub celowo wyłączone. Funkcja ta analizuje treść pytania użytkownika i generuje odpowiedzi oraz sugestie dalszych pytań. W testach przygotowano kilka przykładowych pytań dotyczących wydatków, oszczędzania i stanu kont, a następnie sprawdzono, czy proponowane odpowiedzi zawierają odpowiednie sugestie (np. "Show me my spending by category" w przypadku pytań o wydatki).
+Po drugie, sprawdzono zachowanie metody `generateMockResponse`, która pełni rolę fallbacku w sytuacji, gdy OpenAI API jest niedostępne lub celowo wyłączone. Funkcja ta analizuje treść pytania użytkownika i generuje odpowiedzi oraz sugestie dalszych pytań. W testach przygotowano kilka przykładowych pytań dotyczących wydatków, oszczędzania i stanu kont, a następnie sprawdzono, czy proponowane odpowiedzi zawierają odpowiednie sugestie.
 
 Dzięki połączeniu testów prostych utili, walidacji Zod oraz logiki AI, warstwa testowania jednostkowego zapewnia wystarczajacy poziom pewności, że kluczowe obliczenia i reguły biznesowe w Finwise działają zgodnie z oczekiwaniami, zanim zostaną połączone z zewnętrznymi usługami i warstwą interfejsu.
 
@@ -85,13 +85,13 @@ Drugi zestaw testów integracyjnych obejmuje komunikację z OpenAI. W pliku `int
 
 Trzeci test integracyjny odwołuje się do bazy danych Supabase. Został umieszczony w pliku `integration/supabase/transactions-integration.test.ts` i uruchamia się tylko wtedy, gdy w środowisku testowym zdefiniowane są zmienne `NEXT_PUBLIC_SUPABASE_URL` oraz `SUPABASE_SERVICE_ROLE_KEY`. Test wykorzystuje `createServiceClient` (klienta z uprawnieniami service role, obchodzącego RLS) do utworzenia tymczasowego użytkownika, konta oraz przykładowej transakcji typu `income`. Następnie sprawdza, czy wstawiony rekord ma oczekiwane `user_id` i kwotę. Test ten dowodzi, że aplikacja poprawnie współpracuje z rzeczywistą instancją Supabase.
 
-Podsumowując, testy integracyjne w Finwise koncentrują się na wąskich, ale kluczowych punktach styku z zewnętrznymi usługami – webhooks Stripe, błędach OpenAI oraz podstawowych operacjach na transakcjach w Supabase. Dzięki temu ryzyko subtelnych błędów na granicy aplikacji i usług zewnętrznych zostało istotnie zredukowane, bez potrzeby budowania rozbudowanej infrastruktury mocków.
+Podsumowując, testy integracyjne w Finwise zostały celowo ukierunkowane na niewielki, ale najważniejszy zestaw punktów styku z usługami zewnętrznymi. Takie zawężenie zakresu pozwoliło znacząco ograniczyć ryzyko trudnych do wykrycia błędów na granicy aplikacji i dostawców (Stripe, OpenAI, Supabase), jednocześnie bez konieczności tworzenia rozbudowanej infrastruktury mocków.
 
 ## 5.4. TESTY END-TO-END – GŁÓWNE SCENARIUSZE UŻYTKOWNIKA
 
 Testy end‑to‑end (E2E) mają na celu sprawdzenie, czy najważniejsze scenariusze użytkownika można zrealizować w przeglądarce bez błędów, przy współdziałaniu wszystkich warstw systemu. Do ich implementacji wykorzystano bibliotekę Playwright oraz wydzielony katalog `e2e/`.
 
-Wspólnym elementem wszystkich testów E2E jest konsekwentne używanie atrybutów `data-testid` w komponentach UI (formularze, przyciski, wiersze tabel), co pozwala uniknąć kruchych selektorów opartych na strukturze DOM lub treści tekstu, a jednocześnie nie wpływa na dostępność aplikacji.
+Wspólnym elementem wszystkich testów E2E jest konsekwentne używanie atrybutów `data-testid` w komponentach UI (formularze, przyciski, wiersze tabel), co pozwala uniknąć selekorów podatnych na zmiany struktury DOM lub treści tekstu, a jednocześnie nie wpływa na dostępność aplikacji.
 
 ### 5.4.1. Weryfikacja strony głównej
 
@@ -99,7 +99,7 @@ Najprostszym testem E2E jest weryfikacja strony głównej. W pliku `e2e/landing.
 
 ### 5.4.2. Logowanie z użyciem magic linku
 
-Drugi test E2E dotyczy logowania z użyciem magic linku i został zapisany w pliku `e2e/auth.spec.ts`. Scenariusz polega na wejściu na `/login`, wypełnieniu pola e‑mail oraz kliknięciu przycisku wysyłającego link. W pełnym, skonfigurowanym środowisku testowym test oczekuje przekierowania na stronę `/email-sent` i wyświetlenia komunikatu potwierdzającego wysłanie wiadomości. W środowisku deweloperskim, gdzie konfiguracja SMTP lub Supabase może być ograniczona, weryfikacja została osłabiona do sprawdzenia, że formularz pozostaje funkcjonalny i nie generuje błędu po stronie klienta.
+Drugi test E2E dotyczy logowania z użyciem magic linku i został zapisany w pliku `e2e/auth.spec.ts`. Scenariusz polega na wejściu na `/login`, wypełnieniu pola e‑mail oraz kliknięciu przycisku wysyłającego link. W pełnym, skonfigurowanym środowisku testowym test oczekuje przekierowania na stronę `/email-sent` i wyświetlenia komunikatu potwierdzającego wysłanie wiadomości. Test oczekuje przekierowania na stronę /email-sent i wyświetlenia komunikatu potwierdzającego wysłanie wiadomości, co w praktyce weryfikuje poprawność integracji formularza z mechanizmem wysyłki magic linków w Supabase.
 
 ### 5.4.3. Dodawanie transakcji z poziomu dashboardu
 
@@ -117,7 +117,7 @@ Uzupełnieniem testów funkcjonalnych i integracyjnych są pomiary wydajności o
 
 ### 5.5.1. Metodyka pomiarów z użyciem Lighthouse
 
-Do pomiaru wydajności użyto narzędzia **Lighthouse** uruchamianego z poziomu przeglądarki (Chrome DevTools). Analiza została przeprowadzona dla adresu `/` w konfiguracji desktopowej, przy wykorzystaniu domyślnego profilu symulującego wolniejsze łącze sieciowe i ograniczoną moc CPU. Wynik raportu dołączono w formie pliku PDF w Załączniku 8.2.1, co umożliwia jego ponowną analizę lub porównanie z wynikami przyszłych wersji systemu. W tym samym załączniku zebrano również przykładowe raporty z uruchomień testów jednostkowych (Vitest) i end‑to‑end (Playwright).
+Do pomiaru wydajności użyto narzędzia **Lighthouse** uruchamianego z poziomu przeglądarki (Chrome DevTools). Analiza została przeprowadzona dla adresu `/` w konfiguracji desktopowej, przy wykorzystaniu domyślnego profilu symulującego wolniejsze łącze sieciowe i ograniczoną moc CPU. Wynik raportu dołączono w formie pliku PDF w Załączniku 8.2.1, co umożliwia jego ponowną analizę lub porównanie z wynikami przyszłych wersji systemu.
 
 Raport Lighthouse obejmuje cztery główne kategorie: Performance, Accessibility, Best Practices oraz SEO. W przypadku Finwise szczególną uwagę zwrócono na:
 
@@ -132,4 +132,4 @@ Uzyskane wyniki wykazały, że strona główna osiąga niemal maksymalny poziom 
 
 Ograniczenia przyjętego podejścia testowego wynikają głównie z charakteru pracy magisterskiej oraz skali projektu. Testy jednostkowe i integracyjne obejmują najważniejsze fragmenty logiki, a nie każdy możliwy przypadek brzegowy. Testy end‑to‑end koncentrują się na głównych ścieżkach użytkownika i nie pokrywają wszystkich kombinacji błędów czy stanów krawędziowych (np. pracy w trybie offline). Testy integracji z Supabase zostały świadomie ograniczone do scenariusza dodania transakcji przy użyciu klienta service role, aby nie komplikować konfiguracji baz testowych.
 
-Mimo tych ograniczeń, opisany zestaw testów i pomiarów wydajności stanowi solidną podstawę do oceny jakości implementacji Finwise. Zapewnia on równowagę między złożonością a wartością informacyjną i może być w przyszłości rozszerzony o bardziej zaawansowane testy obciążeniowe, monitorowanie produkcyjne czy automatyczne testy regresyjne uruchamiane w pipeline CI/CD.
+Mimo tych ograniczeń, opisany zestaw testów i pomiarów wydajności stanowi solidną podstawę do oceny jakości implementacji Finwise. Zapewnia on równowagę między złożonością, a wartością informacyjną i może być w przyszłości rozszerzony o bardziej zaawansowane testy obciążeniowe, monitorowanie produkcyjne czy automatyczne testy uruchamiane w pipeline CI/CD.
