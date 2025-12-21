@@ -58,9 +58,17 @@ Rozbudowa w tym kierunku wymagałaby ścisłej współpracy z ekspertami finanso
 
 ### 6.2.3. Aplikacja mobilna
 
-Naturalnym uzupełnieniem obecnej wersji Finwise byłoby opracowanie dedykowanej aplikacji mobilnej, umożliwiającej użytkownikom wygodne zarządzanie finansami z poziomu urządzenia mobilnego. Aplikacja mógłby oferować uproszczony interfejs do szybkiego dodawania transakcji, przeglądania kluczowych wskaźników oraz odbierania powiadomień o przekroczeniu budżetu czy pojawieniu się nowych rekomendacji asystenta AI.
+Naturalnym uzupełnieniem obecnej wersji Finwise byłoby opracowanie dedykowanej aplikacji mobilnej, umożliwiającej użytkownikom wygodne zarządzanie finansami z poziomu urządzenia mobilnego. Aplikacja mogłaby oferować uproszczony interfejs do szybkiego dodawania transakcji, przeglądania kluczowych wskaźników oraz odbierania powiadomień o przekroczeniu budżetu czy pojawieniu się nowych rekomendacji asystenta AI.
 
 Z technicznego punktu widzenia rozwój aplikacji mobilnej mógłby zostać zrealizowany w oparciu o technologie wieloplatformowe, pozwalające na współdzielenie logiki z istniejącą aplikacją webową (np. poprzez wspólne API i moduły domenowe). Wymagałoby to jednak dopracowania zagadnień związanych z synchronizacją danych offline, projektowaniem interfejsu pod kątem małych ekranów oraz zapewnieniem spójnego doświadczenia użytkownika między wersją przeglądarkową, a mobilną.
+
+### 6.2.4. Możliwe sposoby komercjalizacji
+
+Architektura i funkcjonalności Finwise zostały zaprojektowany w sposób umożliwiający jego potencjalne wykorzystanie komercyjne w modelu SaaS. Najbardziej oczywistym scenariuszem byłoby oferowanie aplikacji w modelu subskrypcyjnym dla użytkownika indywidualnego (B2C), z rozróżnieniem na plan bezpłatny oraz warianty płatne. Plan podstawowy mógłby obejmować ograniczoną liczbę kont oraz zapytań kierowanych do asystenta AI, podczas gdy plany premium oferowałyby zaawansowane analizy, nielimitowany dostęp do modułu asystenta o rozszerzonych możliwościach oraz priorytetowe wsparcie użytkownika.
+
+Drugim kierunkiem komercjalizacji mogłoby być skierowanie produktu do segmentu B2B lub B2B2C, czyli współpraca z instytucjami finansowymi lub firmami z sektora HR i benefitów pracowniczych. W takim scenariuszu Finwise funkcjonowałby jako narzędzie do edukacji finansowej klientów lub pracowników integrowane z istniejącymi systemami. Podobnie jak Workday, który dostarcza moduły HR i finansowe osadzane w portalach pracowniczych, czy programy wellbeingowe typu Headspace for Work, oferowane firmom jako element ich ekosystemu benefitów. Taki model pozwalałby udostępniać Finwise użytkownikom końcowym za pośrednictwem już istniejących systemów partnerów, przy zachowaniu jednej, wspólnej instancji aplikacji utrzymywanej i rozwijanej centralnie przez dostawcę.
+
+Trzecim, uzupełniającym sposobem komercjalizacji mogłoby być oferowanie wybranych komponentów systemu, w szczególności modułu analitycznego lub asystenta AI, jako usług API dla innych aplikacji finansowych. Przykładem podobnego modelu jest Plaid, który udostępnia integracje z rachunkami bankowymi wyłącznie w formie API wykorzystywanego przez inne aplikacje finansowe (np. aplikacje budżetowe czy inwestycyjne) do pobierania i analizy danych użytkowników. Takie podejście wymagałoby dopracowania mechanizmów autoryzacji, limitowania zapytań oraz rozliczania zużycia zasobów, ale mogłoby otworzyć drogę do współpracy z mniejszymi podmiotami, które nie posiadają własnych zasobów do budowy zaawansowanych modułów analitycznych. Niezależnie od wybranego wariantu, kluczowe znaczenie miałoby dopracowanie kwestii bezpieczeństwa, ochrony danych i zgodności regulacyjnej, które stanowią fundament zaufania w sektorze FinTech.
 
 ## 6.4. Podsumowanie
 
