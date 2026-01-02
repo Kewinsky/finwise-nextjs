@@ -1,206 +1,245 @@
 # Finwise
 
-A modern, AI-powered expense and income tracking app built with Next.js 15, Supabase, Stripe, and TypeScript. Finwise helps you track personal and business finances, analyze income and expenses, and get smart AI insights for better financial decisions.
+## Overview
 
-## 🚀 Features
+- Finwise is an AI-powered SaaS application for personal and business financial management
+- It solves the problem of fragmented financial tracking by providing a unified platform for expense and income tracking, financial analysis, and AI-powered insights
+- Built for individuals and small businesses who need comprehensive financial tracking with intelligent recommendations
 
-### Core Features
+## Key Features
 
-- **AI-Powered Insights**: Smart financial analysis and personalized recommendations
-- **Expense & Income Tracking**: Comprehensive transaction management with automatic categorization
-- **Financial Dashboard**: Real-time overview of your financial health with visual analytics
-- **Goal Tracking**: Set and monitor financial goals with progress indicators
-- **Multi-Account Support**: Track multiple bank accounts, credit cards, and investment accounts
-- **Data Export**: Export financial data in CSV and Excel formats
-- **Team Collaboration**: Share financial insights with family or business partners
-- **Bank-Level Security**: Enterprise-grade encryption and privacy protection
-- **Mobile Optimized**: Responsive design that works perfectly on all devices
-- **Dark/Light Mode**: Theme switching with next-themes
-- **Email System**: Custom email templates with Supabase integration
-- **Rate Limiting**: Built-in rate limiting with Upstash Redis
-- **Type Safety**: Full TypeScript support with Zod validation
+- **AI-Powered Financial Assistant**: Natural language chat interface for asking financial questions, with context-aware responses based on transaction data
+- **Automated Financial Insights**: AI-generated monthly insights including spending patterns, savings recommendations, budget optimization, and areas of concern
+- **Transaction Management**: Create, edit, and delete income, expense, and transfer transactions with categorization
+- **Multi-Account Support**: Track multiple accounts (checking, savings, investment, credit card) with balance management
+- **Financial Dashboard**: Real-time analytics with monthly summaries, category spending breakdowns, spending trends, and account balance history
+- **Subscription Management**: Stripe-integrated subscription plans (Free, Basic, Pro) with checkout, webhooks, and customer portal
+- **Data Export**: Export transactions to CSV and JSON formats with filtering options
+- **User Authentication**: Email/password, magic link, and OAuth (Google, GitHub) authentication via Supabase Auth
+- **User Preferences**: Customizable theme (dark/light mode), language, font, and notification settings
+- **Rate Limiting**: API and authentication rate limiting using Upstash Redis
+- **Error Monitoring**: Production error tracking and performance monitoring with Sentry
 
-### UI Components
+## Tech Stack
 
-- Modern, accessible components with Radix UI primitives
-- Responsive navigation and sidebar
-- Financial form components with validation
-- Transaction tables with sorting and filtering
-- Financial charts and analytics components
-- Toast notifications and modals
+### Frontend
 
-### Developer Experience
+- **Framework**: Next.js 15 (App Router)
+- **UI Library**: React 19
+- **Styling**: Tailwind CSS 4
+- **Component Library**: shadcn/ui, Radix UI primitives
+- **Icons**: Lucide React, Tabler Icons
+- **Forms**: React Hook Form with Zod validation
+- **Charts**: Recharts
+- **Animations**: Motion (Framer Motion)
+- **Theme**: next-themes for dark/light mode
 
-- ESLint and Prettier configuration
-- Husky git hooks
-- TypeScript strict mode
-- Hot reloading and fast refresh
-- Comprehensive error handling
-- Structured logging with Pino
-- Error monitoring with Sentry
-- Performance tracking and session replay
+### Backend
 
-## 📋 Prerequisites
+- **Runtime**: Next.js Server Actions and API Routes
+- **Language**: TypeScript (strict mode)
+- **Authentication**: Supabase Auth (JWT-based)
+- **Database**: Supabase (PostgreSQL) with Row Level Security (RLS)
+- **Payment Processing**: Stripe (Checkout, Subscriptions, Webhooks)
+- **AI Integration**: OpenAI API for financial insights and chat assistant
+- **Rate Limiting**: Upstash Redis
+- **Logging**: Pino (structured logging)
 
-Before you begin, ensure you have the following installed:
+### Infrastructure / Cloud
 
-- **Node.js** 18.17 or later
-- **pnpm** (recommended) or npm/yarn
-- **Git**
+- **Hosting**: Vercel (serverless functions, edge network, CDN)
+- **Database**: Supabase (managed PostgreSQL)
+- **Cache/Rate Limiting**: Upstash Redis
+- **Error Monitoring**: Sentry (error tracking, performance monitoring, session replay)
+- **Email**: Supabase Auth email templates
 
-## 🛠️ Quick Start
+### Tooling & DevOps
 
-### 1. Clone and Install
+- **Package Manager**: pnpm
+- **Linting**: ESLint with TypeScript support
+- **Formatting**: Prettier
+- **Git Hooks**: Husky with lint-staged
+- **Testing**: Vitest (unit/integration), Playwright (E2E)
+- **Type Checking**: TypeScript compiler
+- **Build Tool**: Next.js built-in bundler
 
-```bash
-git clone <your-repository-url>
-cd finwise-nextjs
-pnpm install
-```
+## Architecture & Design
 
-### 2. Environment Setup
+- **Architecture Pattern**: Layered architecture with clear separation between presentation, business logic, and data access layers
+- **Design Patterns**:
+  - Service Layer Pattern: Business logic encapsulated in service classes (TransactionService, AccountService, AIAssistantService, BillingService, etc.)
+  - Server Actions Pattern: Form submissions and mutations via Next.js Server Actions
+  - Repository Pattern: Data access abstraction through Supabase client
+  - Dependency Injection: Services receive dependencies via constructor
+- **Data Flow**:
+  - Client components → Server Actions → Service Layer → Supabase Client → PostgreSQL (with RLS)
+  - Stripe webhooks → API Routes → Service Layer → Database updates
+  - AI requests → Service Layer → OpenAI API → Response processing → Database storage
+- **Security Architecture**:
+  - Multi-layer security: Middleware authentication checks, RLS policies at database level, rate limiting at API level
+  - JWT tokens stored in HTTP-only cookies with automatic refresh
+  - Service role client for webhook operations (bypasses RLS when needed)
 
-```bash
-cp env.example .env.local
-# Edit .env.local with your actual values
-```
-
-### 3. Run Development Server
-
-```bash
-pnpm dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) to see your application.
-
-## 📖 Complete Setup Guide
-
-For detailed setup instructions including all external services (Supabase, Stripe, Upstash Redis, Sentry), see the **[Complete Setup Guide](docs/SETUP_GUIDE.md)**.
-
-The setup guide covers:
-
-- ✅ Supabase database and authentication setup
-- ✅ Stripe payment processing configuration
-- ✅ Rate limiting setup (Upstash Redis)
-- ✅ Error monitoring setup (Sentry)
-- ✅ OAuth provider configuration
-- ✅ Domain and DNS setup
-- ✅ Production deployment
-- ✅ Application configuration
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 finwise-nextjs/
 ├── src/
 │   ├── app/                    # Next.js App Router (pages, layouts, API routes)
-│   ├── services/              # Business logic layer (6 services)
-│   ├── components/            # React components (UI, forms, layouts)
-│   ├── lib/                   # Utilities (actions, stripe, rate limiting)
-│   ├── contexts/              # React contexts (settings, cookies)
+│   │   ├── (auth)/            # Authentication pages (login, signup)
+│   │   ├── (protected)/       # Protected routes (dashboard, transactions, settings)
+│   │   ├── (public)/          # Public pages (landing, pricing)
+│   │   └── api/               # API routes (Stripe webhooks)
+│   ├── components/             # React components
+│   │   ├── accounts/          # Account management components
+│   │   ├── assistant/         # AI chat interface components
+│   │   ├── dashboard/         # Dashboard analytics components
+│   │   ├── transactions/      # Transaction management components
+│   │   ├── settings/          # Settings and preferences components
+│   │   └── ui/                # Reusable UI components (shadcn/ui)
+│   ├── services/              # Business logic layer
+│   │   ├── account.service.ts
+│   │   ├── ai.service.ts
+│   │   ├── auth.service.ts
+│   │   ├── billing.service.ts
+│   │   ├── subscription.service.ts
+│   │   └── transaction.service.ts
+│   ├── lib/                   # Utilities and helpers
+│   │   ├── actions/           # Server actions
+│   │   ├── stripe/            # Stripe integration utilities
+│   │   ├── openai/            # OpenAI client and configuration
+│   │   ├── ratelimit/         # Rate limiting utilities
+│   │   └── constants/         # Error messages, logs
 │   ├── hooks/                 # Custom React hooks
-│   ├── schemas/               # Zod validation schemas
+│   ├── contexts/              # React contexts (settings, AI usage)
 │   ├── types/                 # TypeScript type definitions
-│   ├── utils/                 # Utility functions
-│   └── sentry/                # Error monitoring configuration
-├── database/                  # Database initialization
+│   ├── validation/            # Zod validation schemas
+│   └── middleware.ts          # Next.js middleware for route protection
+├── database/                  # Database initialization scripts
 ├── emails/                    # Email templates
-├── scripts/                   # Utility scripts
-├── docs/                      # Comprehensive documentation
-└── public/                    # Static assets
+├── e2e/                      # Playwright E2E tests
+├── integration/               # Integration tests
+└── docs/                     # Project documentation
 ```
 
-For detailed file structure and architecture information, see [ARCHITECTURE.md](docs/ARCHITECTURE.md).
+## Setup & Local Development
 
-## 🔧 Available Scripts
+### Prerequisites
+
+- Node.js 18.17 or later
+- pnpm (recommended) or npm/yarn
+- Git
+- Supabase account (for database and authentication)
+- Stripe account (for payment processing)
+- Upstash Redis account (for rate limiting)
+- OpenAI API key (for AI features)
+- Sentry account (for error monitoring, optional)
+
+### Installation Steps
+
+1. Clone the repository:
 
 ```bash
-# Development
-pnpm dev              # Start development server
-pnpm build            # Build for production
-pnpm start            # Start production server
-
-# Code Quality
-pnpm lint             # Run ESLint
-pnpm lint:fix         # Fix ESLint errors
-pnpm type-check       # Run TypeScript type checking
-pnpm format           # Format code with Prettier
-pnpm format:check     # Check code formatting
-
-# Maintenance
-pnpm clean            # Clean build cache
-pnpm clean:all        # Clean everything and reinstall
+git clone <repository-url>
+cd finwise-nextjs
 ```
 
-## 📚 Documentation
+2. Install dependencies:
 
-Comprehensive documentation is available in the [`docs/`](docs/) directory:
-
-### Main Documentation
-
-- **[Architecture](docs/ARCHITECTURE.md)** - System architecture, dependencies, and data flows
-- **[Security](docs/SECURITY.md)** - Security features, authentication, and best practices
-- **[Database](docs/DATABASE.md)** - Database schema, setup, and best practices
-- **[API](docs/API.md)** - API routes, integrations, and server actions
-- **[Services](docs/SERVICES.md)** - Services architecture and business logic guide
-- **[Monitoring](docs/MONITORING.md)** - Error tracking, performance monitoring, and Sentry integration
-
-## 📄 License
-
-This project is licensed under the **MIT License**.
-
-### License Summary
-
-**You are free to:**
-
-- ✅ Use this template for commercial and non-commercial projects
-- ✅ Modify and customize the code
-- ✅ Distribute your modified version
-- ✅ Use this template for client projects
-- ✅ Create derivative works
-
-**You must:**
-
-- 📝 Include the original license and copyright notice
-- 📝 Include a copy of the MIT License with your distribution
-
-### Full License
-
-```
-MIT License
-
-Copyright (c) 2025 Finwise
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+```bash
+pnpm install
 ```
 
-For the complete license text, see the [LICENSE](LICENSE) file in the root directory.
+3. Set up environment variables:
 
-## 🙏 Acknowledgments
+```bash
+cp env.example .env.local
+```
 
-- [Next.js](https://nextjs.org/) - React framework
-- [Supabase](https://supabase.com/) - Backend as a Service
-- [Stripe](https://stripe.com/) - Payment processing
-- [Tailwind CSS](https://tailwindcss.com/) - CSS framework
-- [shadcn/ui](https://ui.shadcn.com/) - UI components
-- [Vercel](https://vercel.com/) - Deployment platform
+4. Configure environment variables in `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
+   - `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key
+   - `UPSTASH_REDIS_REST_URL` - Upstash Redis endpoint
+   - `UPSTASH_REDIS_REST_TOKEN` - Upstash Redis token
+   - `STRIPE_SECRET_KEY` - Stripe secret key
+   - `STRIPE_WEBHOOK_SECRET` - Stripe webhook secret
+   - `NEXT_PUBLIC_STRIPE_BASIC_PRICE_ID` - Stripe Basic plan price ID
+   - `NEXT_PUBLIC_STRIPE_PRO_PRICE_ID` - Stripe Pro plan price ID
+   - `OPENAI_API_KEY` - OpenAI API key (optional, set `ENABLE_OPENAI=true` to use)
+   - `SENTRY_AUTH_TOKEN` - Sentry auth token (optional)
 
----
+5. Set up Supabase database:
+   - Run `database/init.sql` in Supabase SQL Editor to create tables, functions, and RLS policies
 
-**Happy coding! 🚀**
+6. Run the development server:
+
+```bash
+pnpm dev
+```
+
+7. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+### Environment Variables
+
+All required environment variables are documented in `env.example`. Key variables include:
+
+- Supabase configuration (database and authentication)
+- Stripe configuration (payment processing)
+- Upstash Redis configuration (rate limiting)
+- OpenAI configuration (AI features)
+- Sentry configuration (error monitoring, optional)
+- Application URLs (for production)
+
+## Deployment
+
+- **Deployment Platform**: Vercel (serverless hosting with edge network and CDN)
+- **Deployment Process**:
+  - Connect GitHub repository to Vercel
+  - Configure environment variables in Vercel dashboard
+  - Automatic deployments on push to main branch
+  - Preview deployments for pull requests
+- **Infrastructure Services**:
+  - Vercel: Application hosting, edge functions, CDN
+  - Supabase: Database and authentication (managed PostgreSQL)
+  - Upstash: Redis for rate limiting
+  - Stripe: Payment processing (hosted checkout)
+  - Sentry: Error monitoring (external service)
+
+## Security & Best Practices
+
+### Authentication / Authorization
+
+- **Authentication Method**: Supabase Auth with JWT tokens
+- **Session Management**:
+  - Access tokens (1 hour expiry) and refresh tokens (7 days expiry)
+  - Tokens stored in HTTP-only cookies with Secure and SameSite flags
+  - Automatic token refresh via Next.js middleware
+- **Authorization**:
+  - Row Level Security (RLS) policies at database level ensure users can only access their own data
+  - Middleware protection for protected routes
+  - Service role client used only for webhook operations (bypasses RLS)
+
+### Data Validation and Error Handling
+
+- **Input Validation**: Zod schemas for all user inputs (transactions, accounts, user preferences)
+- **Error Handling**:
+  - Centralized error messages in `src/lib/constants/errors.ts`
+  - Service layer returns `ServiceResult<T>` type for consistent error handling
+  - User-friendly error messages displayed via toast notifications
+- **Type Safety**: Full TypeScript coverage with strict mode enabled
+
+### Security-Related Practices
+
+- **Rate Limiting**:
+  - Authentication endpoints: 5 requests per 15 minutes per IP
+  - API endpoints: 100 requests per 15 minutes per IP
+  - AI queries: Plan-based limits (Free: 5/month, Basic: 50/month, Pro: unlimited)
+- **Security Headers**:
+  - Content Security Policy (CSP) configured in `next.config.ts`
+  - X-Frame-Options, X-Content-Type-Options, Referrer-Policy headers
+  - Permissions-Policy header for feature restrictions
+- **Password Security**: Handled by Supabase Auth (bcrypt hashing, strength requirements)
+- **CSRF Protection**: SameSite cookie flags and CSRF token validation
+- **SQL Injection Prevention**: Parameterized queries via Supabase client (no raw SQL in application code)
+- **XSS Prevention**: React's built-in XSS protection, CSP headers, input sanitization
