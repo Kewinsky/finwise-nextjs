@@ -58,11 +58,12 @@ This SaaS template is built using a modern, serverless architecture with the fol
 ### External Services
 
 - **Payments**: Stripe (subscriptions, checkout, invoices)
-- **Email**: Resend (transactional emails)
+- **Email**: Supabase Auth (email templates for authentication)
+- **AI**: OpenAI API (financial insights and chat assistant)
 - **Rate Limiting**: Upstash Redis
 - **Hosting**: Vercel (recommended)
 - **CDN**: Vercel Edge Network
-- **Monitoring**: Vercel Analytics + Sentry (optional)
+- **Monitoring**: Sentry (error tracking, performance monitoring)
 
 ### Developer Tools
 
@@ -115,8 +116,8 @@ This SaaS template is built using a modern, serverless architecture with the fol
         │     Auth)       │   └────────────┘  └─────────────────┘
         │                 │
         │  ┌───────────┐  │   ┌────────────┐
-        │  │PostgreSQL │  │   │   Resend   │
-        │  │    DB     │  │   │  (Email)   │
+        │  │PostgreSQL │  │   │   OpenAI   │
+        │  │    DB     │  │   │    API     │
         │  └───────────┘  │   └────────────┘
         └─────────────────┘
 ```
@@ -160,8 +161,9 @@ This SaaS template is built using a modern, serverless architecture with the fol
        │
        │
 ┌──────▼─────┐
-│   Resend   │
-│  (Email)   │
+│   OpenAI   │
+│    API     │
+│  (AI/ML)   │
 └────────────┘
 ```
 
@@ -169,10 +171,10 @@ This SaaS template is built using a modern, serverless architecture with the fol
 
 **Next.js** depends on:
 
-- Supabase: Database queries, authentication
+- Supabase: Database queries, authentication, email templates
 - Stripe: Payment processing
 - Upstash: Rate limiting
-- Resend: Email delivery
+- OpenAI: AI-powered financial insights and chat assistant
 
 **Supabase** provides:
 
@@ -476,8 +478,9 @@ This SaaS template is built using a modern, serverless architecture with the fol
      │ 8. Send confirmation email
      │
 ┌────▼────────────────┐
-│  Resend API         │
+│  Stripe             │
 │  • Send invoice     │
+│  (via webhook)      │
 └────┬────────────────┘
      │
      │ 9. Redirect user
@@ -762,11 +765,12 @@ Browser                 Middleware              Supabase
 │  │  • Set stripe_id     │                                │
 │  └──────┬───────────────┘                                │
 │         │                                                │
-│         │ Send email                                     │
+│         │ Send confirmation                              │
 │         ↓                                                │
 │  ┌──────────────────────┐                                │
-│  │   Resend API         │                                │
+│  │   Stripe             │                                │
 │  │  • Send invoice      │                                │
+│  │  (via webhook)       │                                │
 │  └──────────────────────┘                                │
 └──────────────────────────────────────────────────────────┘
 ```

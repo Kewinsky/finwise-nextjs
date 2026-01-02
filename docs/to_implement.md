@@ -1,4 +1,0 @@
-- importowanie
-- monitorowanie kosztow stalych i subskrybcji
-- open banking
-- budzetowanie

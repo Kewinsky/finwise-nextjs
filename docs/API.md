@@ -19,9 +19,9 @@ This SaaS template uses a combination of:
 
 - **Next.js API Routes**: For webhooks and external integrations
 - **Server Actions**: For form submissions and data mutations
-- **Supabase API**: For database operations
+- **Supabase API**: For database operations and authentication
 - **Stripe API**: For payment processing
-- **Resend API**: For email delivery
+- **OpenAI API**: For AI-powered financial insights and chat assistant
 
 ### API Architecture
 
@@ -46,7 +46,8 @@ This SaaS template uses a combination of:
 
 External APIs:
 ├── Stripe (Payments)
-├── Resend (Emails)
+├── OpenAI (AI Features)
+├── Supabase (Database, Auth, Email Templates)
 └── Upstash (Rate Limiting)
 ```
 
@@ -682,61 +683,55 @@ Ratelimit.slidingWindow(1000, '1 h');
 
 ## Email Service
 
-### Resend Configuration
+### Supabase Auth Email Templates
 
-```typescript
-// src/lib/email.ts
-import { Resend } from 'resend';
-import { env } from '@/schemas/env';
+Emails are handled by Supabase Auth using customizable email templates. The application uses Supabase's built-in email service for:
 
-export const resend = new Resend(env.RESEND_API_KEY);
+- **Signup confirmations**: Email verification links
+- **Magic link authentication**: Passwordless login emails
+- **Password reset**: Password recovery emails
+
+### Email Template Customization
+
+Email templates can be customized in the Supabase Dashboard:
+
+1. Go to **Authentication** → **Email Templates**
+2. Customize templates for:
+   - Signup confirmation
+   - Magic link
+   - Password reset
+   - Email change confirmation
+
+### Custom Email Templates
+
+Custom email templates are stored in `emails/` directory:
+
+```
+emails/
+├── custom/
+│   └── invoice.html          # Custom invoice email template
+└── supabase/
+    ├── magic-link.html       # Magic link template override
+    ├── reset-password.html   # Password reset template override
+    └── signup.html           # Signup template override
 ```
 
-### Sending Emails
+### Email Configuration
 
-**Welcome Email**:
+Email settings are configured in Supabase Dashboard:
 
-```typescript
-export async function sendWelcomeEmail(email: string, name: string) {
-  await resend.emails.send({
-    from: env.EMAIL_FROM,
-    to: email,
-    subject: 'Welcome to Our SaaS!',
-    html: `<h1>Welcome ${name}!</h1><p>Thanks for signing up.</p>`,
-  });
-}
-```
-
-**Invoice Email**:
-
-```typescript
-export async function sendInvoiceEmail(email: string, invoiceUrl: string) {
-  await resend.emails.send({
-    from: env.EMAIL_FROM,
-    to: email,
-    subject: 'Your Invoice is Ready',
-    html: `<p>Download your invoice: <a href="${invoiceUrl}">here</a></p>`,
-  });
-}
-```
-
-### Email Templates
-
-Use React for email templates:
-
-```typescript
-// Note: Email sending is handled automatically by Supabase (auth) and Stripe (billing)
-// No custom email service needed
-
-const html = render(InvoiceEmail({ invoiceUrl }));
+- **SMTP Settings**: Configure custom SMTP (optional)
+- **Email Templates**: Customize HTML templates
+- **Email Rate Limiting**: Built-in protection against spam
 
 await resend.emails.send({
-  from: env.EMAIL_FROM,
-  to: email,
-  subject: 'Your Invoice',
-  html,
+from: env.EMAIL_FROM,
+to: email,
+subject: 'Your Invoice',
+html,
 });
-```
+
+````
 
 ## Error Handling
 
@@ -760,7 +755,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-```
+````
 
 ### Server Action Error Handling
 

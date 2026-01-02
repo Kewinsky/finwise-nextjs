@@ -59,9 +59,23 @@ This creates:
 - ✅ Subscriptions table
 - ✅ User preferences table
 - ✅ Notification preferences table
-- ✅ User sessions table
 - ✅ Row Level Security policies
 - ✅ Database functions and triggers
+
+6. **Set up Financial Management Tables** (Required for Finwise):
+
+1. In the Supabase SQL Editor, create a new query
+1. Copy the entire contents of [`database/finwise-migration.sql`](../database/finwise-migration.sql)
+1. Paste into the SQL editor
+1. Click **"Run"** to execute
+
+This creates:
+
+- ✅ Accounts table (checking, savings, investment, credit card)
+- ✅ Transactions table (income, expense, transfer)
+- ✅ Account balance update triggers
+- ✅ Row Level Security policies for financial data
+- ✅ Indexes for performance optimization
 
 ### Step 1.4: Configure Authentication
 

@@ -97,13 +97,17 @@ finwise-nextjs/
 │   │   ├── transactions/      # Transaction management components
 │   │   ├── settings/          # Settings and preferences components
 │   │   └── ui/                # Reusable UI components (shadcn/ui)
-│   ├── services/              # Business logic layer
+│   ├── services/              # Business logic layer (11 service classes)
 │   │   ├── account.service.ts
 │   │   ├── ai.service.ts
 │   │   ├── auth.service.ts
 │   │   ├── billing.service.ts
+│   │   ├── notification.service.ts
+│   │   ├── openai-usage.service.ts
 │   │   ├── subscription.service.ts
-│   │   └── transaction.service.ts
+│   │   ├── transaction.service.ts
+│   │   ├── user-preferences.service.ts
+│   │   └── user.service.ts
 │   ├── lib/                   # Utilities and helpers
 │   │   ├── actions/           # Server actions
 │   │   ├── stripe/            # Stripe integration utilities

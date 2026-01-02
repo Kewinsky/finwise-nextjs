@@ -84,12 +84,14 @@ This application uses **PostgreSQL** via **Supabase** as its database provider.
 
 The database consists of:
 
-- **4 main tables**: `profiles`, `subscriptions`, `user_preferences`, and `notification_preferences`
+- **6 main tables**: `profiles`, `subscriptions`, `user_preferences`, `notification_preferences`, `accounts`, and `transactions`
 - **1 auth schema**: Managed by Supabase Auth
-- **2 custom enums**: `subscription_status` and `user_role`
+- **4 custom enums**: `subscription_status`, `user_role`, `account_type`, and `transaction_type`
 - **Multiple indexes**: For query performance
 - **RLS policies**: For data security
-- **Triggers**: For automatic updates
+- **Triggers**: For automatic updates (including account balance updates)
+
+**Note**: The financial management tables (`accounts`, `transactions`) are created via `database/finwise-migration.sql` which should be run after the base `database/init.sql` file.
 
 ## Tables
 

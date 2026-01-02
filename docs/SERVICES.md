@@ -32,10 +32,14 @@ Services use centralized error handling with consistent patterns:
 
 ```
 src/services/
-├── auth.service.ts              # Authentication service
+├── account.service.ts           # Account management service
+├── ai.service.ts               # AI assistant and insights service
+├── auth.service.ts             # Authentication service
 ├── billing.service.ts           # Billing and payments service
 ├── notification.service.ts      # Notification preferences service
+├── openai-usage.service.ts      # OpenAI usage tracking service
 ├── subscription.service.ts      # Subscription management service
+├── transaction.service.ts       # Transaction management service
 ├── user-preferences.service.ts  # User preferences service
 ├── user.service.ts              # User profile service
 └── index.ts                     # Service exports
@@ -118,6 +122,61 @@ src/services/
 - `createUserProfile(input)` - Create new profile
 - `searchUsers(filters)` - Search users
 - `getUserMetadata(userId)` - Get user metadata
+
+### AccountService
+
+**File**: `src/services/account.service.ts`  
+**Responsibilities**: Financial account management (checking, savings, investment, credit card)
+
+**Key Methods**:
+
+- `getAccounts(userId, filters?)` - Get all accounts for user
+- `getAccountById(userId, accountId)` - Get account by ID
+- `createAccount(userId, input)` - Create new account
+- `updateAccount(userId, accountId, input)` - Update account
+- `deleteAccount(userId, accountId)` - Delete account
+- `getAccountBalances(userId)` - Get all account balances
+
+### TransactionService
+
+**File**: `src/services/transaction.service.ts`  
+**Responsibilities**: Transaction CRUD, filtering, analytics, and exports
+
+**Key Methods**:
+
+- `getTransactions(userId, filters?, pagination?, sort?)` - Get transactions with filtering
+- `getTransactionById(userId, transactionId)` - Get transaction by ID
+- `createTransaction(userId, input)` - Create new transaction
+- `updateTransaction(userId, transactionId, input)` - Update transaction
+- `deleteTransaction(userId, transactionId)` - Delete transaction
+- `getMonthlySummary(userId)` - Get monthly income/expense summary
+- `getCategorySpending(userId, type)` - Get spending by category
+- `getSpendingTrends(userId, days)` - Get spending trends over time
+- `exportTransactions(userId, filters?, format)` - Export transactions (CSV/JSON)
+
+### AIAssistantService
+
+**File**: `src/services/ai.service.ts`  
+**Responsibilities**: AI-powered financial insights and chat assistant
+
+**Key Methods**:
+
+- `generateInsights(userId)` - Generate automated monthly financial insights
+- `askQuestion(userId, message)` - Answer financial questions using AI
+- `saveInsights(userId, insights)` - Save insights to database
+- `getLatestInsights(userId)` - Get most recent insights
+
+### OpenAIUsageService
+
+**File**: `src/services/openai-usage.service.ts`  
+**Responsibilities**: Track and limit OpenAI API usage per user/plan
+
+**Key Methods**:
+
+- `canMakeAPICall(userId)` - Check if user can make AI query (rate limit check)
+- `recordUsage(userId, tokens, queryType)` - Record API usage
+- `getUsageStats(userId)` - Get usage statistics for current period
+- `getUsageHistory(userId, period?)` - Get historical usage data
 
 ## Usage Patterns
 
